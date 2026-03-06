@@ -31,7 +31,13 @@ test("init scaffolds core files", () => {
   });
 
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("<!-- waypoint:start -->"));
-  assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("If you are not sure whether the bootstrap already ran, run it again."));
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "If you need repo-specific AGENTS instructions, write them outside this managed block."
+    )
+  );
+  assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
+  assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
@@ -42,7 +48,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Earlier chat context or partial memory from the current session does not count as a substitute."
+      "Do not rerun it mid-conversation just because a task becomes more substantial."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "write it outside the managed `waypoint:start/end` block in `AGENTS.md`"
     )
   );
   assert.ok(
@@ -73,6 +84,39 @@ test("doctor is clean after init", () => {
 
   const findings = doctorRepository(root);
   assert.equal(findings.length, 0);
+});
+
+test("init preserves AGENTS content outside the managed block", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-agents-preserve-"));
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  writeFileSync(
+    path.join(root, "AGENTS.md"),
+    [
+      "# Repo Guidance",
+      "",
+      "This text should survive upgrades.",
+      "",
+      readFileSync(path.join(root, "AGENTS.md"), "utf8"),
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
+  assert.ok(agents.includes("This text should survive upgrades."));
+  assert.ok(agents.includes("<!-- waypoint:start -->"));
 });
 
 test("sync installs automation into CODEX_HOME", () => {

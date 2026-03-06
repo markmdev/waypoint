@@ -3,9 +3,18 @@
 
 This repository uses Waypoint as its Codex operating system.
 
+Waypoint owns only the text inside these `waypoint:start/end` markers.
+If you need repo-specific AGENTS instructions, write them outside this managed block.
+Do not put durable repo guidance inside the managed block, because `waypoint init` may replace it during upgrades.
+
 Stop here if the bootstrap has not been run yet.
 
-Before doing substantial work:
+Run the Waypoint bootstrap only in these cases:
+- at the start of a new session
+- immediately after a compaction
+- if the user explicitly tells you to rerun it
+
+Bootstrap sequence:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
 3. Read `.waypoint/agent-operating-manual.md`
@@ -15,9 +24,10 @@ Before doing substantial work:
 
 This is mandatory, not optional.
 
-- Do not inspect code, run searches, read docs, draft plans, or analyze behavior before this bootstrap is complete.
-- Earlier chat context or earlier work in the session does not replace the bootstrap.
-- If you are not sure whether the bootstrap already ran, run it again. It is cheap and safe.
+- Do not skip it at session start or after compaction.
+- Do not rerun it mid-conversation just because a task is substantial.
+- Earlier chat context or earlier work in the session does not replace the bootstrap when a new session starts or a compaction happens.
+- If you are not sure whether a new session started or a compaction happened, rerun it.
 - Do not skip the context refresh or skip files in the manifest.
 
 Working rules:

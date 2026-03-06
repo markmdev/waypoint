@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10
+
+### Patch Changes
+
+- Clarify that repo-specific AGENTS guidance belongs outside the managed Waypoint block, and verify that `waypoint init` preserves custom content outside those markers.
+
 ## 0.1.9
 
 ### Patch Changes

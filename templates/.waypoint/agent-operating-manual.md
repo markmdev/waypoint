@@ -2,9 +2,17 @@
 
 This repository uses Waypoint as its operating system for Codex.
 
+If the repo needs custom AGENTS guidance, write it outside the managed `waypoint:start/end` block in `AGENTS.md`. Treat the managed block as Waypoint-owned and replaceable.
+
 ## Session start
 
-At the start of every session:
+Run the Waypoint bootstrap only:
+
+- at the start of every new session
+- immediately after a compaction
+- when the user explicitly asks for a rerun
+
+Bootstrap sequence:
 
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
@@ -15,9 +23,10 @@ At the start of every session:
 
 Do not skip this sequence.
 
-- Do not read code, search the repo, inspect runtime behavior, or start planning before the sequence is complete.
-- Earlier chat context or partial memory from the current session does not count as a substitute.
-- If you are unsure whether the bootstrap already ran, rerun it instead of guessing.
+- Do not skip it at new-session start or after compaction.
+- Do not rerun it mid-conversation just because a task becomes more substantial.
+- Earlier chat context or partial memory from the current session does not count as a substitute when a new session starts or a compaction happens.
+- If you are unsure whether a new session started or a compaction happened, rerun it instead of guessing.
 
 ## Repository memory model
 

@@ -22,7 +22,7 @@
 
 ## Session bootstrap
 
-Waypoint's session bootstrap is explicit:
+Waypoint's session bootstrap is explicit and event-based:
 
 1. run `.waypoint/scripts/prepare-context.mjs`
 2. read `.waypoint/SOUL.md`
@@ -33,6 +33,6 @@ Waypoint's session bootstrap is explicit:
 
 `prepare-context.mjs` generates both repo-state context and a bounded `RECENT_THREAD.md` from the latest local Codex session for the repo. If the session has compacted, it prefers the 25 meaningful turns immediately before the last compaction; otherwise it falls back to the latest 25 meaningful turns. Adjacent assistant commentary/final messages are merged into one readable turn, and obvious token formats are redacted before the file is written.
 
-The contract is intentionally strict: prior chat context does not replace bootstrap, and if the agent is unsure whether bootstrap already happened, it should rerun it before continuing.
+The intended trigger is narrow: run it at the start of a new session or immediately after compaction, not before every substantial task inside the same conversation.
 
 This is the Codex replacement for hidden hook-based context injection.
