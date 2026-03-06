@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+### Patch Changes
+
+- Fix the built CLI to resolve `package.json` correctly so globally installed `waypoint` runs instead of crashing on startup.
+
 ## 0.1.3
 
 ### Patch Changes

@@ -342,6 +342,18 @@ test("import-legacy writes report and imported docs", () => {
   assert.ok(existsSync(path.join(target, ".waypoint/docs/legacy-import/example.md")));
 });
 
+test("built cli can read package version", () => {
+  const repoRoot = path.resolve(process.cwd());
+  const distCli = path.join(repoRoot, "dist/src/cli.js");
+  const expectedVersion = JSON.parse(readFileSync(path.join(repoRoot, "package.json"), "utf8")).version as string;
+  const actualVersion = execFileSync("node", [distCli, "--version"], {
+    cwd: repoRoot,
+    encoding: "utf8"
+  }).trim();
+
+  assert.equal(actualVersion, expectedVersion);
+});
+
 function mkdirp(dirPath: string): void {
   mkdirSync(dirPath, { recursive: true });
 }

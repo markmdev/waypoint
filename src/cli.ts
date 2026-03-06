@@ -10,7 +10,7 @@ import { doctorRepository, importLegacyRepo, initRepository, syncRepository } fr
 import type { Finding } from "./types.js";
 
 const VERSION = JSON.parse(
-  readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../package.json"), "utf8")
+  readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../package.json"), "utf8")
 ).version as string;
 
 function resolveRepo(input?: string): string {
