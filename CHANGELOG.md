@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7
+
+### Patch Changes
+
+- Fix context generation to capture repo-state commands reliably, explain pull request lookup context, and avoid injecting the current conversation when the latest session has not compacted.
+
 ## 0.1.6
 
 ### Patch Changes

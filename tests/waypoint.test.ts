@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -191,6 +191,10 @@ test("prepare-context writes merged recent thread with redaction", () => {
         role: "user",
         content: [{ type: "input_text", text: "Here is a token: npm_ABC123SECRET\n" }]
       }
+    },
+    {
+      type: "compacted",
+      payload: { message: "", replacement_history: [] }
     }
   ];
   writeFileSync(sessionPath, `${sessionLines.map((line) => JSON.stringify(line)).join("\n")}\n`, "utf8");
@@ -302,6 +306,49 @@ test("prepare-context prefers turns before the last compaction", () => {
   assert.ok(!recentThread.includes("This is after compaction."));
 });
 
+test("prepare-context does not inject current thread when no compaction exists", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-no-compaction-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  const sessionDir = path.join(codexHome, "sessions/2026/03/06");
+  mkdirp(sessionDir);
+  const sessionPath = path.join(sessionDir, "waypoint-no-compaction-session.jsonl");
+  const sessionLines = [
+    {
+      type: "session_meta",
+      payload: { cwd: root }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:00.000Z",
+      payload: {
+        type: "message",
+        role: "user",
+        content: [{ type: "input_text", text: "This is still the current conversation.\n" }]
+      }
+    }
+  ];
+  writeFileSync(sessionPath, `${sessionLines.map((line) => JSON.stringify(line)).join("\n")}\n`, "utf8");
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  assert.ok(recentThread.includes("No compaction was found"));
+  assert.ok(!recentThread.includes("This is still the current conversation."));
+});
+
 test("prepare-context skips stale sessions whose cwd no longer exists", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-stale-session-"));
   const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
@@ -345,7 +392,8 @@ test("prepare-context skips stale sessions whose cwd no longer exists", () => {
           role: "user",
           content: [{ type: "input_text", text: "Real current session.\n" }]
         }
-      })
+      }),
+      JSON.stringify({ type: "compacted", payload: { message: "", replacement_history: [] } })
     ].join("\n") + "\n",
     "utf8"
   );
@@ -404,6 +452,73 @@ test("prepare-context captures repo state for commits, changes, and nested repos
   assert.ok(commits.includes("Initial commit"));
   assert.ok(nested.includes("nested-service"));
   assert.ok(nested.includes("Nested commit"));
+});
+
+test("prepare-context explains PR context using gh output", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-pr-context-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  const fakeBin = mkdtempSync(path.join(os.tmpdir(), "waypoint-fake-bin-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  execFileSync("git", ["init"], { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["config", "user.name", "Waypoint Test"], { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["config", "user.email", "waypoint@example.com"], { cwd: root, stdio: "pipe" });
+  writeFileSync(path.join(root, "README.md"), "# Temp Repo\n", "utf8");
+  execFileSync("git", ["add", "README.md"], { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["commit", "-m", "Initial commit"], { cwd: root, stdio: "pipe" });
+
+  const ghPath = path.join(fakeBin, "gh");
+  writeFileSync(
+    ghPath,
+    [
+      "#!/usr/bin/env node",
+      "const args = process.argv.slice(2);",
+      "if (args[0] === 'repo' && args[1] === 'view') {",
+      "  process.stdout.write('markmdev/waypoint-test');",
+      "  process.exit(0);",
+      "}",
+      "if (args[0] === 'api' && args[1] === 'user') {",
+      "  process.stdout.write('markmdev');",
+      "  process.exit(0);",
+      "}",
+      "if (args[0] === 'pr' && args[1] === 'list') {",
+      "  const stateIndex = args.indexOf('--state');",
+      "  const state = stateIndex >= 0 ? args[stateIndex + 1] : '';",
+      "  if (state === 'open') {",
+      "    process.stdout.write('#12 Fix transfer bug (markmdev) [codex/fix-transfer]\\n');",
+      "  } else if (state === 'merged') {",
+      "    process.stdout.write('#11 Ship continuity fixes (markmdev) merged 2 days ago\\n');",
+      "  }",
+      "  process.exit(0);",
+      "}",
+      "process.exit(1);",
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(ghPath, 0o755);
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: {
+      ...process.env,
+      CODEX_HOME: codexHome,
+      PATH: `${fakeBin}${path.delimiter}${process.env.PATH ?? ""}`,
+    },
+    stdio: "pipe"
+  });
+
+  const prs = readFileSync(path.join(root, ".waypoint/context/PULL_REQUESTS.md"), "utf8");
+  assert.ok(prs.includes("GitHub viewer: markmdev"));
+  assert.ok(prs.includes("GitHub repo: markmdev/waypoint-test"));
+  assert.ok(prs.includes("#12 Fix transfer bug"));
+  assert.ok(prs.includes("#11 Ship continuity fixes"));
 });
 
 test("import-legacy writes report and imported docs", () => {
