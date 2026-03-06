@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5
+
+### Patch Changes
+
+- Skip stale local Codex sessions whose recorded working directory no longer exists instead of crashing the bootstrap context script.
+
 ## 0.1.4
 
 ### Patch Changes

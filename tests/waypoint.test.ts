@@ -302,6 +302,65 @@ test("prepare-context prefers turns before the last compaction", () => {
   assert.ok(!recentThread.includes("This is after compaction."));
 });
 
+test("prepare-context skips stale sessions whose cwd no longer exists", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-stale-session-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  const sessionDir = path.join(codexHome, "sessions/2026/03/06");
+  mkdirp(sessionDir);
+
+  writeFileSync(
+    path.join(sessionDir, "stale-session.jsonl"),
+    [
+      JSON.stringify({ type: "session_meta", payload: { cwd: "/Users/mark/code/atg/olympus-transfer-prod-data" } }),
+      JSON.stringify({
+        type: "response_item",
+        payload: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "Old session that should be ignored.\n" }]
+        }
+      })
+    ].join("\n") + "\n",
+    "utf8"
+  );
+
+  writeFileSync(
+    path.join(sessionDir, "valid-session.jsonl"),
+    [
+      JSON.stringify({ type: "session_meta", payload: { cwd: root } }),
+      JSON.stringify({
+        type: "response_item",
+        timestamp: "2026-03-06T05:00:00.000Z",
+        payload: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "Real current session.\n" }]
+        }
+      })
+    ].join("\n") + "\n",
+    "utf8"
+  );
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  assert.ok(recentThread.includes("Real current session."));
+  assert.ok(!recentThread.includes("Old session that should be ignored."));
+});
+
 test("import-legacy writes report and imported docs", () => {
   const source = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-source-"));
   const target = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-target-"));

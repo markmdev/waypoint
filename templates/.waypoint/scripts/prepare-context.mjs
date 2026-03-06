@@ -55,8 +55,21 @@ function redactSecrets(text) {
   return SECRET_PATTERNS.reduce((current, pattern) => current.replace(pattern, "[REDACTED]"), text);
 }
 
+function safeRealpath(targetPath) {
+  try {
+    return realpathSync(targetPath);
+  } catch {
+    return null;
+  }
+}
+
 function isWithinPath(childPath, parentPath) {
-  const rel = path.relative(realpathSync(parentPath), realpathSync(childPath));
+  const resolvedParent = safeRealpath(parentPath);
+  const resolvedChild = safeRealpath(childPath);
+  if (!resolvedParent || !resolvedChild) {
+    return false;
+  }
+  const rel = path.relative(resolvedParent, resolvedChild);
   return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
 }
 
