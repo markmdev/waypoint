@@ -50,6 +50,7 @@ repo/
 - `waypoint init` — scaffold or refresh the repo
 - `waypoint doctor` — check for drift and missing pieces
 - `waypoint sync` — rebuild `.waypoint/DOCS_INDEX.md` and sync optional automations/rules
+- `waypoint upgrade` — update the global Waypoint CLI and refresh the current repo with its existing config
 - `waypoint import-legacy` — import from an older repo layout
 
 ## Shipped skills
@@ -71,9 +72,13 @@ If you initialize with `--with-roles`, Waypoint scaffolds:
 ## Update
 
 ```bash
-npm install -g waypoint-codex@latest
-waypoint init --with-automations --with-roles
-waypoint doctor
+waypoint upgrade
+```
+
+If you only want to update the CLI without refreshing the repo:
+
+```bash
+waypoint upgrade --skip-repo-refresh
 ```
 
 ## Learn more

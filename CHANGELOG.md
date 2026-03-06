@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8
+
+### Patch Changes
+
+- Add `waypoint upgrade` to update the global CLI and refresh the current repo using its existing Waypoint config.
+
 ## 0.1.7
 
 ### Patch Changes

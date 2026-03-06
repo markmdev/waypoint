@@ -6,8 +6,9 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import process from "node:process";
 
-import { doctorRepository, importLegacyRepo, initRepository, syncRepository } from "./core.js";
+import { doctorRepository, importLegacyRepo, initRepository, loadWaypointConfig, syncRepository } from "./core.js";
 import type { Finding } from "./types.js";
+import { upgradeWaypoint } from "./upgrade.js";
 
 const VERSION = JSON.parse(
   readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../package.json"), "utf8")
@@ -39,6 +40,7 @@ Commands:
   init                Initialize a repository with Waypoint scaffolding
   doctor              Validate repository health and report drift
   sync                Rebuild docs index and sync optional user-home artifacts
+  upgrade             Update the global Waypoint CLI and refresh this repo using existing config
   import-legacy       Analyze a legacy repository layout and produce a Waypoint adoption report
 `);
 }
@@ -143,6 +145,24 @@ async function main(): Promise<number> {
       console.log(result.report);
     }
     return 0;
+  }
+
+  if (command === "upgrade") {
+    const { values, positionals } = parseArgs({
+      args: argv.slice(1),
+      options: {
+        "skip-repo-refresh": { type: "boolean", default: false }
+      },
+      allowPositionals: true
+    });
+    const projectRoot = resolveRepo(positionals[0]);
+    const config = loadWaypointConfig(projectRoot);
+    return upgradeWaypoint({
+      projectRoot,
+      config,
+      cliEntry: process.argv[1] ? path.resolve(process.argv[1]) : fileURLToPath(import.meta.url),
+      skipRepoRefresh: values["skip-repo-refresh"],
+    });
   }
 
   console.error(`Unknown command: ${command}`);

@@ -1,11 +1,24 @@
 # Upgrading Waypoint
 
-## CLI update
+## Recommended update path
 
-If Waypoint is installed globally from npm:
+If Waypoint is installed globally from npm, use:
 
 ```bash
-npm install -g waypoint-codex@latest
+waypoint upgrade
+```
+
+That does two things:
+
+1. updates the globally installed `waypoint-codex` package
+2. reruns `waypoint init` and `waypoint doctor` in the current repo using the repo's existing Waypoint config
+
+## CLI-only update
+
+If you only want to update the CLI and skip repo refresh:
+
+```bash
+waypoint upgrade --skip-repo-refresh
 ```
 
 If you use `npx`, no global update step is required:
@@ -16,7 +29,7 @@ npx waypoint-codex@latest --help
 
 ## Repo update
 
-After upgrading the CLI, refresh the repo scaffold:
+If you updated the CLI outside `waypoint upgrade`, refresh the repo scaffold manually:
 
 ```bash
 waypoint init --with-automations --with-roles
