@@ -361,6 +361,51 @@ test("prepare-context skips stale sessions whose cwd no longer exists", () => {
   assert.ok(!recentThread.includes("Old session that should be ignored."));
 });
 
+test("prepare-context captures repo state for commits, changes, and nested repos", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-repo-state-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  execFileSync("git", ["init"], { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["config", "user.name", "Waypoint Test"], { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["config", "user.email", "waypoint@example.com"], { cwd: root, stdio: "pipe" });
+  writeFileSync(path.join(root, "README.md"), "# Temp Repo\n", "utf8");
+  execFileSync("git", ["add", "README.md"], { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["commit", "-m", "Initial commit"], { cwd: root, stdio: "pipe" });
+  writeFileSync(path.join(root, "scratch.txt"), "local change\n", "utf8");
+
+  const nestedRepo = path.join(root, "nested-service");
+  mkdirp(nestedRepo);
+  execFileSync("git", ["init"], { cwd: nestedRepo, stdio: "pipe" });
+  execFileSync("git", ["config", "user.name", "Waypoint Test"], { cwd: nestedRepo, stdio: "pipe" });
+  execFileSync("git", ["config", "user.email", "waypoint@example.com"], { cwd: nestedRepo, stdio: "pipe" });
+  writeFileSync(path.join(nestedRepo, "service.txt"), "nested\n", "utf8");
+  execFileSync("git", ["add", "service.txt"], { cwd: nestedRepo, stdio: "pipe" });
+  execFileSync("git", ["commit", "-m", "Nested commit"], { cwd: nestedRepo, stdio: "pipe" });
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const changes = readFileSync(path.join(root, ".waypoint/context/UNCOMMITTED_CHANGES.md"), "utf8");
+  const commits = readFileSync(path.join(root, ".waypoint/context/RECENT_COMMITS.md"), "utf8");
+  const nested = readFileSync(path.join(root, ".waypoint/context/NESTED_REPOS.md"), "utf8");
+
+  assert.ok(changes.includes("scratch.txt"));
+  assert.ok(commits.includes("Initial commit"));
+  assert.ok(nested.includes("nested-service"));
+  assert.ok(nested.includes("Nested commit"));
+});
+
 test("import-legacy writes report and imported docs", () => {
   const source = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-source-"));
   const target = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-target-"));

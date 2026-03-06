@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+
+### Patch Changes
+
+- Fix repo-state context generation so recent commits, uncommitted changes, and nested repo history are captured reliably without shell quoting bugs.
+
 ## 0.1.5
 
 ### Patch Changes

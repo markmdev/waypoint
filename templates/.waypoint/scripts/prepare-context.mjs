@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,7 +25,7 @@ function ensureDir(dirPath) {
 
 function safeExec(command, cwd) {
   try {
-    return execSync(command, {
+    return execFileSync(command[0], command.slice(1), {
       cwd,
       stdio: ["ignore", "pipe", "ignore"],
       encoding: "utf8",
@@ -329,21 +329,43 @@ function main() {
     contextDir,
     "UNCOMMITTED_CHANGES.md",
     "Uncommitted Changes",
-    `\`\`\`\n${safeExec("git diff --stat", projectRoot) || "No uncommitted changes."}\n\`\`\``
+    [
+      "## Status",
+      "",
+      "```",
+      safeExec(["git", "status", "--short", "--branch"], projectRoot) || "No uncommitted changes.",
+      "```",
+      "",
+      "## Diff Stat",
+      "",
+      "```",
+      safeExec(["git", "diff", "--stat"], projectRoot) || "No unstaged tracked diff.",
+      "```",
+      "",
+      "## Staged Diff Stat",
+      "",
+      "```",
+      safeExec(["git", "diff", "--stat", "--cached"], projectRoot) || "No staged diff.",
+      "```",
+    ].join("\n")
   );
 
   const recentCommitsPath = writeContextFile(
     contextDir,
     "RECENT_COMMITS.md",
     "Recent Commits",
-    `\`\`\`\n${safeExec("git log --format=%h%d %s (%cr) -20 --all", projectRoot) || "No recent commits found."}\n\`\`\``
+    [
+      "```",
+      safeExec(["git", "log", "--format=%h%d %s (%cr)", "-20", "--all"], projectRoot) || "No recent commits found.",
+      "```",
+    ].join("\n")
   );
 
   const nestedRepos = collectNestedGitRepos(projectRoot);
   const nestedRepoSections = nestedRepos.map((repoPath) => {
     const rel = path.relative(projectRoot, repoPath) || ".";
-    const branch = safeExec("git branch --show-current", repoPath) || "unknown";
-    const commits = safeExec("git log --format=%h %s (%cr) -10", repoPath) || "No recent commits found.";
+    const branch = safeExec(["git", "branch", "--show-current"], repoPath) || "unknown";
+    const commits = safeExec(["git", "log", "--format=%h %s (%cr)", "-10"], repoPath) || "No recent commits found.";
     return `## ${rel}\n\nBranch: ${branch}\n\n\`\`\`\n${commits}\n\`\`\``;
   });
   const nestedReposPath = writeContextFile(
@@ -354,11 +376,39 @@ function main() {
   );
 
   const openPrs = safeExec(
-    "gh pr list --state open --author @me --limit 5 --json number,title,author,headRefName --template '{{range .}}#{{.number}} {{.title}} ({{.author.login}}) [{{.headRefName}}]\\n{{end}}'",
+    [
+      "gh",
+      "pr",
+      "list",
+      "--state",
+      "open",
+      "--author",
+      "@me",
+      "--limit",
+      "5",
+      "--json",
+      "number,title,author,headRefName",
+      "--template",
+      "{{range .}}#{{.number}} {{.title}} ({{.author.login}}) [{{.headRefName}}]\n{{end}}",
+    ],
     projectRoot
   );
   const mergedPrs = safeExec(
-    "gh pr list --state merged --author @me --limit 5 --json number,title,author,mergedAt --template '{{range .}}#{{.number}} {{.title}} ({{.author.login}}) merged {{timeago .mergedAt}}\\n{{end}}'",
+    [
+      "gh",
+      "pr",
+      "list",
+      "--state",
+      "merged",
+      "--author",
+      "@me",
+      "--limit",
+      "5",
+      "--json",
+      "number,title,author,mergedAt",
+      "--template",
+      "{{range .}}#{{.number}} {{.title}} ({{.author.login}}) merged {{timeago .mergedAt}}\n{{end}}",
+    ],
     projectRoot
   );
   const prsPath = writeContextFile(
