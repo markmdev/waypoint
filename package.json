@@ -1,0 +1,42 @@
+{
+  "name": "waypoint-codex",
+  "version": "0.1.0",
+  "description": "Codex-native repository operating system: scaffolding, docs routing, repo-local skills, doctor, and sync.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "waypoint": "./dist/src/cli.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "npm run clean && npm run build && npm test",
+    "clean": "rm -rf dist",
+    "dev": "tsx src/cli.ts",
+    "prepack": "npm run check",
+    "test": "tsx --test tests/**/*.test.ts"
+  },
+  "keywords": [
+    "codex",
+    "agents",
+    "automation",
+    "skills",
+    "developer-tools"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5"
+  }
+}

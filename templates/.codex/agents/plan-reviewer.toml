@@ -1,0 +1,14 @@
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = """
+Read these files in order before doing anything else:
+1. .waypoint/SOUL.md
+2. .waypoint/agent-operating-manual.md
+3. WORKSPACE.md
+4. .waypoint/context/MANIFEST.md
+5. every file listed in that manifest
+6. .waypoint/agents/plan-reviewer.md
+
+After reading them, follow .waypoint/agents/plan-reviewer.md as your operating instructions.
+"""
+

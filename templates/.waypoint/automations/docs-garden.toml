@@ -1,0 +1,7 @@
+id = "waypoint-docs-garden"
+name = "Waypoint docs garden"
+prompt = "Review docs/ and DOCS_INDEX.md with a docs-focused lens. Strengthen weak routing metadata, remove obvious doc drift, rebuild DOCS_INDEX.md, and summarize what changed."
+rrule = "RRULE:FREQ=WEEKLY;BYHOUR=10;BYMINUTE=0;BYDAY=FR"
+execution_environment = "worktree"
+status = "PAUSED"
+enabled = false

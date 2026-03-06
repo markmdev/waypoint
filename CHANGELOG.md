@@ -1,0 +1,34 @@
+# Changelog
+
+All notable changes to Waypoint will be documented in this file.
+
+The format is inspired by Keep a Changelog and uses semantic versioning.
+
+## [0.1.0] - 2026-03-05
+
+### Added
+
+- Initial Node/TypeScript CLI
+- `waypoint init`
+- `waypoint doctor`
+- `waypoint sync`
+- `waypoint import-legacy`
+- Repo-local template scaffold for:
+  - `AGENTS.md`
+  - `WORKSPACE.md`
+  - `DOCS_INDEX.md`
+  - `.waypoint/`
+  - `.agents/skills/`
+- Session-start context generation via `.waypoint/scripts/prepare-context.mjs`
+- Docs-index generation via `.waypoint/scripts/build-docs-index.mjs`
+- Shipped skills:
+  - `planning`
+  - `error-audit`
+  - `observability-audit`
+  - `ux-states-audit`
+- Optional reviewer agent pack:
+  - `code-health-reviewer`
+  - `code-reviewer`
+  - `docs-researcher`
+  - `plan-reviewer`
+- Declarative automation sync into Codex App's automation store

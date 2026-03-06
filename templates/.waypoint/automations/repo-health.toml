@@ -1,0 +1,8 @@
+id = "waypoint-repo-health"
+name = "Waypoint repo health"
+prompt = "Run a lightweight repository health sweep. Start with waypoint doctor signals, then fix only small high-confidence issues around docs drift, workspace drift, and Waypoint-maintained files. Rebuild DOCS_INDEX.md if needed and summarize findings."
+rrule = "RRULE:FREQ=WEEKLY;BYHOUR=9;BYMINUTE=0;BYDAY=MO"
+execution_environment = "worktree"
+status = "PAUSED"
+enabled = false
+
