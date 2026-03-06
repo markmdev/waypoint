@@ -31,7 +31,7 @@ test("init scaffolds core files", () => {
 
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("<!-- waypoint:start -->"));
   assert.ok(readFileSync(path.join(root, "WORKSPACE.md"), "utf8").includes("## Active Goal"));
-  assert.ok(readFileSync(path.join(root, "DOCS_INDEX.md"), "utf8").includes("## docs/"));
+  assert.ok(readFileSync(path.join(root, "DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
@@ -45,6 +45,8 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/observability-audit/SKILL.md"), "utf8").includes("# Observability Audit")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "utf8").includes("# UX States Audit"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/docs/README.md"), "utf8").includes("Waypoint-managed project memory"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes("Docs-first engineering"));
 });
 
 test("doctor is clean after init", () => {

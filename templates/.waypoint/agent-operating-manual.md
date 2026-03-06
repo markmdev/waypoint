@@ -20,7 +20,7 @@ Do not skip this sequence.
 The repository should contain the context the next agent needs.
 
 - `WORKSPACE.md` is the live operational record: in progress, current state, next steps
-- `docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
+- `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
 - `.waypoint/context/` is the generated session context bundle: current git/PR/doc index state
 
 If something important lives only in your head or in the chat transcript, the repo is under-documented.
@@ -30,7 +30,7 @@ If something important lives only in your head or in the chat transcript, the re
 - Read code before editing it.
 - Follow the repo's documented patterns when they are healthy.
 - Update `WORKSPACE.md` as live execution state when progress meaningfully changes.
-- Update `docs/` when durable knowledge changes.
+- Update `.waypoint/docs/` when durable knowledge changes.
 - Rebuild `DOCS_INDEX.md` whenever routable docs change.
 - Use the repo-local skills and optional reviewer agents instead of improvising from scratch.
 

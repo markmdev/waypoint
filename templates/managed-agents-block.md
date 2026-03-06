@@ -15,7 +15,7 @@ This is mandatory, not optional. Do not skip the context refresh or skip files i
 
 Working rules:
 - Keep `WORKSPACE.md` current as the live execution state
-- Update `docs/` when behavior or durable project knowledge changes
+- Update `.waypoint/docs/` when behavior or durable project knowledge changes
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
 - Treat the generated context bundle as required session bootstrap, not optional reference material
 <!-- waypoint:end -->

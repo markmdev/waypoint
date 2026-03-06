@@ -18,7 +18,7 @@ import { readTemplate, renderWaypointConfig, MANAGED_BLOCK_END, MANAGED_BLOCK_ST
 import type { AutomationSpec, Finding, SyncRecord, WaypointConfig } from "./types.js";
 
 const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
-const DEFAULT_DOCS_DIR = "docs";
+const DEFAULT_DOCS_DIR = ".waypoint/docs";
 const DEFAULT_DOCS_INDEX = "DOCS_INDEX.md";
 const DEFAULT_WORKSPACE = "WORKSPACE.md";
 const STATE_DIR = ".waypoint/state";
@@ -121,6 +121,8 @@ export function initRepository(
 ): string[] {
   ensureDir(projectRoot);
   for (const deprecatedPath of [
+    "docs/README.md",
+    "docs/code-guide.md",
     ".agents/skills/waypoint-planning",
     ".agents/skills/waypoint-docs",
     ".agents/skills/waypoint-review",
@@ -161,8 +163,8 @@ export function initRepository(
   );
   writeIfMissing(path.join(projectRoot, DEFAULT_WORKSPACE), readTemplate("WORKSPACE.md"));
   ensureDir(path.join(projectRoot, DEFAULT_DOCS_DIR));
-  writeIfMissing(path.join(projectRoot, "docs/README.md"), readTemplate("docs/README.md"));
-  writeIfMissing(path.join(projectRoot, "docs/code-guide.md"), readTemplate("docs/code-guide.md"));
+  writeIfMissing(path.join(projectRoot, ".waypoint/docs/README.md"), readTemplate(".waypoint/docs/README.md"));
+  writeIfMissing(path.join(projectRoot, ".waypoint/docs/code-guide.md"), readTemplate(".waypoint/docs/code-guide.md"));
   upsertManagedBlock(path.join(projectRoot, "AGENTS.md"), readTemplate("managed-agents-block.md"));
   scaffoldSkills(projectRoot);
   if (options.withRoles) {
@@ -175,7 +177,7 @@ export function initRepository(
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created WORKSPACE.md and docs/ scaffold",
+    "Created WORKSPACE.md and .waypoint/docs/ scaffold",
     "Installed repo-local Waypoint skills",
     "Generated DOCS_INDEX.md",
   ];

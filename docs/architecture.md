@@ -5,7 +5,7 @@
 1. **Repo contract**
    - `AGENTS.md`
    - `WORKSPACE.md`
-   - `docs/`
+   - `.waypoint/docs/`
    - `DOCS_INDEX.md`
 
 2. **Skill layer**

@@ -1,7 +1,7 @@
 version = 1
 profile = "__PROFILE__"
 workspace_file = "WORKSPACE.md"
-docs_dir = "docs"
+docs_dir = ".waypoint/docs"
 docs_index_file = "DOCS_INDEX.md"
 
 [features]
@@ -10,4 +10,3 @@ docs_index = true
 roles = __ROLES__
 rules = __RULES__
 automations = __AUTOMATIONS__
-

@@ -6,7 +6,7 @@ It helps the next agent pick up your repo with full context by keeping the impor
 
 - `AGENTS.md` for startup instructions
 - `WORKSPACE.md` for live state
-- `docs/` for durable project memory
+- `.waypoint/docs/` for durable project memory
 - `DOCS_INDEX.md` for docs routing
 - repo-local skills for planning and audits
 
@@ -38,9 +38,11 @@ repo/
 ├── AGENTS.md
 ├── WORKSPACE.md
 ├── DOCS_INDEX.md
-├── docs/
 ├── .agents/skills/
 └── .waypoint/
+    ├── docs/
+    ├── context/
+    └── ...
 ```
 
 ## Main commands
