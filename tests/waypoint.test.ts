@@ -1,4 +1,5 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
@@ -37,7 +38,7 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
   );
   assert.ok(
-    readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("Prepared Waypoint context")
+    readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("RECENT_THREAD.md")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
   assert.ok(readFileSync(path.join(root, ".agents/skills/error-audit/SKILL.md"), "utf8").includes("# Error Audit"));
@@ -121,6 +122,92 @@ test("init with roles scaffolds optional codex role pack", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("You are a code reviewer")
   );
+});
+
+test("prepare-context writes merged recent thread with redaction", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-context-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  const sessionDir = path.join(codexHome, "sessions/2026/03/06");
+  mkdirp(sessionDir);
+  const sessionPath = path.join(sessionDir, "waypoint-test-session.jsonl");
+  const sessionLines = [
+    {
+      type: "session_meta",
+      payload: { cwd: root }
+    },
+    {
+      type: "response_item",
+      payload: {
+        type: "message",
+        role: "user",
+        content: [{ type: "input_text", text: `# AGENTS.md instructions for ${root}\n` }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:00.000Z",
+      payload: {
+        type: "message",
+        role: "user",
+        content: [{ type: "input_text", text: "Please release Waypoint.\n" }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:01.000Z",
+      payload: {
+        type: "message",
+        role: "assistant",
+        phase: "commentary",
+        content: [{ type: "output_text", text: "I’m validating the package first.\n" }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:02.000Z",
+      payload: {
+        type: "message",
+        role: "assistant",
+        phase: "final_answer",
+        content: [{ type: "output_text", text: "Published successfully.\n" }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:03.000Z",
+      payload: {
+        type: "message",
+        role: "user",
+        content: [{ type: "input_text", text: "Here is a token: npm_ABC123SECRET\n" }]
+      }
+    }
+  ];
+  writeFileSync(sessionPath, `${sessionLines.map((line) => JSON.stringify(line)).join("\n")}\n`, "utf8");
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
+
+  assert.ok(recentThread.includes("Assistant (merged 2 messages)"));
+  assert.ok(recentThread.includes("I’m validating the package first."));
+  assert.ok(recentThread.includes("Published successfully."));
+  assert.ok(recentThread.includes("[REDACTED]"));
+  assert.ok(!recentThread.includes("npm_ABC123SECRET"));
+  assert.ok(manifest.includes(".waypoint/context/RECENT_THREAD.md"));
 });
 
 test("import-legacy writes report and imported docs", () => {

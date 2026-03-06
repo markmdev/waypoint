@@ -29,6 +29,8 @@ Waypoint's session bootstrap is explicit:
 3. read `.waypoint/agent-operating-manual.md`
 4. read `WORKSPACE.md`
 5. read `.waypoint/context/MANIFEST.md`
-6. read everything listed there
+6. read everything listed there, including the generated recent-thread continuity file
+
+`prepare-context.mjs` generates both repo-state context and a bounded `RECENT_THREAD.md` from the latest local Codex session for the repo. Adjacent assistant commentary/final messages are merged into one readable turn, and obvious token formats are redacted before the file is written.
 
 This is the Codex replacement for hidden hook-based context injection.
