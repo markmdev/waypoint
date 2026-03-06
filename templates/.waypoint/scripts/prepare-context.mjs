@@ -123,6 +123,7 @@ function parseSession(sessionFile, projectRoot) {
   let sessionCwd = null;
   let compactionCount = 0;
   const rawTurns = [];
+  const compactionBoundaries = [];
 
   for (const line of readFileSync(sessionFile, "utf8").split("\n")) {
     if (!line.trim()) {
@@ -146,6 +147,7 @@ function parseSession(sessionFile, projectRoot) {
 
     if (parsed.type === "compacted") {
       compactionCount += 1;
+      compactionBoundaries.push(rawTurns.length);
       continue;
     }
 
@@ -175,7 +177,9 @@ function parseSession(sessionFile, projectRoot) {
     return null;
   }
 
-  const turns = mergeConsecutiveTurns(rawTurns);
+  const selectedFromPreCompaction = compactionBoundaries.length > 0;
+  const relevantTurns = selectedFromPreCompaction ? rawTurns.slice(0, compactionBoundaries.at(-1)) : rawTurns;
+  const turns = mergeConsecutiveTurns(relevantTurns);
   if (turns.length === 0) {
     return null;
   }
@@ -185,6 +189,7 @@ function parseSession(sessionFile, projectRoot) {
     sessionCwd,
     turns,
     compactionCount,
+    selectedFromPreCompaction,
   };
 }
 
@@ -235,7 +240,9 @@ function writeRecentThread(contextDir, projectRoot) {
     `- Session cwd: \`${snapshot.sessionCwd}\``,
     `- Included turns: ${selectedTurns.length} of ${snapshot.turns.length} meaningful turns`,
     `- Compactions in source session: ${snapshot.compactionCount}`,
-    "- Selection rule: take the latest meaningful turns from the local transcript; compaction boundaries are treated as hints, not the only source of truth.",
+    snapshot.selectedFromPreCompaction
+      ? "- Selection rule: take the 25 meaningful turns immediately before the last compaction."
+      : "- Selection rule: no compaction found, so take the latest meaningful turns from the local transcript.",
     "- Noise filter: bootstrap AGENTS payloads are excluded.",
     "- Secret handling: obvious token formats are redacted before writing this file.",
     "",

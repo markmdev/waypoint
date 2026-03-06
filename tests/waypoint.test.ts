@@ -208,6 +208,96 @@ test("prepare-context writes merged recent thread with redaction", () => {
   assert.ok(recentThread.includes("[REDACTED]"));
   assert.ok(!recentThread.includes("npm_ABC123SECRET"));
   assert.ok(manifest.includes(".waypoint/context/RECENT_THREAD.md"));
+  assert.ok(manifest.includes("latest meaningful turns"));
+});
+
+test("prepare-context prefers turns before the last compaction", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-compaction-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  const sessionDir = path.join(codexHome, "sessions/2026/03/06");
+  mkdirp(sessionDir);
+  const sessionPath = path.join(sessionDir, "waypoint-compacted-session.jsonl");
+  const sessionLines = [
+    {
+      type: "session_meta",
+      payload: { cwd: root }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T04:59:58.000Z",
+      payload: {
+        type: "message",
+        role: "user",
+        content: [{ type: "input_text", text: "Discuss the release.\n" }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T04:59:59.000Z",
+      payload: {
+        type: "message",
+        role: "assistant",
+        phase: "commentary",
+        content: [{ type: "output_text", text: "I’m preparing the release.\n" }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:00.000Z",
+      payload: {
+        type: "message",
+        role: "assistant",
+        phase: "final_answer",
+        content: [{ type: "output_text", text: "Release plan is ready.\n" }]
+      }
+    },
+    {
+      type: "compacted",
+      payload: { message: "", replacement_history: [] }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:01.000Z",
+      payload: {
+        type: "message",
+        role: "user",
+        content: [{ type: "input_text", text: "This is after compaction.\n" }]
+      }
+    },
+    {
+      type: "response_item",
+      timestamp: "2026-03-06T05:00:02.000Z",
+      payload: {
+        type: "message",
+        role: "assistant",
+        phase: "final_answer",
+        content: [{ type: "output_text", text: "This should not be in recent thread.\n" }]
+      }
+    }
+  ];
+  writeFileSync(sessionPath, `${sessionLines.map((line) => JSON.stringify(line)).join("\n")}\n`, "utf8");
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  assert.ok(recentThread.includes("take the 25 meaningful turns immediately before the last compaction"));
+  assert.ok(recentThread.includes("I’m preparing the release."));
+  assert.ok(recentThread.includes("Release plan is ready."));
+  assert.ok(!recentThread.includes("This should not be in recent thread."));
+  assert.ok(!recentThread.includes("This is after compaction."));
 });
 
 test("import-legacy writes report and imported docs", () => {
