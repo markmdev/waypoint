@@ -46,7 +46,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "utf8").includes("# UX States Audit"));
   assert.ok(readFileSync(path.join(root, ".waypoint/docs/README.md"), "utf8").includes("Waypoint-managed project memory"));
-  assert.ok(readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes("Docs-first engineering"));
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes(
+      "Compatibility is opt-in, not ambient"
+    )
+  );
 });
 
 test("doctor is clean after init", () => {

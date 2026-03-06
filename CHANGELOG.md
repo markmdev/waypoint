@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- Ship a stronger default Code Guide focused on explicit behavior, strict configuration, visible failures, and long-term legibility.
+
 All notable changes to Waypoint will be documented in this file.
 
 The format is inspired by Keep a Changelog and uses semantic versioning.
