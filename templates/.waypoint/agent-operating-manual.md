@@ -15,6 +15,10 @@ At the start of every session:
 
 Do not skip this sequence.
 
+- Do not read code, search the repo, inspect runtime behavior, or start planning before the sequence is complete.
+- Earlier chat context or partial memory from the current session does not count as a substitute.
+- If you are unsure whether the bootstrap already ran, rerun it instead of guessing.
+
 ## Repository memory model
 
 The repository should contain the context the next agent needs.

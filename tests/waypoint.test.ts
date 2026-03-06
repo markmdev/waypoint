@@ -31,6 +31,7 @@ test("init scaffolds core files", () => {
   });
 
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("<!-- waypoint:start -->"));
+  assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("If you are not sure whether the bootstrap already ran, run it again."));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
@@ -38,6 +39,11 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Earlier chat context or partial memory from the current session does not count as a substitute."
+    )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("RECENT_THREAD.md")

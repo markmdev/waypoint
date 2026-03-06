@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9
+
+### Patch Changes
+
+- Harden the startup contract so agents are explicitly told not to inspect code or plan before running the Waypoint bootstrap, and to rerun it whenever there is any doubt.
+
 ## 0.1.8
 
 ### Patch Changes

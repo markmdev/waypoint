@@ -33,4 +33,6 @@ Waypoint's session bootstrap is explicit:
 
 `prepare-context.mjs` generates both repo-state context and a bounded `RECENT_THREAD.md` from the latest local Codex session for the repo. If the session has compacted, it prefers the 25 meaningful turns immediately before the last compaction; otherwise it falls back to the latest 25 meaningful turns. Adjacent assistant commentary/final messages are merged into one readable turn, and obvious token formats are redacted before the file is written.
 
+The contract is intentionally strict: prior chat context does not replace bootstrap, and if the agent is unsure whether bootstrap already happened, it should rerun it before continuing.
+
 This is the Codex replacement for hidden hook-based context injection.
