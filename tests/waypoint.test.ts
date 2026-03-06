@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -31,8 +31,10 @@ test("init scaffolds core files", () => {
   });
 
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("<!-- waypoint:start -->"));
-  assert.ok(readFileSync(path.join(root, "WORKSPACE.md"), "utf8").includes("## Active Goal"));
-  assert.ok(readFileSync(path.join(root, "DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
+  assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
@@ -334,8 +336,10 @@ test("import-legacy writes report and imported docs", () => {
   writeFileSync(path.join(sourceAgentsDir, "reviewer.md"), "---\nname: reviewer\n---\n", "utf8");
 
   const result = importLegacyRepo(source, target, { initTarget: false });
-  writeFileSync(path.join(target, "WAYPOINT_MIGRATION.md"), result.report, "utf8");
+  writeFileSync(path.join(target, ".waypoint/IMPORT_LEGACY.md"), result.report, "utf8");
   assert.ok(result.report.includes("Legacy Repository Adoption Report"));
+  assert.ok(existsSync(path.join(target, ".waypoint/IMPORT_LEGACY.md")));
+  assert.ok(existsSync(path.join(target, ".waypoint/docs/legacy-import/example.md")));
 });
 
 function mkdirp(dirPath: string): void {

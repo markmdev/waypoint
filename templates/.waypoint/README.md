@@ -3,6 +3,8 @@
 Repo-local Waypoint configuration and optional integration sources.
 
 - `config.toml` — Waypoint feature toggles and file locations
+- `WORKSPACE.md` — live operational state
+- `DOCS_INDEX.md` — generated docs routing map
 - `SOUL.md` — agent identity and working values
 - `agent-operating-manual.md` — required session workflow
 - `docs/` — Waypoint-managed project memory (architecture, decisions, debugging knowledge, durable plans)

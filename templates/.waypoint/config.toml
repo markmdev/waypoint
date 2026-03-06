@@ -1,8 +1,8 @@
 version = 1
 profile = "__PROFILE__"
-workspace_file = "WORKSPACE.md"
+workspace_file = ".waypoint/WORKSPACE.md"
 docs_dir = ".waypoint/docs"
-docs_index_file = "DOCS_INDEX.md"
+docs_index_file = ".waypoint/DOCS_INDEX.md"
 
 [features]
 repo_skills = true

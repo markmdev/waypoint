@@ -5,9 +5,9 @@ Waypoint is a docs-first repository operating system for Codex.
 It helps the next agent pick up your repo with full context by keeping the important things in markdown files inside the repo:
 
 - `AGENTS.md` for startup instructions
-- `WORKSPACE.md` for live state
+- `.waypoint/WORKSPACE.md` for live state
 - `.waypoint/docs/` for durable project memory
-- `DOCS_INDEX.md` for docs routing
+- `.waypoint/DOCS_INDEX.md` for docs routing
 - repo-local skills for planning and audits
 
 ## Install
@@ -36,10 +36,10 @@ That scaffolds:
 ```text
 repo/
 ├── AGENTS.md
-├── WORKSPACE.md
-├── DOCS_INDEX.md
 ├── .agents/skills/
 └── .waypoint/
+    ├── WORKSPACE.md
+    ├── DOCS_INDEX.md
     ├── docs/
     ├── context/
     └── ...
@@ -49,7 +49,7 @@ repo/
 
 - `waypoint init` — scaffold or refresh the repo
 - `waypoint doctor` — check for drift and missing pieces
-- `waypoint sync` — rebuild `DOCS_INDEX.md` and sync optional automations/rules
+- `waypoint sync` — rebuild `.waypoint/DOCS_INDEX.md` and sync optional automations/rules
 - `waypoint import-legacy` — import from an older repo layout
 
 ## Shipped skills

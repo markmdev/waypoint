@@ -139,7 +139,7 @@ export function renderDocsIndex(projectRoot) {
 }
 
 export function writeDocsIndex(projectRoot) {
-  const outputPath = path.join(projectRoot, "DOCS_INDEX.md");
+  const outputPath = path.join(projectRoot, ".waypoint", "DOCS_INDEX.md");
   writeFileSync(outputPath, renderDocsIndex(projectRoot), "utf8");
   return outputPath;
 }

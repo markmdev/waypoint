@@ -19,8 +19,8 @@ import type { AutomationSpec, Finding, SyncRecord, WaypointConfig } from "./type
 
 const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
 const DEFAULT_DOCS_DIR = ".waypoint/docs";
-const DEFAULT_DOCS_INDEX = "DOCS_INDEX.md";
-const DEFAULT_WORKSPACE = "WORKSPACE.md";
+const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
+const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
 const STATE_DIR = ".waypoint/state";
 const SYNC_RECORDS_FILE = ".waypoint/state/sync-records.json";
 
@@ -44,6 +44,16 @@ function removePathIfExists(targetPath: string): void {
   if (existsSync(targetPath)) {
     rmSync(targetPath, { recursive: true, force: true });
   }
+}
+
+function migrateLegacyRootFiles(projectRoot: string): void {
+  const legacyWorkspace = path.join(projectRoot, "WORKSPACE.md");
+  const newWorkspace = path.join(projectRoot, DEFAULT_WORKSPACE);
+  if (existsSync(legacyWorkspace) && !existsSync(newWorkspace)) {
+    writeText(newWorkspace, readFileSync(legacyWorkspace, "utf8"));
+  }
+  removePathIfExists(legacyWorkspace);
+  removePathIfExists(path.join(projectRoot, "DOCS_INDEX.md"));
 }
 
 function appendGitignoreSnippet(projectRoot: string): void {
@@ -120,9 +130,12 @@ export function initRepository(
   },
 ): string[] {
   ensureDir(projectRoot);
+  migrateLegacyRootFiles(projectRoot);
   for (const deprecatedPath of [
     "docs/README.md",
     "docs/code-guide.md",
+    "docs/legacy-import",
+    "WAYPOINT_MIGRATION.md",
     ".agents/skills/waypoint-planning",
     ".agents/skills/waypoint-docs",
     ".agents/skills/waypoint-review",
@@ -177,9 +190,9 @@ export function initRepository(
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created WORKSPACE.md and .waypoint/docs/ scaffold",
+    "Created .waypoint/WORKSPACE.md and .waypoint/docs/ scaffold",
     "Installed repo-local Waypoint skills",
-    "Generated DOCS_INDEX.md",
+    "Generated .waypoint/DOCS_INDEX.md",
   ];
 }
 
@@ -374,7 +387,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     findings.push({
       severity: "error",
       category: "workspace",
-      message: "WORKSPACE.md is missing.",
+      message: ".waypoint/WORKSPACE.md is missing.",
       remediation: "Run `waypoint init` to scaffold the workspace file.",
       paths: [workspacePath],
     });
@@ -424,7 +437,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     findings.push({
       severity: "error",
       category: "docs",
-      message: "docs/ directory is missing.",
+      message: ".waypoint/docs/ directory is missing.",
       remediation: "Run `waypoint init` to scaffold docs.",
       paths: [docsDir],
     });
@@ -442,7 +455,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     findings.push({
       severity: "warn",
       category: "docs",
-      message: "DOCS_INDEX.md is missing.",
+      message: ".waypoint/DOCS_INDEX.md is missing.",
       remediation: "Run `waypoint sync` to generate the docs index.",
       paths: [docsIndexPath],
     });
@@ -450,7 +463,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     findings.push({
       severity: "warn",
       category: "docs",
-      message: "DOCS_INDEX.md is stale.",
+      message: ".waypoint/DOCS_INDEX.md is stale.",
       remediation: "Run `waypoint sync` to rebuild the docs index.",
       paths: [docsIndexPath],
     });
@@ -536,7 +549,7 @@ export function syncRepository(projectRoot: string): string[] {
   const docsIndex = renderDocsIndex(projectRoot, docsDir);
   writeText(docsIndexPath, `${docsIndex.content}\n`);
 
-  const results = ["Rebuilt DOCS_INDEX.md"];
+  const results = ["Rebuilt .waypoint/DOCS_INDEX.md"];
   const featureMap = config.features ?? {};
   if (featureMap.rules) {
     results.push(...syncRules(projectRoot));
@@ -599,7 +612,7 @@ export function importLegacyRepo(
   }
 
   if (targetRepo) {
-    const importDir = path.join(targetRepo, "docs/legacy-import");
+    const importDir = path.join(targetRepo, ".waypoint/docs/legacy-import");
     ensureDir(importDir);
     for (const docName of portableDocs) {
       copyFileSync(path.join(sourceDocsDir, docName), path.join(importDir, docName));
@@ -659,7 +672,7 @@ export function importLegacyRepo(
   ].join("\n");
 
   if (targetRepo) {
-    const reportPath = path.join(targetRepo, "WAYPOINT_MIGRATION.md");
+    const reportPath = path.join(targetRepo, ".waypoint/IMPORT_LEGACY.md");
     writeText(reportPath, report);
     actions.push(`Wrote migration report to ${reportPath}`);
   }

@@ -28,9 +28,10 @@ waypoint doctor
 ## What to check after upgrading
 
 - `AGENTS.md`
+- `.waypoint/WORKSPACE.md`
+- `.waypoint/DOCS_INDEX.md`
 - `.waypoint/SOUL.md`
 - `.waypoint/agent-operating-manual.md`
 - `.waypoint/scripts/prepare-context.mjs`
 - `.agents/skills/`
 - `.codex/agents/` if roles are enabled
-

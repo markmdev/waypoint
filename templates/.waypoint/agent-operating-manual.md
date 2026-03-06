@@ -9,7 +9,7 @@ At the start of every session:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
 3. Read this file
-4. Read `WORKSPACE.md`
+4. Read `.waypoint/WORKSPACE.md`
 5. Read `.waypoint/context/MANIFEST.md`
 6. Read every file listed in that manifest
 
@@ -19,7 +19,7 @@ Do not skip this sequence.
 
 The repository should contain the context the next agent needs.
 
-- `WORKSPACE.md` is the live operational record: in progress, current state, next steps
+- `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
 - `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
 - `.waypoint/context/` is the generated session context bundle: current git/PR/doc index state
 
@@ -29,9 +29,9 @@ If something important lives only in your head or in the chat transcript, the re
 
 - Read code before editing it.
 - Follow the repo's documented patterns when they are healthy.
-- Update `WORKSPACE.md` as live execution state when progress meaningfully changes.
+- Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes.
 - Update `.waypoint/docs/` when durable knowledge changes.
-- Rebuild `DOCS_INDEX.md` whenever routable docs change.
+- Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Use the repo-local skills and optional reviewer agents instead of improvising from scratch.
 
 ## Documentation expectations

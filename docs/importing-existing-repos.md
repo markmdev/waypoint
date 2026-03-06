@@ -21,5 +21,4 @@ Waypoint can help adopt repositories that already have older assistant scaffoldi
 waypoint import-legacy /path/to/source-repo /path/to/new-repo --init-target
 ```
 
-This writes an adoption report into the target repo and copies legacy docs into a dedicated import directory for review.
-
+This writes an adoption report into `.waypoint/IMPORT_LEGACY.md` and copies legacy docs into `.waypoint/docs/legacy-import/` for review.

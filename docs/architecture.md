@@ -4,9 +4,9 @@
 
 1. **Repo contract**
    - `AGENTS.md`
-   - `WORKSPACE.md`
+   - `.waypoint/WORKSPACE.md`
    - `.waypoint/docs/`
-   - `DOCS_INDEX.md`
+   - `.waypoint/DOCS_INDEX.md`
 
 2. **Skill layer**
    - repo-local skills under `.agents/skills/`
@@ -27,7 +27,7 @@ Waypoint's session bootstrap is explicit:
 1. run `.waypoint/scripts/prepare-context.mjs`
 2. read `.waypoint/SOUL.md`
 3. read `.waypoint/agent-operating-manual.md`
-4. read `WORKSPACE.md`
+4. read `.waypoint/WORKSPACE.md`
 5. read `.waypoint/context/MANIFEST.md`
 6. read everything listed there, including the generated recent-thread continuity file
 

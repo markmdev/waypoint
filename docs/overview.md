@@ -8,7 +8,7 @@ The project exists to solve one main problem:
 
 Waypoint does this by combining:
 
-- a repo contract (`AGENTS.md`, `WORKSPACE.md`, `.waypoint/docs/`, `DOCS_INDEX.md`)
+- a repo contract (`AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, `.waypoint/DOCS_INDEX.md`)
 - repo-local skills
 - optional reviewer roles
 - generated session context

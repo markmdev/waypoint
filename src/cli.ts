@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
 import { parseArgs } from "node:util";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import process from "node:process";
 
 import { doctorRepository, importLegacyRepo, initRepository, syncRepository } from "./core.js";
 import type { Finding } from "./types.js";
 
-const VERSION = "0.1.0";
+const VERSION = JSON.parse(
+  readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../package.json"), "utf8")
+).version as string;
 
 function resolveRepo(input?: string): string {
   return path.resolve(input ?? ".");
