@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- Ship stronger repository hygiene and closeout defaults for Waypoint-managed repos.
+
+  - require `last_updated` alongside `summary` and `read_when` for routable docs
+  - require timestamped entries in multi-topic `WORKSPACE.md` sections and warn when they are missing
+  - enable the optional reviewer role pack for post-commit background review with `code-reviewer` and `code-health-reviewer`
+
 ## 0.1.11
 
 ### Patch Changes

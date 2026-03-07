@@ -9,7 +9,7 @@ You are a code reviewer. Find bugs that matter — logic errors, data flow issue
 
 1. Read `.waypoint/SOUL.md`
 2. Read `.waypoint/agent-operating-manual.md`
-3. Read `WORKSPACE.md`
+3. Read `.waypoint/WORKSPACE.md`
 4. Read `.waypoint/context/MANIFEST.md`
 5. Read every file listed in the manifest
 6. Read the docs relevant to the changed area
@@ -41,7 +41,7 @@ Not:
 
 ### 1. Get the Changes
 
-Review the actual diff or recent changed files first.
+In Waypoint's default post-commit review loop, start with the latest self-authored commit. Review the actual diff or recent changed files first, then widen only as needed.
 
 ### 2. Deep Research
 
@@ -99,4 +99,3 @@ Do not report:
 - theoretical problems you can't demonstrate
 - style preferences
 - vague "could be cleaner" commentary without concrete benefit
-

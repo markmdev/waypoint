@@ -10,7 +10,7 @@ Waypoint does this by combining:
 
 - a repo contract (`AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, `.waypoint/DOCS_INDEX.md`)
 - repo-local skills
-- optional reviewer roles
+- optional reviewer roles for post-commit background review
 - generated session context
 - optional automation sync
 
@@ -20,3 +20,8 @@ Waypoint is not a hook-driven system. The philosophy is:
 - more explicit repo-local state
 - more markdown
 - more durable context
+
+Two contract details matter in practice:
+
+- `.waypoint/WORKSPACE.md` entries in multi-topic sections are timestamped
+- routable docs under `.waypoint/docs/` carry `summary`, `last_updated`, and `read_when` frontmatter

@@ -5,8 +5,8 @@ Waypoint is a docs-first repository operating system for Codex.
 It helps the next agent pick up your repo with full context by keeping the important things in markdown files inside the repo:
 
 - `AGENTS.md` for startup instructions
-- `.waypoint/WORKSPACE.md` for live state
-- `.waypoint/docs/` for durable project memory
+- `.waypoint/WORKSPACE.md` for live state, with timestamped multi-topic entries
+- `.waypoint/docs/` for durable project memory, with `summary`, `last_updated`, and `read_when` frontmatter on routable docs
 - `.waypoint/DOCS_INDEX.md` for docs routing
 - repo-local skills for planning and audits
 
@@ -68,6 +68,8 @@ If you initialize with `--with-roles`, Waypoint scaffolds:
 - `code-reviewer`
 - `docs-researcher`
 - `plan-reviewer`
+
+The intended workflow is post-commit: after your own commit lands, run `code-reviewer` and `code-health-reviewer` in parallel in the background, then fix real findings before you call the work finished.
 
 ## Update
 

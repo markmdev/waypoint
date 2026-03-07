@@ -31,8 +31,9 @@ This is mandatory, not optional.
 - Do not skip the context refresh or skip files in the manifest.
 
 Working rules:
-- Keep `.waypoint/WORKSPACE.md` current as the live execution state
-- Update `.waypoint/docs/` when behavior or durable project knowledge changes
+- Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
+- Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
+- If optional reviewer roles are present and you make a commit, run `code-reviewer` and `code-health-reviewer` in parallel before calling the work done
 - Treat the generated context bundle as required session bootstrap, not optional reference material
 <!-- waypoint:end -->

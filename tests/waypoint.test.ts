@@ -39,6 +39,7 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
@@ -54,6 +55,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "write it outside the managed `waypoint:start/end` block in `AGENTS.md`"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers."
     )
   );
   assert.ok(
@@ -84,6 +90,57 @@ test("doctor is clean after init", () => {
 
   const findings = doctorRepository(root);
   assert.equal(findings.length, 0);
+});
+
+test("doctor warns when workspace entries are not timestamped", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-workspace-timestamps-"));
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  writeFileSync(
+    path.join(root, ".waypoint/WORKSPACE.md"),
+    [
+      "# Workspace",
+      "",
+      "Timestamp discipline: Prefix new or materially revised bullets in `Current State`, `In Progress`, `Next`, `Parked`, and `Done Recently` with `[YYYY-MM-DD HH:MM TZ]`.",
+      "",
+      "## Active Goal",
+      "",
+      "Ship something useful.",
+      "",
+      "## Current State",
+      "",
+      "- Missing timestamp here.",
+      "",
+      "## In Progress",
+      "",
+      "## Next",
+      "",
+      "- [2026-03-06 20:10 PST] Run verification.",
+      "",
+      "## Parked",
+      "",
+      "## Done Recently",
+      "",
+      "- [2026-03-06 20:09 PST] Added the new rule.",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+
+  const findings = doctorRepository(root);
+  assert.ok(
+    findings.some(
+      (finding) =>
+        finding.category === "workspace" &&
+        finding.message.includes("untimestamped entries") &&
+        finding.message.includes("## Current State")
+    )
+  );
 });
 
 test("init preserves AGENTS content outside the managed block", () => {
@@ -161,6 +218,8 @@ test("init with roles scaffolds optional codex role pack", () => {
   });
 
   const codexConfig = readFileSync(path.join(root, ".codex/config.toml"), "utf8");
+  assert.ok(codexConfig.includes("[features]"));
+  assert.ok(codexConfig.includes("multi_agent = true"));
   assert.ok(codexConfig.includes('[agents."code-health-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."docs-researcher"]'));
@@ -169,10 +228,19 @@ test("init with roles scaffolds optional codex role pack", () => {
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/agents/code-reviewer.md")
   );
   assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
+  );
+  assert.ok(
     readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(".waypoint/agents/plan-reviewer.md")
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("You are a code reviewer")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("latest self-authored commit")
   );
 });
 
@@ -665,7 +733,7 @@ test("import-legacy writes report and imported docs", () => {
 
   writeFileSync(
     path.join(sourceDocsDir, "example.md"),
-    "---\nsummary: Example doc\nread_when:\n  - example\n---\n\n# Example\n",
+    "---\nsummary: Example doc\nlast_updated: \"2026-03-06 19:55 PST\"\nread_when:\n  - example\n---\n\n# Example\n",
     "utf8"
   );
   writeFileSync(path.join(sourceSkillsDir, "SKILL.md"), "---\nname: planning\ndescription: test\n---\n", "utf8");

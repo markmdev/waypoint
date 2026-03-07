@@ -23,6 +23,14 @@ const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
 const STATE_DIR = ".waypoint/state";
 const SYNC_RECORDS_FILE = ".waypoint/state/sync-records.json";
+const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
+  "## Current State",
+  "## In Progress",
+  "## Next",
+  "## Parked",
+  "## Done Recently",
+]);
+const TIMESTAMPED_ENTRY_PATTERN = /^(?:[-*]|\d+\.)\s+\[\d{4}-\d{2}-\d{2} \d{2}:\d{2} [A-Z]{2,5}\]/;
 
 function ensureDir(dirPath: string): void {
   mkdirSync(dirPath, { recursive: true });
@@ -228,6 +236,30 @@ function codexHome(): string {
   return process.env.CODEX_HOME ?? path.join(os.homedir(), ".codex");
 }
 
+function findWorkspaceTimestampViolations(workspaceText: string): string[] {
+  let currentSection = "";
+  const violations = new Set<string>();
+
+  for (const rawLine of workspaceText.split("\n")) {
+    const line = rawLine.trim();
+    if (line.startsWith("## ")) {
+      currentSection = line;
+      continue;
+    }
+    if (!TIMESTAMPED_WORKSPACE_SECTIONS.has(currentSection) || line.length === 0) {
+      continue;
+    }
+    if (!/^(?:[-*]|\d+\.)\s+/.test(line)) {
+      continue;
+    }
+    if (!TIMESTAMPED_ENTRY_PATTERN.test(line)) {
+      violations.add(currentSection);
+    }
+  }
+
+  return [...violations];
+}
+
 function renderCodexAutomation(spec: AutomationSpec, cwd: string): string {
   const now = Date.now();
   const rrule = spec.rrule?.startsWith("RRULE:") ? spec.rrule : `RRULE:${spec.rrule}`;
@@ -411,6 +443,16 @@ export function doctorRepository(projectRoot: string): Finding[] {
         });
       }
     }
+    const timestampViolations = findWorkspaceTimestampViolations(workspaceText);
+    if (timestampViolations.length > 0) {
+      findings.push({
+        severity: "warn",
+        category: "workspace",
+        message: `Workspace has untimestamped entries in ${timestampViolations.join(", ")}.`,
+        remediation: "Prefix new or materially revised workspace bullets with `[YYYY-MM-DD HH:MM TZ]`.",
+        paths: [workspacePath],
+      });
+    }
   }
 
   for (const requiredFile of [
@@ -447,7 +489,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
       severity: "warn",
       category: "docs",
       message: `Doc is missing valid frontmatter: ${relPath}`,
-      remediation: "Add `summary` and `read_when` frontmatter.",
+      remediation: "Add `summary`, `last_updated`, and `read_when` frontmatter.",
       paths: [path.join(projectRoot, relPath)],
     });
   }

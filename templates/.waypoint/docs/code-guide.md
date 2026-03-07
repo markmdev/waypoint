@@ -1,5 +1,6 @@
 ---
 summary: Opinionated rules for writing and changing Waypoint code so behavior stays explicit, strict, observable, and easy to evolve.
+last_updated: "2026-03-05 21:27 PST"
 read_when:
   - writing new code
   - changing existing behavior

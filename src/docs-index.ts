@@ -19,19 +19,20 @@ const SKIP_DIRS = new Set([
 
 const SKIP_NAMES = new Set(["README.md", "CHANGELOG.md", "LICENSE.md"]);
 
-function parseFrontmatter(filePath: string): { summary: string; readWhen: string[] } {
+function parseFrontmatter(filePath: string): { summary: string; lastUpdated: string; readWhen: string[] } {
   const text = readFileSync(filePath, "utf8");
   if (!text.startsWith("---\n")) {
-    return { summary: "", readWhen: [] };
+    return { summary: "", lastUpdated: "", readWhen: [] };
   }
 
   const endIndex = text.indexOf("\n---\n", 4);
   if (endIndex === -1) {
-    return { summary: "", readWhen: [] };
+    return { summary: "", lastUpdated: "", readWhen: [] };
   }
 
   const frontmatter = text.slice(4, endIndex);
   let summary = "";
+  let lastUpdated = "";
   const readWhen: string[] = [];
   let collectingReadWhen = false;
 
@@ -39,6 +40,11 @@ function parseFrontmatter(filePath: string): { summary: string; readWhen: string
     const line = rawLine.trim();
     if (line.startsWith("summary:")) {
       summary = line.slice("summary:".length).trim().replace(/^['"]|['"]$/g, "");
+      collectingReadWhen = false;
+      continue;
+    }
+    if (line.startsWith("last_updated:")) {
+      lastUpdated = line.slice("last_updated:".length).trim().replace(/^['"]|['"]$/g, "");
       collectingReadWhen = false;
       continue;
     }
@@ -55,7 +61,7 @@ function parseFrontmatter(filePath: string): { summary: string; readWhen: string
     }
   }
 
-  return { summary, readWhen };
+  return { summary, lastUpdated, readWhen };
 }
 
 function walkDocs(projectRoot: string, currentDir: string, output: DocEntry[], invalid: string[]): void {
@@ -74,9 +80,9 @@ function walkDocs(projectRoot: string, currentDir: string, output: DocEntry[], i
       continue;
     }
 
-    const { summary, readWhen } = parseFrontmatter(fullPath);
+    const { summary, lastUpdated, readWhen } = parseFrontmatter(fullPath);
     const relPath = path.relative(projectRoot, fullPath);
-    if (!summary || readWhen.length === 0) {
+    if (!summary || !lastUpdated || readWhen.length === 0) {
       invalid.push(relPath);
       continue;
     }

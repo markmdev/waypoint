@@ -1,13 +1,16 @@
+[features]
+multi_agent = true
+
 [agents]
 max_depth = 1
 max_threads = 4
 
 [agents."code-health-reviewer"]
-description = "Read-only reviewer focused on maintainability drift, dead code, duplication, and refactoring opportunities worth fixing."
+description = "Read-only background reviewer for post-commit maintainability drift, dead code, duplication, and refactoring opportunities worth fixing."
 config_file = "agents/code-health-reviewer.toml"
 
 [agents."code-reviewer"]
-description = "Read-only deep code reviewer focused on real bugs, regressions, and integration mistakes."
+description = "Read-only background reviewer for post-commit bugs, regressions, and integration mistakes."
 config_file = "agents/code-reviewer.toml"
 
 [agents."docs-researcher"]

@@ -18,10 +18,10 @@ Every routable doc needs YAML frontmatter:
 ```yaml
 ---
 summary: One-line description
+last_updated: "2026-03-06 20:10 PST"
 read_when:
   - task cue
 ---
 ```
 
-`DOCS_INDEX.md` is generated from the docs here.
-
+Refresh `last_updated` whenever you materially change a doc. `DOCS_INDEX.md` is generated from the docs here.

@@ -42,8 +42,8 @@ If something important lives only in your head or in the chat transcript, the re
 
 - Read code before editing it.
 - Follow the repo's documented patterns when they are healthy.
-- Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes.
-- Update `.waypoint/docs/` when durable knowledge changes.
+- Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
+- Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Use the repo-local skills and optional reviewer agents instead of improvising from scratch.
 
@@ -75,6 +75,15 @@ If the repo was initialized with Waypoint roles enabled, use them as focused sec
 - `code-health-reviewer` for maintainability drift
 - `docs-researcher` for external dependency research
 - `plan-reviewer` to challenge weak implementation plans before execution
+
+## Post-Commit Review Loop
+
+If Waypoint's optional roles are enabled and you authored a commit, immediately after that commit:
+
+1. Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers.
+2. Scope them to the commit you just made, then widen only when surrounding files are needed to validate a finding.
+3. Do not call the work finished before you read both reviewer results.
+4. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
 
 ## Quality bar
 

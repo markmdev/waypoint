@@ -4,17 +4,19 @@
 
 1. **Repo contract**
    - `AGENTS.md`
-   - `.waypoint/WORKSPACE.md`
-   - `.waypoint/docs/`
+   - `.waypoint/WORKSPACE.md` with timestamped multi-topic entries
+   - `.waypoint/docs/` with `summary`, `last_updated`, and `read_when` frontmatter on routable docs
    - `.waypoint/DOCS_INDEX.md`
 
 2. **Skill layer**
    - repo-local skills under `.agents/skills/`
 
 3. **Optional role layer**
-   - `.codex/config.toml`
+   - `.codex/config.toml` with multi-agent enabled when roles are scaffolded
    - `.codex/agents/*.toml`
    - `.waypoint/agents/*.md`
+
+The default intent for the reviewer pair is a post-commit loop: spawn `code-reviewer` and `code-health-reviewer` in parallel after your own commit, then reconcile and fix findings before final closeout.
 
 4. **Optional sync layer**
    - rules

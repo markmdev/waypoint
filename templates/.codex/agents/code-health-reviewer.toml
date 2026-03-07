@@ -4,11 +4,10 @@ developer_instructions = """
 Read these files in order before doing anything else:
 1. .waypoint/SOUL.md
 2. .waypoint/agent-operating-manual.md
-3. WORKSPACE.md
+3. .waypoint/WORKSPACE.md
 4. .waypoint/context/MANIFEST.md
 5. every file listed in that manifest
 6. .waypoint/agents/code-health-reviewer.md
 
 After reading them, follow .waypoint/agents/code-health-reviewer.md as your operating instructions.
 """
-
