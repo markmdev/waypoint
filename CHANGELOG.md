@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.11
+
+### Patch Changes
+
+- Add `--thread-id` support to the context bootstrap script so repos can target an exact local Codex session transcript instead of relying only on repo-level session matching.
+
 ## 0.1.10
 
 ### Patch Changes

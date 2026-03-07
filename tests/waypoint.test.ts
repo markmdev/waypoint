@@ -399,6 +399,75 @@ test("prepare-context does not inject current thread when no compaction exists",
   assert.ok(!recentThread.includes("This is still the current conversation."));
 });
 
+test("prepare-context can target an explicit thread id", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-thread-id-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  const sessionDir = path.join(codexHome, "sessions/2026/03/06");
+  mkdirp(sessionDir);
+
+  const targetedThreadId = "session-targeted-123";
+  writeFileSync(
+    path.join(sessionDir, "targeted-session.jsonl"),
+    [
+      JSON.stringify({
+        type: "session_meta",
+        payload: { id: targetedThreadId, cwd: root, timestamp: "2026-03-06T22:44:58.467Z" }
+      }),
+      JSON.stringify({
+        type: "response_item",
+        timestamp: "2026-03-06T22:45:00.000Z",
+        payload: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "Targeted session message.\n" }]
+        }
+      }),
+      JSON.stringify({ type: "compacted", payload: { message: "", replacement_history: [] } })
+    ].join("\n") + "\n",
+    "utf8"
+  );
+
+  writeFileSync(
+    path.join(sessionDir, "newer-session.jsonl"),
+    [
+      JSON.stringify({
+        type: "session_meta",
+        payload: { id: "session-newer-456", cwd: root, timestamp: "2026-03-06T23:55:07.825Z" }
+      }),
+      JSON.stringify({
+        type: "response_item",
+        timestamp: "2026-03-06T23:55:10.000Z",
+        payload: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "Newer session should not win when override is set.\n" }]
+        }
+      })
+    ].join("\n") + "\n",
+    "utf8"
+  );
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs"), "--thread-id", targetedThreadId], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  assert.ok(recentThread.includes("targeted-session.jsonl"));
+  assert.ok(recentThread.includes("Compactions in source session: 1"));
+  assert.ok(!recentThread.includes("newer-session.jsonl"));
+});
+
 test("prepare-context skips stale sessions whose cwd no longer exists", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-stale-session-"));
   const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));

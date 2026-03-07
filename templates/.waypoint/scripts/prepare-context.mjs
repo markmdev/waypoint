@@ -213,7 +213,9 @@ function mergeConsecutiveTurns(turns) {
 }
 
 function parseSession(sessionFile, projectRoot) {
+  let sessionId = null;
   let sessionCwd = null;
+  let sessionStartedAt = null;
   let compactionCount = 0;
   const rawTurns = [];
   const compactionBoundaries = [];
@@ -231,9 +233,17 @@ function parseSession(sessionFile, projectRoot) {
     }
 
     if (parsed.type === "session_meta") {
+      const sessionMetaId = parsed.payload?.id;
+      if (typeof sessionMetaId === "string") {
+        sessionId = sessionMetaId;
+      }
       const cwd = parsed.payload?.cwd;
       if (typeof cwd === "string") {
         sessionCwd = cwd;
+      }
+      const timestamp = parsed.payload?.timestamp;
+      if (typeof timestamp === "string") {
+        sessionStartedAt = timestamp;
       }
       continue;
     }
@@ -279,14 +289,16 @@ function parseSession(sessionFile, projectRoot) {
 
   return {
     path: sessionFile,
+    sessionId,
     sessionCwd,
     turns,
     compactionCount,
     selectedFromPreCompaction,
+    sessionStartedAt,
   };
 }
 
-function latestMatchingSession(projectRoot) {
+function latestMatchingSession(projectRoot, threadIdOverride = null) {
   const matches = [];
   for (const dirName of SESSION_DIR_NAMES) {
     for (const sessionFile of collectSessionFiles(path.join(codexHome(), dirName))) {
@@ -297,13 +309,28 @@ function latestMatchingSession(projectRoot) {
     }
   }
 
-  matches.sort((a, b) => statSync(b.path).mtimeMs - statSync(a.path).mtimeMs);
+  const requestedThreadId = threadIdOverride || process.env.CODEX_THREAD_ID || null;
+  if (requestedThreadId) {
+    const exact = matches.find((item) => item.sessionId === requestedThreadId);
+    if (exact) {
+      return exact;
+    }
+  }
+
+  matches.sort((a, b) => {
+    const left = a.sessionStartedAt || "";
+    const right = b.sessionStartedAt || "";
+    if (left === right) {
+      return b.path.localeCompare(a.path);
+    }
+    return right.localeCompare(left);
+  });
   return matches[0] || null;
 }
 
-function writeRecentThread(contextDir, projectRoot) {
+function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
   const filePath = path.join(contextDir, "RECENT_THREAD.md");
-  const snapshot = latestMatchingSession(projectRoot);
+  const snapshot = latestMatchingSession(projectRoot, threadIdOverride);
   const generatedAt = new Date().toString();
 
   if (!snapshot) {
@@ -414,6 +441,11 @@ function main() {
   const projectRoot = detectProjectRoot();
   const contextDir = path.join(projectRoot, ".waypoint", "context");
   ensureDir(contextDir);
+  const threadIdFlagIndex = process.argv.indexOf("--thread-id");
+  const threadIdOverride =
+    threadIdFlagIndex >= 0 && threadIdFlagIndex + 1 < process.argv.length
+      ? process.argv[threadIdFlagIndex + 1]
+      : null;
 
   const docsIndexPath = writeDocsIndex(projectRoot);
 
@@ -557,7 +589,7 @@ function main() {
       "```",
     ].join("\n")
   );
-  const recentThreadPath = writeRecentThread(contextDir, projectRoot);
+  const recentThreadPath = writeRecentThread(contextDir, projectRoot, threadIdOverride);
 
   const manifestPath = path.join(contextDir, "MANIFEST.md");
   const manifestLines = [
