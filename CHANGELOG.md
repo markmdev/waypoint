@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- Ship the code-guide-audit skill in the Waypoint scaffold.
+
 ## 0.4.0
 
 ### Minor Changes

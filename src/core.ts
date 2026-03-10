@@ -517,6 +517,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     "observability-audit",
     "ux-states-audit",
     "docs-sync",
+    "code-guide-audit",
     "workspace-compress",
     "pre-pr-hygiene",
     "pr-review",

@@ -73,6 +73,9 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "utf8").includes("# UX States Audit"));
   assert.ok(readFileSync(path.join(root, ".agents/skills/docs-sync/SKILL.md"), "utf8").includes("# Docs Sync"));
   assert.ok(
+    readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
+  );
+  assert.ok(
     readFileSync(path.join(root, ".agents/skills/workspace-compress/SKILL.md"), "utf8").includes("# Workspace Compress")
   );
   assert.ok(
