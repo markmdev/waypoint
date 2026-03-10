@@ -25,3 +25,4 @@ Two contract details matter in practice:
 
 - `.waypoint/WORKSPACE.md` entries in multi-topic sections are timestamped
 - routable docs under `.waypoint/docs/` carry `summary`, `last_updated`, and `read_when` frontmatter
+- repo-local skills handle structured workflows such as planning, pre-PR hygiene, end-to-end verification, PR review closure, and workspace compression

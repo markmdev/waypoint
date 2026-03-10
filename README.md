@@ -8,7 +8,7 @@ It helps the next agent pick up your repo with full context by keeping the impor
 - `.waypoint/WORKSPACE.md` for live state, with timestamped multi-topic entries
 - `.waypoint/docs/` for durable project memory, with `summary`, `last_updated`, and `read_when` frontmatter on routable docs
 - `.waypoint/DOCS_INDEX.md` for docs routing
-- repo-local skills for planning and audits
+- repo-local skills for planning, audits, verification, workspace compression, and review closure
 
 ## Install
 
@@ -59,6 +59,10 @@ repo/
 - `error-audit`
 - `observability-audit`
 - `ux-states-audit`
+- `workspace-compress`
+- `pre-pr-hygiene`
+- `pr-review`
+- `e2e-verify`
 
 ## Optional reviewer roles
 

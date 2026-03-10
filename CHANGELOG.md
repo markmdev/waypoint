@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+### Minor Changes
+
+- Ship workspace compression, pre-PR hygiene, PR review, and end-to-end verification as built-in Waypoint skills, and strengthen the scaffolded coding guide and agent workflow guidance around review, QA, and long-running reviewers.
+
 ## 0.2.0
 
 ### Minor Changes

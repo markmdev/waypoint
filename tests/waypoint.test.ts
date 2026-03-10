@@ -71,6 +71,14 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/observability-audit/SKILL.md"), "utf8").includes("# Observability Audit")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "utf8").includes("# UX States Audit"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/workspace-compress/SKILL.md"), "utf8").includes("# Workspace Compress")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/pre-pr-hygiene/SKILL.md"), "utf8").includes("# Pre-PR Hygiene")
+  );
+  assert.ok(readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes("# PR Review"));
+  assert.ok(readFileSync(path.join(root, ".agents/skills/e2e-verify/SKILL.md"), "utf8").includes("# E2E Verify"));
   assert.ok(readFileSync(path.join(root, ".waypoint/docs/README.md"), "utf8").includes("Waypoint-managed project memory"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes(
@@ -220,6 +228,7 @@ test("init with roles scaffolds optional codex role pack", () => {
   const codexConfig = readFileSync(path.join(root, ".codex/config.toml"), "utf8");
   assert.ok(codexConfig.includes("[features]"));
   assert.ok(codexConfig.includes("multi_agent = true"));
+  assert.ok(codexConfig.includes("max_threads = 24"));
   assert.ok(codexConfig.includes('[agents."code-health-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."docs-researcher"]'));

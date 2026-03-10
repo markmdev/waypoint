@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workspace Compress"
+  short_description: "Compress the live workspace handoff"
+  default_prompt: "Use this skill after a meaningful chunk of work, before stopping, before review, or before opening or updating a PR to keep WORKSPACE.md short, current, and useful to the next agent."

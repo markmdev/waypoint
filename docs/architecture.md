@@ -10,13 +10,14 @@
 
 2. **Skill layer**
    - repo-local skills under `.agents/skills/`
+   - includes planning, audits, workspace compression, pre-PR hygiene, PR review, and end-to-end verification workflows
 
 3. **Optional role layer**
    - `.codex/config.toml` with multi-agent enabled when roles are scaffolded
    - `.codex/agents/*.toml`
    - `.waypoint/agents/*.md`
 
-The default intent for the reviewer pair is a post-commit loop: spawn `code-reviewer` and `code-health-reviewer` in parallel after your own commit, then reconcile and fix findings before final closeout.
+The default intent for the reviewer pair is a post-commit loop: spawn `code-reviewer` and `code-health-reviewer` in parallel after your own commit, then reconcile and fix findings before final closeout. Slow reviewers should be allowed to finish unless they are clearly stuck or the user redirects the work.
 
 4. **Optional sync layer**
    - rules

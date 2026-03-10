@@ -46,6 +46,7 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Use the repo-local skills and optional reviewer agents instead of improvising from scratch.
+- Do not kill long-running subagents or reviewer agents just because they are slow. Wait unless they are clearly stuck, failed, or the user redirects the work.
 
 ## Documentation expectations
 
@@ -66,6 +67,10 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `error-audit` when failures are being swallowed or degraded invisibly
 - `observability-audit` when production debugging signals look weak
 - `ux-states-audit` when async/data-driven UI likely lacks loading, empty, or error states
+- `workspace-compress` after meaningful chunks, before stopping, and before review when the live handoff needs compression
+- `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work
+- `pr-review` once a PR has active review comments or automated review in progress
+- `e2e-verify` for major user-facing or cross-system changes that need manual end-to-end verification
 
 ## When to use the optional reviewer agents
 

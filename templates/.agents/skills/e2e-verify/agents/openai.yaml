@@ -1,0 +1,4 @@
+interface:
+  display_name: "E2E Verify"
+  short_description: "Manually verify a feature end to end"
+  default_prompt: "Use this skill for manual end-to-end verification of a feature or major change. Exercise the real flow, inspect UI plus logs and persisted state, document issues, fix them, and repeat until no meaningful end-to-end issues remain."

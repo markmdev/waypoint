@@ -1,96 +1,113 @@
 ---
-summary: Opinionated rules for writing and changing Waypoint code so behavior stays explicit, strict, observable, and easy to evolve.
-last_updated: "2026-03-05 21:27 PST"
+summary: Universal coding conventions — explicit behavior, type safety, frontend consistency, reliability, and behavior-focused verification
+last_updated: "2026-03-10 10:05 PDT"
 read_when:
-  - writing new code
-  - changing existing behavior
-  - introducing or removing configuration
-  - handling external input or external systems
-  - adding tests, logging, or state transitions
+  - writing code
+  - coding standards
+  - code conventions
+  - TypeScript
+  - frontend
+  - backend
+  - error handling patterns
+  - testing
 ---
 
 # Code Guide
 
-Waypoint favors explicitness over convenience, correctness over compatibility theater, and deletion over accumulation. Code should make the system easier to reason about after the change, not merely pass today.
+Write code that keeps behavior explicit, failure visible, and the next change easier than the last one.
 
 ## 1. Compatibility is opt-in, not ambient
 
 Do not preserve old behavior unless a user-facing requirement explicitly asks for it.
 
-When replacing a path, remove the old one instead of leaving a shim, alias, translation layer, or silent compatibility branch. If compatibility must be preserved, document the exact contract being preserved and the planned removal condition.
+- Remove replaced paths instead of leaving shims, aliases, or silent compatibility branches.
+- Do not keep dead fields, dual formats, or migration-only logic "just in case."
+- If compatibility must stay, document the exact contract being preserved and the removal condition.
 
-Do not keep dead fields, dead parameters, dual formats, or migration-only logic "just in case". Every compatibility layer becomes part of the design whether intended or not.
+## 2. Type safety is non-negotiable
 
-## 2. Fail clearly, never quietly
+The compiler is part of the design, not an afterthought.
 
-Errors are part of the contract. Surface them early and with enough context to diagnose the cause.
+- Write as if strict mode is enabled. Type errors are build blockers.
+- Never use `any` when `unknown`, narrowing, generics, or better shared types can express the real contract.
+- Reuse exported library or app types instead of recreating them locally.
+- Be explicit at boundaries: function params, returns, public interfaces, API payloads, DB rows, and shared contracts.
+- Validate external data at boundaries with schema validation and convert it into trusted internal shapes once.
+- Avoid cross-package type casts unless there is no better contract available; fix the shared types instead when practical.
 
-Do not swallow errors, downgrade them to logs, or return partial success unless partial success is the explicit API. If an operation can fail in distinct ways, preserve those distinctions. Do not replace a specific failure with a generic one that destroys meaning.
+## 3. Fail clearly, never quietly
 
-Error messages should identify what failed, at which boundary, and why the system refused to proceed. They should not force readers to infer missing state from generic text.
+Errors are part of the contract.
 
-## 3. No silent fallback paths
+- Fail explicitly. No silent fallbacks, empty catches, or degraded behavior that pretends everything is fine.
+- Every caught exception must propagate, crash, or be surfaced truthfully to the user or operator.
+- Do not silently switch to worse models, stale cache, inferred defaults, empty values, or best-effort modes unless that degradation is an intentional product behavior.
+- Required configuration has no silent defaults. Missing required config is a startup or boundary failure.
+- Error messages should identify what failed, where, and why.
 
-Fallbacks are allowed only when they are deliberate product behavior, not a coding reflex.
+## 4. Validate at boundaries
 
-Do not silently retry with weaker behavior, alternate providers, cached data, inferred defaults, empty values, or best-effort modes unless the user asked for degraded operation and the degraded result remains truthful.
+Anything crossing a boundary is untrusted until proven otherwise.
 
-If degradation exists, it must be explicit in code, testable, and observable. Hidden fallback logic makes the system look healthy while it is already off-contract.
+- Validate user input, config, files, HTTP responses, generated content, database reads, queue payloads, and external API data at the boundary.
+- Reject invalid data instead of "normalizing" it into something ambiguous.
+- Keep validation near the boundary instead of scattering half-validation deep inside the system.
 
-## 4. Validate at boundaries, not deep inside
+## 5. Prefer direct code over speculative abstraction
 
-Anything that crosses a boundary must be treated as untrusted: user input, config, environment, files, network responses, database reads, queue payloads, generated content, and data from other modules.
+Do not invent complexity for hypothetical future needs.
 
-Validate structure, required fields, allowed values, and invariants at the boundary. Convert external data into a trusted internal shape once. Do not pass loosely-typed or half-validated data deeper into the system and hope downstream code copes.
+- Add abstractions only when multiple concrete cases already demand the same shape.
+- Prefer straightforward code and small duplication over the wrong generic layer.
+- If a helper hides critical validation, state changes, or failure modes, it is probably hurting clarity.
 
-Boundary validation should reject invalid data, not "normalize" it into something ambiguous.
+## 6. Make state, contracts, and provenance explicit
 
-## 5. Configuration must be strict
+Readers should be able to tell what states exist, what transitions are legal, and what data can be trusted.
 
-Missing or invalid configuration should stop the system at startup or at the feature boundary where it becomes required.
+- Use explicit state representations and enforce invariants at the boundary of the operation.
+- Multi-step writes must have clear transaction boundaries.
+- Retryable operations must be idempotent or guarded against duplicate effects.
+- New schema and persistence work should make provenance obvious and protect against duplication with the right uniqueness constraints, foreign keys, or equivalent invariants.
+- Shared schemas, fixtures, and contract types must match the real API and stored data shape.
 
-Do not hide absent configuration behind guessed defaults, environment-dependent behavior, or implicit no-op modes. Defaults are acceptable only when they are safe, intentional, and documented as part of the product contract.
+## 7. Frontend must reuse and fit the existing system
 
-Configuration should be centralized enough to audit. A reader should be able to tell which settings matter, what values are valid, and what happens when they are wrong.
+Frontend changes should extend the app, not fork its design language.
 
-## 6. Prefer direct code over speculative abstraction
+- Before creating a new component, check whether the app already has a component or pattern that should be reused.
+- Reuse existing components when they satisfy the need, even if minor adaptation is required.
+- When a new component is necessary, make it match the design language, interaction model, spacing, states, and compositional patterns of the rest of the app.
+- Handle all states for async and data-driven UI: loading, success, empty, error.
+- Optimistic UI must have an explicit rollback or invalidation strategy. Never leave optimistic state hanging without a recovery path.
 
-Do not introduce abstractions for imagined future use. Add them only when multiple concrete cases already demand the same shape.
+## 8. Observability is part of correctness
 
-A small amount of duplication is cheaper than the wrong abstraction. Prefer code that exposes the current domain plainly over generic layers, plugin systems, factories, wrappers, or strategy trees created before the need is real.
+If you cannot see the failure path, you have not finished the work.
 
-Abstractions must remove real complexity, not relocate it. If a helper hides critical behavior, state changes, validation, or failure modes, it is making the system harder to read.
+- Emit structured logs, metrics, or events at important boundaries and state transitions.
+- Include enough context to reproduce issues without logging secrets or sensitive data.
+- Failed async work, retries, degraded paths, and rejected inputs must leave a useful trace.
+- Do not use noisy logging to compensate for unclear control flow.
 
-## 7. Make state and invariants explicit
+## 9. Test behavior, not implementation
 
-State transitions should be visible in code. Readers should be able to answer: what states exist, what moves the system between them, and what must always be true.
+Tests should protect the contract users depend on.
 
-Do not encode important transitions as scattered flag mutations, ordering assumptions, optional fields, or side effects hidden in utility calls. Avoid representations where invalid states are easy to create and hard to detect.
-
-When a function changes state, make the transition obvious. When a module depends on an invariant, assert it at the boundary of the operation instead of relying on folklore.
-
-## 8. Tests define behavior changes, not just regressions
-
-Any behavior change must update tests to describe the new contract. If the old behavior mattered, remove or rewrite the old tests instead of making them weaker.
-
-Test observable behavior and boundary cases, not implementation trivia. Cover failure modes, validation rules, configuration strictness, and any intentional degradation path. If a bug fix closes a previously possible bad state, add a test that proves the bad state is now rejected.
-
-Do not merge code whose behavior changed without leaving behind executable evidence of the new rules.
-
-## 9. Observability is part of correctness
-
-Code is not complete if production failures cannot be understood from its signals.
-
-Emit structured logs, metrics, or events at important boundaries and state transitions, especially around input rejection, external calls, retries, and degraded modes. Observability should explain which path executed and why.
-
-Do not log noise to compensate for poor design. Prefer a small number of high-value signals tied to decisions, failures, and contract edges.
+- Test observable behavior and boundary cases, not implementation trivia.
+- Never write brittle regression tests that assert exact class strings, styling internals, private helper calls, incidental DOM structure, internal schema representations, or other implementation-detail artifacts.
+- Regression tests must focus on the behavior that was broken and the behavior that is now guaranteed.
+- For backend bugs, prefer behavior-focused regression tests by default.
+- For frontend bugs, prefer manual QA by default; add automated regression coverage only when there is a stable user-visible behavior worth protecting.
+- Do not merge behavior changes without leaving behind executable or clearly documented evidence of the new contract.
 
 ## 10. Optimize for future legibility
 
-Write code for the next person who must change it under pressure.
+Write code for the next engineer or agent who has to change it under pressure.
 
-Keep modules narrow in responsibility. Keep data flow obvious. Keep control flow boring. Prefer designs where the main path is easy to follow and unusual behavior is explicitly named.
+- Keep modules narrow in responsibility and data flow obvious.
+- Remove stale branches, half-migrations, dead code, and obsolete docs around the change.
+- Keep docs and shipped behavior aligned.
+- Before pushing or opening a PR, do a hygiene pass for stale docs, drifting contracts, typing gaps, missing rollback strategies, and new persistence correctness risks.
 
-When changing code, improve the shape around the change if needed. Do not leave behind half-migrated designs, obsolete branches, commented-out code, or placeholders for imagined follow-ups.
-
-The best code is not code that can handle every possible future. It is code whose current truth is obvious, whose failures are visible, and whose wrong parts can be deleted without fear.
+The best code is not the most flexible code. It is the code whose current truth is obvious, whose failures are visible, and whose wrong parts can be deleted without fear.

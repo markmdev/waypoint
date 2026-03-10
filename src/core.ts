@@ -516,6 +516,10 @@ export function doctorRepository(projectRoot: string): Finding[] {
     "error-audit",
     "observability-audit",
     "ux-states-audit",
+    "workspace-compress",
+    "pre-pr-hygiene",
+    "pr-review",
+    "e2e-verify",
   ]) {
     const skillPath = path.join(projectRoot, ".agents/skills", skillName, "SKILL.md");
     if (!existsSync(skillPath)) {

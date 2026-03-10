@@ -3,7 +3,7 @@ multi_agent = true
 
 [agents]
 max_depth = 1
-max_threads = 4
+max_threads = 24
 
 [agents."code-health-reviewer"]
 description = "Read-only background reviewer for post-commit maintainability drift, dead code, duplication, and refactoring opportunities worth fixing."
