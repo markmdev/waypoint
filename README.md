@@ -59,6 +59,7 @@ repo/
 - `error-audit`
 - `observability-audit`
 - `ux-states-audit`
+- `docs-sync`
 - `workspace-compress`
 - `pre-pr-hygiene`
 - `pr-review`

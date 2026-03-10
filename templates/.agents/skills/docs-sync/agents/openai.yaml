@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docs Sync"
+  short_description: "Audit docs against the real codebase"
+  default_prompt: "Use this skill to audit routed docs against the actual codebase and shipped behavior, then update or flag any missing, incorrect, or outdated documentation."

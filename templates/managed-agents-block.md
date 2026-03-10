@@ -34,6 +34,7 @@ Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
+- Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
 - If optional reviewer roles are present and you make a commit, run `code-reviewer` and `code-health-reviewer` in parallel before calling the work done
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - Use `pr-review` once a PR has active review comments or automated review in progress

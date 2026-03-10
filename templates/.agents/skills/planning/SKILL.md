@@ -5,8 +5,8 @@ description: >
   Use for new features, refactoring, architecture changes, migrations, or any non-trivial
   implementation work. Ask multiple rounds of clarifying questions about product behavior,
   user expectations, edge cases, and architecture; explore the repo deeply before deciding;
-  and do not waste questions on implementation details that can be learned directly from the
-  code or routed docs.
+  do not waste questions on implementation details that can be learned directly from the
+  code or routed docs; and write the final plan into `.waypoint/docs/` so it persists in the repo.
 ---
 
 # Planning
@@ -26,20 +26,15 @@ Before planning:
 5. Read every file listed in the manifest
 6. Read the routed docs relevant to the task
 
-## Verbatim Requirements
+## Output Location
 
-Capture the user's exact words at the top of every plan when the wording matters. No paraphrasing, no compression.
+The plan belongs in the repo, not only in chat.
 
-```markdown
-## Verbatim Requirements
-
-### Original Request
-> [User's ENTIRE message, word for word]
-
-### Clarifications
-**Q:** [Your question]
-**A:** [User's ENTIRE answer, verbatim]
-```
+- Write or update a durable plan doc under `.waypoint/docs/`.
+- Choose the smallest routed location that matches the work, such as a project plan, implementation plan, or focused design note.
+- If a relevant plan doc already exists, update it instead of creating a competing one.
+- Make sure the doc remains discoverable through the routed docs layer.
+- In chat, return only a concise summary plus the path to the plan doc.
 
 ## The Core Loop
 
@@ -105,6 +100,8 @@ Plans document your understanding. Include what matters for this task:
 
 Use ASCII diagrams when they clarify flow, layering, or state.
 
+Distill the requirements and clarifications into a clean plan document. Do not turn the plan into a transcript dump.
+
 ## Self-Review Before Finalizing
 
 Before presenting the plan, verify against real code:
@@ -122,15 +119,15 @@ Before presenting the plan, verify against real code:
 - No pretending you verified something you didn't
 
 If the change touches durable project behavior, include docs/workspace updates in the plan.
-If the plan is meant to outlive the current chat, write or update a durable plan doc under `.waypoint/docs/` and make sure it is discoverable through the routed docs layer.
+Write or update the durable plan doc under `.waypoint/docs/` as part of the skill, not as an optional follow-up.
 
 ## External APIs
 
 If an external API or library is relevant, read the actual upstream docs before finalizing the plan. Prefer the repo's external-doc links or URL registry when one exists. Read the real source docs; do not copy vendor reference material into the repo unless the user explicitly wants a durable local note.
 
-## Output
+## Plan Shape
 
-A good final plan usually includes:
+A good durable plan doc usually includes:
 
 1. Current state
 2. Proposed changes
@@ -138,6 +135,14 @@ A good final plan usually includes:
 4. Acceptance criteria
 5. Verification
 6. TL;DR
+
+## Final Response
+
+When the plan doc is written:
+
+- give a short chat summary
+- include the doc path
+- call out any unresolved decisions that still need the user's input
 
 ## Quality Bar
 
