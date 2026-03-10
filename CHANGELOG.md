@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+### Patch Changes
+
+- Fix the planning skill to read the Waypoint workspace path, persist durable plans into routed docs, ask product and architecture questions instead of code-discoverable implementation questions, and replace the old docs-researcher role with direct use of linked upstream documentation.
+
 ## 0.3.0
 
 ### Minor Changes
@@ -111,6 +117,5 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 - Optional reviewer agent pack:
   - `code-health-reviewer`
   - `code-reviewer`
-  - `docs-researcher`
   - `plan-reviewer`
 - Declarative automation sync into Codex App's automation store

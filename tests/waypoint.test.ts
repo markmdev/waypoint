@@ -231,7 +231,6 @@ test("init with roles scaffolds optional codex role pack", () => {
   assert.ok(codexConfig.includes("max_threads = 24"));
   assert.ok(codexConfig.includes('[agents."code-health-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
-  assert.ok(codexConfig.includes('[agents."docs-researcher"]'));
   assert.ok(codexConfig.includes('[agents."plan-reviewer"]'));
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/agents/code-reviewer.md")

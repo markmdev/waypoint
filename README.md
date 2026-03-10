@@ -70,7 +70,6 @@ If you initialize with `--with-roles`, Waypoint scaffolds:
 
 - `code-health-reviewer`
 - `code-reviewer`
-- `docs-researcher`
 - `plan-reviewer`
 
 The intended workflow is post-commit: after your own commit lands, run `code-reviewer` and `code-health-reviewer` in parallel in the background, then fix real findings before you call the work finished.

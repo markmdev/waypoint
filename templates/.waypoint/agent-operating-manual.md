@@ -78,7 +78,6 @@ If the repo was initialized with Waypoint roles enabled, use them as focused sec
 
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability drift
-- `docs-researcher` for external dependency research
 - `plan-reviewer` to challenge weak implementation plans before execution
 
 ## Post-Commit Review Loop

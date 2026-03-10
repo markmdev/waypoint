@@ -13,10 +13,6 @@ config_file = "agents/code-health-reviewer.toml"
 description = "Read-only background reviewer for post-commit bugs, regressions, and integration mistakes."
 config_file = "agents/code-reviewer.toml"
 
-[agents."docs-researcher"]
-description = "Documentation researcher for external APIs, libraries, and tools when the repo lacks durable docs."
-config_file = "agents/docs-researcher.toml"
-
 [agents."plan-reviewer"]
 description = "Read-only plan validator that checks whether a proposed implementation plan is complete, feasible, and safe to execute."
 config_file = "agents/plan-reviewer.toml"
