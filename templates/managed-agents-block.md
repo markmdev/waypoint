@@ -36,6 +36,7 @@ Working rules:
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
 - Use `code-guide-audit` for a targeted coding-guide compliance pass on a specific feature, file set, or change slice
+- Use `break-it-qa` for browser-facing features that should be tested against invalid inputs, refreshes, repeated clicks, wrong navigation, and other adversarial user behavior
 - If optional reviewer roles are present and you make a commit, run `code-reviewer` and `code-health-reviewer` in parallel before calling the work done
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - Use `pr-review` once a PR has active review comments or automated review in progress

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Break-It QA"
+  short_description: "Try to break a feature through the UI"
+  default_prompt: "Use this skill to verify a user-facing feature by trying to break it through the browser with invalid inputs, wrong action order, refreshes, back navigation, repeated clicks, and other adversarial interactions, then fix clear issues and repeat."

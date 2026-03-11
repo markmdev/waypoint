@@ -69,6 +69,7 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `ux-states-audit` when async/data-driven UI likely lacks loading, empty, or error states
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
+- `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
 - `workspace-compress` after meaningful chunks, before stopping, and before review when the live handoff needs compression
 - `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work
 - `pr-review` once a PR has active review comments or automated review in progress

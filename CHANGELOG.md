@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+### Minor Changes
+
+- Ship the break-it-qa adversarial browser verification skill in the Waypoint scaffold.
+
 ## 0.5.0
 
 ### Minor Changes
