@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1
+
+### Patch Changes
+
+- Strengthen the shipped break-it-qa skill with pre-generated attack logs, coverage rules, and rerun guidance.
+
 ## 0.6.0
 
 ### Minor Changes
