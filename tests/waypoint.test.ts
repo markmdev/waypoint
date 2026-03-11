@@ -59,7 +59,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers."
+      "Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers once there is a coherent slice of work worth reviewing."
     )
   );
   assert.ok(
@@ -83,7 +83,6 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/pre-pr-hygiene/SKILL.md"), "utf8").includes("# Pre-PR Hygiene")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes("# PR Review"));
-  assert.ok(readFileSync(path.join(root, ".agents/skills/e2e-verify/SKILL.md"), "utf8").includes("# E2E Verify"));
   assert.ok(readFileSync(path.join(root, ".waypoint/docs/README.md"), "utf8").includes("Waypoint-managed project memory"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes(
@@ -253,7 +252,7 @@ test("init with roles scaffolds optional codex role pack", () => {
     readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("You are a code reviewer")
   );
   assert.ok(
-    readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("latest self-authored commit")
+    readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("reviewable slice the main agent hands you")
   );
 });
 

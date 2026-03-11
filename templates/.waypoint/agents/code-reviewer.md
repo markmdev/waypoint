@@ -41,7 +41,11 @@ Not:
 
 ### 1. Get the Changes
 
-In Waypoint's default post-commit review loop, start with the latest self-authored commit. Review the actual diff or recent changed files first, then widen only as needed.
+In Waypoint's default review loop, start with the reviewable slice the main agent hands you.
+
+- If there is a recent self-authored commit that cleanly represents the slice, use that commit as the default scope anchor.
+- Otherwise, start from the current changed files or diff the main agent is asking you to review.
+- Widen only as needed.
 
 ### 2. Deep Research
 

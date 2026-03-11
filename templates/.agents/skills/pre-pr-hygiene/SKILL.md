@@ -16,7 +16,9 @@ Before the hygiene pass:
 3. Read `.waypoint/WORKSPACE.md`
 4. Read `.waypoint/context/MANIFEST.md`
 5. Read every file listed in that manifest
-6. Read `.waypoint/docs/code-guide.md` and the routed docs relevant to the area being shipped
+6. Read the repo's routed code guide and the routed docs relevant to the area being shipped
+
+In standard Waypoint repos, the code guide lives at `.waypoint/docs/code-guide.md`. If the repo routes it somewhere else, follow the repo's own docs and routing instead of assuming another fixed path.
 
 ## Step 1: Audit The Whole Change Surface
 

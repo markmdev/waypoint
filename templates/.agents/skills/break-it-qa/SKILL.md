@@ -7,10 +7,7 @@ description: Verify a user-facing feature by trying to break it on purpose inste
 
 Use this skill to attack the feature like an impatient, confused, or careless user.
 
-This is not the same as `e2e-verify`.
-
-- `e2e-verify` proves the intended flow works end to end.
-- `break-it-qa` tries to make the feature fail through invalid, interrupted, stale, repeated, or out-of-order interactions.
+This skill is for adversarial manual QA. It tries to make the feature fail through invalid, interrupted, stale, repeated, or out-of-order interactions instead of only proving the happy path works.
 
 ## Step 1: Ask The Three Setup Questions
 

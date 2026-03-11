@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- Refine Waypoint's review and QA workflow guidance by making reviewer agents run on meaningful reviewable chunks instead of only post-commit, removing `e2e-verify` from the shipped skill pack, and tightening related scaffolded instructions.
+
 ## 0.6.1
 
 ### Patch Changes

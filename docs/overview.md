@@ -10,7 +10,7 @@ Waypoint does this by combining:
 
 - a repo contract (`AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, `.waypoint/DOCS_INDEX.md`)
 - repo-local skills
-- optional reviewer roles for post-commit background review
+- optional reviewer roles for chunk-based background review
 - generated session context
 - optional automation sync
 
@@ -25,4 +25,4 @@ Two contract details matter in practice:
 
 - `.waypoint/WORKSPACE.md` entries in multi-topic sections are timestamped
 - routable docs under `.waypoint/docs/` carry `summary`, `last_updated`, and `read_when` frontmatter
-- repo-local skills handle structured workflows such as planning, pre-PR hygiene, end-to-end verification, PR review closure, and workspace compression
+- repo-local skills handle structured workflows such as planning, pre-PR hygiene, break-it QA, PR review closure, and workspace compression

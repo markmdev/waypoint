@@ -73,7 +73,6 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `workspace-compress` after meaningful chunks, before stopping, and before review when the live handoff needs compression
 - `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work
 - `pr-review` once a PR has active review comments or automated review in progress
-- `e2e-verify` for major user-facing or cross-system changes that need manual end-to-end verification
 
 ## When to use the optional reviewer agents
 
@@ -83,14 +82,15 @@ If the repo was initialized with Waypoint roles enabled, use them as focused sec
 - `code-health-reviewer` for maintainability drift
 - `plan-reviewer` to challenge weak implementation plans before execution
 
-## Post-Commit Review Loop
+## Review Loop
 
-If Waypoint's optional roles are enabled and you authored a commit, immediately after that commit:
+If Waypoint's optional roles are enabled, run the reviewer pair after a meaningful reviewable implementation chunk, not just as a reflex after every tiny commit.
 
-1. Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers.
-2. Scope them to the commit you just made, then widen only when surrounding files are needed to validate a finding.
-3. Do not call the work finished before you read both reviewer results.
-4. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
+1. Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers once there is a coherent slice of work worth reviewing.
+2. If you have a recent self-authored commit that cleanly represents that slice, use it as the default review scope anchor. Otherwise scope the reviewers to the current changed slice.
+3. Widen only when surrounding files are needed to validate a finding.
+4. Do not call the work finished before you read both reviewer results.
+5. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
 
 ## Quality bar
 

@@ -135,7 +135,6 @@ Waypoint ships a strong default skill pack for real coding work:
 - `workspace-compress`
 - `pre-pr-hygiene`
 - `pr-review`
-- `e2e-verify`
 
 These are repo-local, so the workflow travels with the project.
 
@@ -147,7 +146,7 @@ If you initialize with `--with-roles`, Waypoint scaffolds:
 - `code-reviewer`
 - `plan-reviewer`
 
-The intended workflow is post-commit: make your change, commit it, run the reviewers in parallel, fix real findings, then close out.
+The intended workflow is chunk-based: once there is a meaningful reviewable slice, run the reviewers in parallel, fix real findings, then close out. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger.
 
 ## What makes it different
 

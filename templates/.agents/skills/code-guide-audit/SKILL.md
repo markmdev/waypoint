@@ -11,7 +11,9 @@ This skill owns one job: inspect the specific code the user points at, map it ag
 
 ## Step 1: Load The Right Scope
 
-- Read `.waypoint/docs/code-guide.md`.
+- Read the repo's routed code guide.
+- In standard Waypoint repos, use `.waypoint/docs/code-guide.md`.
+- If the repo routes the code guide somewhere else, follow the repo's own docs and routing instead of assuming another fixed path.
 - Read only the files, routes, tests, contracts, and nearby docs needed to understand the specific feature or slice under review.
 - If the scope is ambiguous, resolve it to a concrete file set, feature path, or commit-sized change surface before auditing.
 

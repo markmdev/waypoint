@@ -59,7 +59,13 @@ Do not create findings for:
 
 ## Scope
 
-In Waypoint's default post-commit review loop, start with the latest self-authored commit, then widen only when related files are needed to validate a maintainability issue. Focus on:
+In Waypoint's default review loop, start with the reviewable slice the main agent hands you.
+
+- If there is a recent self-authored commit that cleanly represents the slice, use that commit as the default scope anchor.
+- Otherwise, start from the current changed files or diff under review.
+- Widen only when related files are needed to validate a maintainability issue.
+
+Focus on:
 
 - recently changed files
 - their importers
