@@ -2,58 +2,128 @@
 
 Waypoint is a docs-first repository operating system for Codex.
 
-It helps the next agent pick up your repo with full context by keeping the important things in markdown files inside the repo:
+It helps the next agent understand your repo by making the important context live in the repo itself instead of disappearing into chat history.
 
-- `AGENTS.md` for startup instructions
-- `.waypoint/WORKSPACE.md` for live state, with timestamped multi-topic entries
-- `.waypoint/docs/` for durable project memory, with `summary`, `last_updated`, and `read_when` frontmatter on routable docs
+## Why people use it
+
+Most agent workflows break down the same way:
+
+- the next session starts half-blind
+- important project docs exist, but the agent does not know which ones matter
+- workspace notes turn into noisy append-only logs
+- repo conventions live in people's heads instead of files
+- review and cleanup happen inconsistently
+
+Waypoint gives you a lightweight repo contract that fixes those problems with explicit files, generated context, and a strong default skill set.
+
+## What Waypoint sets up
+
+Waypoint scaffolds a Codex-friendly repo structure built around a few core pieces:
+
+- `AGENTS.md` for the startup contract
+- `.waypoint/WORKSPACE.md` for live operational state
+- `.waypoint/docs/` for durable project memory
 - `.waypoint/DOCS_INDEX.md` for docs routing
-- repo-local skills for planning, audits, verification, workspace compression, and review closure
+- `.waypoint/context/` for generated startup context
+- `.agents/skills/` for repo-local workflows like planning, audits, and QA
+
+The philosophy is simple:
+
+- less hidden runtime magic
+- more repo-local state
+- more markdown
+- better continuity for the next agent
+
+## Best fit
+
+Waypoint is most useful when you want:
+
+- multi-session continuity in a real repo
+- a durable docs and workspace structure for agents
+- stronger planning, review, QA, and closeout defaults
+- repo-local scaffolding instead of a bunch of global mystery behavior
+
+If you only use Codex for tiny one-off edits, Waypoint is probably unnecessary.
 
 ## Install
+
+Waypoint requires Node 20+.
 
 ```bash
 npm install -g waypoint-codex
 ```
 
-Or use it without installing globally:
+Or run it without a global install:
 
 ```bash
 npx waypoint-codex@latest --help
 ```
 
-## Start using it
+## Quick start
 
-Inside your Codex project:
+Inside the repo you want to prepare for Codex:
 
 ```bash
-waypoint init --with-automations --with-roles
+waypoint init --with-roles --with-automations
 waypoint doctor
 ```
 
-That scaffolds:
+That gives you a repo that looks roughly like this:
 
 ```text
 repo/
 ├── AGENTS.md
-├── .agents/skills/
+├── .agents/
+│   └── skills/
 └── .waypoint/
     ├── WORKSPACE.md
     ├── DOCS_INDEX.md
     ├── docs/
     ├── context/
+    ├── scripts/
     └── ...
 ```
+
+From there, start your Codex session in the repo and follow the generated bootstrap in `AGENTS.md`.
+
+## Common init modes
+
+### Minimal setup
+
+```bash
+waypoint init
+```
+
+### Full local workflow setup
+
+```bash
+waypoint init --with-roles --with-rules --with-automations
+```
+
+### App-friendly profile
+
+```bash
+waypoint init --app-friendly --with-roles --with-automations
+```
+
+Flags you can combine:
+
+- `--app-friendly`
+- `--with-roles`
+- `--with-rules`
+- `--with-automations`
 
 ## Main commands
 
 - `waypoint init` — scaffold or refresh the repo
-- `waypoint doctor` — check for drift and missing pieces
-- `waypoint sync` — rebuild `.waypoint/DOCS_INDEX.md` and sync optional automations/rules
-- `waypoint upgrade` — update the global Waypoint CLI and refresh the current repo with its existing config
-- `waypoint import-legacy` — import from an older repo layout
+- `waypoint doctor` — validate health and report drift
+- `waypoint sync` — rebuild the docs index and sync optional user-home artifacts
+- `waypoint upgrade` — update the CLI and refresh the current repo using its saved config
+- `waypoint import-legacy` — analyze an older repo layout and produce an adoption report
 
-## Shipped skills
+## Built-in skills
+
+Waypoint ships a strong default skill pack for real coding work:
 
 - `planning`
 - `error-audit`
@@ -67,6 +137,8 @@ repo/
 - `pr-review`
 - `e2e-verify`
 
+These are repo-local, so the workflow travels with the project.
+
 ## Optional reviewer roles
 
 If you initialize with `--with-roles`, Waypoint scaffolds:
@@ -75,19 +147,45 @@ If you initialize with `--with-roles`, Waypoint scaffolds:
 - `code-reviewer`
 - `plan-reviewer`
 
-The intended workflow is post-commit: after your own commit lands, run `code-reviewer` and `code-health-reviewer` in parallel in the background, then fix real findings before you call the work finished.
+The intended workflow is post-commit: make your change, commit it, run the reviewers in parallel, fix real findings, then close out.
 
-## Update
+## What makes it different
+
+Waypoint is not trying to hide everything behind hooks and background machinery.
+
+It is opinionated, but explicit:
+
+- state lives in files you can inspect
+- docs routing is generated, not guessed from memory
+- repo conventions are encoded in markdown
+- startup context is rebuilt on purpose
+- the repo remains the source of truth
+
+## Upgrading
+
+Recommended path:
 
 ```bash
 waypoint upgrade
 ```
 
-If you only want to update the CLI without refreshing the repo:
+That updates the global CLI and refreshes the current repo using its existing Waypoint config.
+
+If you only want to update the CLI:
 
 ```bash
 waypoint upgrade --skip-repo-refresh
 ```
+
+## Importing an existing repo
+
+If you already have an older assistant setup or repo-memory system:
+
+```bash
+waypoint import-legacy /path/to/source-repo /path/to/new-repo --init-target
+```
+
+This generates an adoption report and helps separate durable docs from old runtime-specific scaffolding.
 
 ## Learn more
 
@@ -95,3 +193,8 @@ waypoint upgrade --skip-repo-refresh
 - [Architecture](docs/architecture.md)
 - [Upgrading](docs/upgrading.md)
 - [Importing Existing Repositories](docs/importing-existing-repos.md)
+- [Releasing](docs/releasing.md)
+
+## License
+
+MIT. See [LICENSE](LICENSE).
