@@ -39,6 +39,7 @@ Ask one question:
 
 Keep only the answer to that question in the workspace. Usually that means:
 
+- active tracker pointers
 - current focus
 - latest verified state
 - open blockers or risks
@@ -52,6 +53,7 @@ Usually remove or collapse:
 - validation transcripts
 - old milestone history
 - duplicated durable documentation
+- per-item implementation checklists that belong in `.waypoint/track/`
 
 Compression is documentation quality, not data loss.
 
@@ -66,6 +68,7 @@ When editing the workspace:
 5. Do not turn the workspace into an archive, changelog, or debug notebook.
 
 If durable context is missing from `.waypoint/docs/`, add or refresh the smallest coherent routed doc before removing it from the workspace.
+If execution detail is still active but too large for the workspace, move it into `.waypoint/track/` instead of deleting it.
 
 ## Step 4: Protect User-Owned State
 

@@ -32,8 +32,10 @@ This is mandatory, not optional.
 
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
+- For large multi-step work, create or update `.waypoint/track/<slug>.md`, keep detailed execution state there, and point to it from `## Active Trackers` in `.waypoint/WORKSPACE.md`
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
+- Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
 - Use `code-guide-audit` for a targeted coding-guide compliance pass on a specific feature, file set, or change slice
 - Use `break-it-qa` for browser-facing features that should be tested against invalid inputs, refreshes, repeated clicks, wrong navigation, and other adversarial user behavior

@@ -14,16 +14,20 @@ import path from "node:path";
 import * as TOML from "@iarna/toml";
 
 import { renderDocsIndex } from "./docs-index.js";
+import { renderTracksIndex } from "./track-index.js";
 import { readTemplate, renderWaypointConfig, MANAGED_BLOCK_END, MANAGED_BLOCK_START, templatePath } from "./templates.js";
 import type { AutomationSpec, Finding, SyncRecord, WaypointConfig } from "./types.js";
 
 const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
 const DEFAULT_DOCS_DIR = ".waypoint/docs";
 const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
+const DEFAULT_TRACK_DIR = ".waypoint/track";
+const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
 const STATE_DIR = ".waypoint/state";
 const SYNC_RECORDS_FILE = ".waypoint/state/sync-records.json";
 const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
+  "## Active Trackers",
   "## Current State",
   "## In Progress",
   "## Next",
@@ -122,6 +126,7 @@ function scaffoldWaypointOptionalTemplates(projectRoot: string): void {
   copyTemplateTree(templatePath(".waypoint/automations"), path.join(projectRoot, ".waypoint/automations"));
   copyTemplateTree(templatePath(".waypoint/rules"), path.join(projectRoot, ".waypoint/rules"));
   copyTemplateTree(templatePath(".waypoint/scripts"), path.join(projectRoot, ".waypoint/scripts"));
+  copyTemplateTree(templatePath(".waypoint/track"), path.join(projectRoot, ".waypoint/track"));
 }
 
 function scaffoldOptionalCodex(projectRoot: string): void {
@@ -143,6 +148,9 @@ export function initRepository(
     "docs/README.md",
     "docs/code-guide.md",
     "docs/legacy-import",
+    ".agents/skills/error-audit",
+    ".agents/skills/observability-audit",
+    ".agents/skills/ux-states-audit",
     "WAYPOINT_MIGRATION.md",
     ".agents/skills/waypoint-planning",
     ".agents/skills/waypoint-docs",
@@ -184,6 +192,7 @@ export function initRepository(
   );
   writeIfMissing(path.join(projectRoot, DEFAULT_WORKSPACE), readTemplate("WORKSPACE.md"));
   ensureDir(path.join(projectRoot, DEFAULT_DOCS_DIR));
+  ensureDir(path.join(projectRoot, DEFAULT_TRACK_DIR));
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/README.md"), readTemplate(".waypoint/docs/README.md"));
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/code-guide.md"), readTemplate(".waypoint/docs/code-guide.md"));
   upsertManagedBlock(path.join(projectRoot, "AGENTS.md"), readTemplate("managed-agents-block.md"));
@@ -193,14 +202,16 @@ export function initRepository(
   }
   appendGitignoreSnippet(projectRoot);
   const docsIndex = renderDocsIndex(projectRoot, path.join(projectRoot, DEFAULT_DOCS_DIR));
+  const tracksIndex = renderTracksIndex(projectRoot, path.join(projectRoot, DEFAULT_TRACK_DIR));
   writeText(path.join(projectRoot, DEFAULT_DOCS_INDEX), `${docsIndex.content}\n`);
+  writeText(path.join(projectRoot, DEFAULT_TRACKS_INDEX), `${tracksIndex.content}\n`);
 
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created .waypoint/WORKSPACE.md and .waypoint/docs/ scaffold",
+    "Created .waypoint/WORKSPACE.md, .waypoint/docs/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
-    "Generated .waypoint/DOCS_INDEX.md",
+    "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
   ];
 }
 
@@ -427,6 +438,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     const workspaceText = readFileSync(workspacePath, "utf8");
     for (const section of [
       "## Active Goal",
+      "## Active Trackers",
       "## Current State",
       "## In Progress",
       "## Next",
@@ -460,6 +472,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     path.join(projectRoot, ".waypoint", "agent-operating-manual.md"),
     path.join(projectRoot, ".waypoint", "scripts", "prepare-context.mjs"),
     path.join(projectRoot, ".waypoint", "scripts", "build-docs-index.mjs"),
+    path.join(projectRoot, ".waypoint", "scripts", "build-track-index.mjs"),
   ]) {
     if (!existsSync(requiredFile)) {
       findings.push({
@@ -475,6 +488,9 @@ export function doctorRepository(projectRoot: string): Finding[] {
   const docsDir = path.join(projectRoot, config.docs_dir ?? DEFAULT_DOCS_DIR);
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
   const docsIndex = renderDocsIndex(projectRoot, docsDir);
+  const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
+  const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
+  const tracksIndex = renderTracksIndex(projectRoot, trackDir);
   if (!existsSync(docsDir)) {
     findings.push({
       severity: "error",
@@ -510,12 +526,58 @@ export function doctorRepository(projectRoot: string): Finding[] {
       paths: [docsIndexPath],
     });
   }
+  if (!existsSync(trackDir)) {
+    findings.push({
+      severity: "error",
+      category: "track",
+      message: ".waypoint/track/ directory is missing.",
+      remediation: "Run `waypoint init` to scaffold track files.",
+      paths: [trackDir],
+    });
+  }
+  for (const relPath of tracksIndex.invalidTracks) {
+    findings.push({
+      severity: "warn",
+      category: "track",
+      message: `Tracker is missing valid frontmatter or status: ${relPath}`,
+      remediation: "Add `summary`, `last_updated`, `status`, and `read_when` frontmatter using the track template.",
+      paths: [path.join(projectRoot, relPath)],
+    });
+  }
+  if (!existsSync(tracksIndexPath)) {
+    findings.push({
+      severity: "warn",
+      category: "track",
+      message: ".waypoint/TRACKS_INDEX.md is missing.",
+      remediation: "Run `waypoint sync` to generate the tracks index.",
+      paths: [tracksIndexPath],
+    });
+  } else if (readFileSync(tracksIndexPath, "utf8").trimEnd() !== tracksIndex.content.trimEnd()) {
+    findings.push({
+      severity: "warn",
+      category: "track",
+      message: ".waypoint/TRACKS_INDEX.md is stale.",
+      remediation: "Run `waypoint sync` to rebuild the tracks index.",
+      paths: [tracksIndexPath],
+    });
+  }
+  if (
+    existsSync(workspacePath) &&
+    tracksIndex.activeTrackPaths.length > 0 &&
+    !tracksIndex.activeTrackPaths.some((trackPath) => readFileSync(workspacePath, "utf8").includes(trackPath))
+  ) {
+    findings.push({
+      severity: "warn",
+      category: "track",
+      message: "Workspace does not reference any active tracker file.",
+      remediation: "Add the active `.waypoint/track/*.md` file paths under `## Active Trackers` in `.waypoint/WORKSPACE.md`.",
+      paths: [workspacePath, ...tracksIndex.activeTrackPaths.map((trackPath) => path.join(projectRoot, trackPath))],
+    });
+  }
 
   for (const skillName of [
     "planning",
-    "error-audit",
-    "observability-audit",
-    "ux-states-audit",
+    "work-tracker",
     "docs-sync",
     "code-guide-audit",
     "break-it-qa",
@@ -595,9 +657,13 @@ export function syncRepository(projectRoot: string): string[] {
   const docsDir = path.join(projectRoot, config.docs_dir ?? DEFAULT_DOCS_DIR);
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
   const docsIndex = renderDocsIndex(projectRoot, docsDir);
+  const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
+  const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
+  const tracksIndex = renderTracksIndex(projectRoot, trackDir);
   writeText(docsIndexPath, `${docsIndex.content}\n`);
+  writeText(tracksIndexPath, `${tracksIndex.content}\n`);
 
-  const results = ["Rebuilt .waypoint/DOCS_INDEX.md"];
+  const results = ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"];
   const featureMap = config.features ?? {};
   if (featureMap.rules) {
     results.push(...syncRules(projectRoot));

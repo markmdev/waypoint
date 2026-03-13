@@ -13,6 +13,8 @@ Put the durable context here that the next agent will need to continue the work:
 
 These are **project docs**, not Waypoint internals.
 
+Do not use `.waypoint/docs/` as the execution tracker layer for active long-running work. That belongs under `.waypoint/track/`.
+
 Every routable doc needs YAML frontmatter:
 
 ```yaml

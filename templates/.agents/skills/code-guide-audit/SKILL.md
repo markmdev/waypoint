@@ -47,6 +47,8 @@ Skip rules that genuinely do not apply, but say that you skipped them.
 
 This skill is narrower than `pre-pr-hygiene`. Use that other skill for broader ship-readiness.
 
+If this audit produces a large remediation campaign, create or update a tracker under `.waypoint/track/` before switching into implementation so the fix list does not live only in chat.
+
 ## Step 4: Verify Evidence
 
 Ground each finding in the actual code.

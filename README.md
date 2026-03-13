@@ -22,10 +22,12 @@ Waypoint scaffolds a Codex-friendly repo structure built around a few core piece
 
 - `AGENTS.md` for the startup contract
 - `.waypoint/WORKSPACE.md` for live operational state
+- `.waypoint/track/` for active long-running execution trackers
 - `.waypoint/docs/` for durable project memory
 - `.waypoint/DOCS_INDEX.md` for docs routing
+- `.waypoint/TRACKS_INDEX.md` for tracker routing
 - `.waypoint/context/` for generated startup context
-- `.agents/skills/` for repo-local workflows like planning, audits, and QA
+- `.agents/skills/` for repo-local workflows like planning, tracking, audits, and QA
 
 The philosophy is simple:
 
@@ -40,7 +42,7 @@ Waypoint is most useful when you want:
 
 - multi-session continuity in a real repo
 - a durable docs and workspace structure for agents
-- stronger planning, review, QA, and closeout defaults
+- stronger planning, tracking, review, QA, and closeout defaults
 - repo-local scaffolding instead of a bunch of global mystery behavior
 
 If you only use Codex for tiny one-off edits, Waypoint is probably unnecessary.
@@ -76,9 +78,11 @@ repo/
 ├── .agents/
 │   └── skills/
 └── .waypoint/
-    ├── WORKSPACE.md
     ├── DOCS_INDEX.md
+    ├── TRACKS_INDEX.md
+    ├── WORKSPACE.md
     ├── docs/
+    ├── track/
     ├── context/
     ├── scripts/
     └── ...
@@ -126,9 +130,7 @@ Flags you can combine:
 Waypoint ships a strong default skill pack for real coding work:
 
 - `planning`
-- `error-audit`
-- `observability-audit`
-- `ux-states-audit`
+- `work-tracker`
 - `docs-sync`
 - `code-guide-audit`
 - `break-it-qa`

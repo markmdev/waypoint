@@ -1,6 +1,7 @@
 export type FindingSeverity = "info" | "warn" | "error";
 export type FindingCategory =
   | "docs"
+  | "track"
   | "workspace"
   | "skills"
   | "roles"
@@ -49,4 +50,3 @@ export interface AutomationSpec {
   status?: "ACTIVE" | "PAUSED";
   enabled?: boolean;
 }
-

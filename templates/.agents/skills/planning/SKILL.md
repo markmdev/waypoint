@@ -36,6 +36,8 @@ The plan belongs in the repo, not only in chat.
 - Make sure the doc remains discoverable through the routed docs layer.
 - In chat, return only a concise summary plus the path to the plan doc.
 
+If the planned implementation will be large, multi-step, or likely to span multiple sessions, also create or update a tracker under `.waypoint/track/` and link it from `WORKSPACE.md` before implementation begins.
+
 ## The Core Loop
 
 ```

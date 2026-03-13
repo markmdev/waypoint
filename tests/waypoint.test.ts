@@ -39,8 +39,10 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Trackers"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
@@ -65,12 +67,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("RECENT_THREAD.md")
   );
-  assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
-  assert.ok(readFileSync(path.join(root, ".agents/skills/error-audit/SKILL.md"), "utf8").includes("# Error Audit"));
   assert.ok(
-    readFileSync(path.join(root, ".agents/skills/observability-audit/SKILL.md"), "utf8").includes("# Observability Audit")
+    readFileSync(path.join(root, ".waypoint/scripts/build-track-index.mjs"), "utf8").includes("TRACKS_INDEX.md")
   );
-  assert.ok(readFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "utf8").includes("# UX States Audit"));
+  assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
+  assert.ok(readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes("# Work Tracker"));
   assert.ok(readFileSync(path.join(root, ".agents/skills/docs-sync/SKILL.md"), "utf8").includes("# Docs Sync"));
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
@@ -83,7 +84,12 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/pre-pr-hygiene/SKILL.md"), "utf8").includes("# Pre-PR Hygiene")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes("# PR Review"));
+  assert.equal(existsSync(path.join(root, ".agents/skills/error-audit")), false);
+  assert.equal(existsSync(path.join(root, ".agents/skills/observability-audit")), false);
+  assert.equal(existsSync(path.join(root, ".agents/skills/ux-states-audit")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/docs/README.md"), "utf8").includes("Waypoint-managed project memory"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/track/README.md"), "utf8").includes("active execution trackers"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/track/_template.md"), "utf8").includes("## Workstreams"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes(
       "Compatibility is opt-in, not ambient"
@@ -102,6 +108,36 @@ test("doctor is clean after init", () => {
 
   const findings = doctorRepository(root);
   assert.equal(findings.length, 0);
+});
+
+test("init removes retired audit skill directories on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-audit-skills-"));
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  mkdirSync(path.join(root, ".agents/skills/error-audit"), { recursive: true });
+  writeFileSync(path.join(root, ".agents/skills/error-audit/SKILL.md"), "# Error Audit\n", "utf8");
+  mkdirSync(path.join(root, ".agents/skills/observability-audit"), { recursive: true });
+  writeFileSync(path.join(root, ".agents/skills/observability-audit/SKILL.md"), "# Observability Audit\n", "utf8");
+  mkdirSync(path.join(root, ".agents/skills/ux-states-audit"), { recursive: true });
+  writeFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "# UX States Audit\n", "utf8");
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  assert.equal(existsSync(path.join(root, ".agents/skills/error-audit")), false);
+  assert.equal(existsSync(path.join(root, ".agents/skills/observability-audit")), false);
+  assert.equal(existsSync(path.join(root, ".agents/skills/ux-states-audit")), false);
+  assert.equal(existsSync(path.join(root, ".agents/skills/planning/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/pr-review/SKILL.md")), true);
 });
 
 test("doctor warns when workspace entries are not timestamped", () => {
@@ -123,6 +159,8 @@ test("doctor warns when workspace entries are not timestamped", () => {
       "## Active Goal",
       "",
       "Ship something useful.",
+      "",
+      "## Active Trackers",
       "",
       "## Current State",
       "",
@@ -345,6 +383,56 @@ test("prepare-context writes merged recent thread with redaction", () => {
   assert.ok(!recentThread.includes("npm_ABC123SECRET"));
   assert.ok(manifest.includes(".waypoint/context/RECENT_THREAD.md"));
   assert.ok(manifest.includes("latest meaningful turns"));
+});
+
+test("prepare-context includes active trackers in generated context", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-active-trackers-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal",
+    withRoles: false,
+    withRules: false,
+    withAutomations: false
+  });
+
+  writeFileSync(
+    path.join(root, ".waypoint/track/backend-hardening.md"),
+    [
+      "---",
+      "summary: Close the backend hardening fix campaign",
+      'last_updated: "2026-03-13 11:38 PDT"',
+      "status: active",
+      "read_when:",
+      "  - resuming backend hardening",
+      "---",
+      "",
+      "# Backend Hardening",
+      "",
+      "## Goal",
+      "",
+      "Ship the hardening fixes.",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const tracksIndex = readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8");
+  const activeTrackers = readFileSync(path.join(root, ".waypoint/context/ACTIVE_TRACKERS.md"), "utf8");
+  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
+
+  assert.ok(tracksIndex.includes(".waypoint/track/backend-hardening.md"));
+  assert.ok(activeTrackers.includes(".waypoint/track/backend-hardening.md"));
+  assert.ok(manifest.includes(".waypoint/TRACKS_INDEX.md"));
+  assert.ok(manifest.includes(".waypoint/context/ACTIVE_TRACKERS.md"));
+  assert.ok(manifest.includes(".waypoint/track/backend-hardening.md"));
 });
 
 test("prepare-context prefers turns before the last compaction", () => {

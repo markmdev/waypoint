@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+### Minor Changes
+
+- Add a first-class `.waypoint/track/` layer for long-running work, including a generated `.waypoint/TRACKS_INDEX.md`, active-tracker bootstrap context, and a built-in `work-tracker` skill. Also remove `error-audit`, `observability-audit`, and `ux-states-audit` from the default shipped skill pack while keeping the rest of Waypoint's core workflow skills.
+
 ## 0.7.0
 
 ### Minor Changes

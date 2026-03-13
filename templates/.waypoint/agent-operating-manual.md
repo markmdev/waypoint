@@ -33,8 +33,9 @@ Do not skip this sequence.
 The repository should contain the context the next agent needs.
 
 - `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
+- `.waypoint/track/` is the durable execution-tracking layer for active long-running work
 - `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
-- `.waypoint/context/` is the generated session context bundle: current git/PR/doc index state
+- `.waypoint/context/` is the generated session context bundle: current git/PR/doc/track index state
 
 If something important lives only in your head or in the chat transcript, the repo is under-documented.
 
@@ -43,8 +44,10 @@ If something important lives only in your head or in the chat transcript, the re
 - Read code before editing it.
 - Follow the repo's documented patterns when they are healthy.
 - Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
+- For large multi-step work, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
+- Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
 - Use the repo-local skills and optional reviewer agents instead of improvising from scratch.
 - Do not kill long-running subagents or reviewer agents just because they are slow. Wait unless they are clearly stuck, failed, or the user redirects the work.
 
@@ -64,9 +67,7 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 ## When to use Waypoint skills
 
 - `planning` for non-trivial changes
-- `error-audit` when failures are being swallowed or degraded invisibly
-- `observability-audit` when production debugging signals look weak
-- `ux-states-audit` when async/data-driven UI likely lacks loading, empty, or error states
+- `work-tracker` when large multi-step work needs durable progress tracking in `.waypoint/track/`
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
 - `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
