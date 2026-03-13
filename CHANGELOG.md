@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1
+
+### Patch Changes
+
+- Make `waypoint init` update the global CLI before scaffolding by default, with `--skip-cli-update` to opt out.
+
 ## 0.8.0
 
 ### Minor Changes

@@ -8,7 +8,7 @@ import process from "node:process";
 
 import { doctorRepository, importLegacyRepo, initRepository, loadWaypointConfig, syncRepository } from "./core.js";
 import type { Finding } from "./types.js";
-import { upgradeWaypoint } from "./upgrade.js";
+import { maybeUpgradeWaypointBeforeInit, upgradeWaypoint } from "./upgrade.js";
 
 const VERSION = JSON.parse(
   readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../package.json"), "utf8")
@@ -37,7 +37,7 @@ function printHelp(): void {
   console.log(`usage: waypoint [--version] <command> [options]
 
 Commands:
-  init                Initialize a repository with Waypoint scaffolding
+  init                Initialize a repository with Waypoint scaffolding (auto-updates CLI unless skipped)
   doctor              Validate repository health and report drift
   sync                Rebuild docs index and sync optional user-home artifacts
   upgrade             Update the global Waypoint CLI and refresh this repo using existing config
@@ -66,11 +66,22 @@ async function main(): Promise<number> {
         "app-friendly": { type: "boolean", default: false },
         "with-roles": { type: "boolean", default: false },
         "with-rules": { type: "boolean", default: false },
-        "with-automations": { type: "boolean", default: false }
+        "with-automations": { type: "boolean", default: false },
+        "skip-cli-update": { type: "boolean", default: false }
       },
       allowPositionals: true
     });
     const projectRoot = resolveRepo(positionals[0]);
+    if (!values["skip-cli-update"]) {
+      const status = maybeUpgradeWaypointBeforeInit({
+        currentVersion: VERSION,
+        cliEntry: process.argv[1] ? path.resolve(process.argv[1]) : fileURLToPath(import.meta.url),
+        initArgs: argv.slice(1),
+      });
+      if (status !== null) {
+        return status;
+      }
+    }
     const results = initRepository(projectRoot, {
       profile: values["app-friendly"] ? "app-friendly" : "universal",
       withRoles: values["with-roles"],

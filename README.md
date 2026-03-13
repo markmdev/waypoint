@@ -98,6 +98,12 @@ From there, start your Codex session in the repo and follow the generated bootst
 waypoint init
 ```
 
+By default, `waypoint init` updates the global CLI to the latest published `waypoint-codex` first, then scaffolds with that fresh version. If you want to scaffold with the currently installed binary instead, use:
+
+```bash
+waypoint init --skip-cli-update
+```
+
 ### Full local workflow setup
 
 ```bash
@@ -116,10 +122,11 @@ Flags you can combine:
 - `--with-roles`
 - `--with-rules`
 - `--with-automations`
+- `--skip-cli-update`
 
 ## Main commands
 
-- `waypoint init` — scaffold or refresh the repo
+- `waypoint init` — update the CLI to latest by default, then scaffold or refresh the repo
 - `waypoint doctor` — validate health and report drift
 - `waypoint sync` — rebuild the docs index and sync optional user-home artifacts
 - `waypoint upgrade` — update the CLI and refresh the current repo using its saved config

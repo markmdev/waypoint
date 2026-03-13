@@ -5,7 +5,13 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { buildInitArgs, npmBinaryForPlatform, upgradeWaypoint } from "../src/upgrade.js";
+import {
+  buildInitArgs,
+  compareVersions,
+  maybeUpgradeWaypointBeforeInit,
+  npmBinaryForPlatform,
+  upgradeWaypoint,
+} from "../src/upgrade.js";
 
 test("buildInitArgs preserves config feature flags", () => {
   const args = buildInitArgs("/tmp/repo", {
@@ -30,6 +36,99 @@ test("buildInitArgs preserves config feature flags", () => {
 test("npmBinaryForPlatform maps windows to npm.cmd", () => {
   assert.equal(npmBinaryForPlatform("win32"), "npm.cmd");
   assert.equal(npmBinaryForPlatform("darwin"), "npm");
+});
+
+test("compareVersions handles release and prerelease ordering", () => {
+  assert.equal(compareVersions("0.8.0", "0.8.0"), 0);
+  assert.ok(compareVersions("0.8.1", "0.8.0") > 0);
+  assert.ok(compareVersions("0.9.0", "0.8.9") > 0);
+  assert.ok(compareVersions("0.8.0", "0.8.0-beta.1") > 0);
+  assert.ok(compareVersions("0.8.0-beta.2", "0.8.0-beta.1") > 0);
+});
+
+test("init auto-updates and re-execs when a newer CLI is published", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-init-upgrade-"));
+  const fakeBin = mkdtempSync(path.join(os.tmpdir(), "waypoint-fake-bin-"));
+  const logFile = path.join(root, "calls.log");
+
+  const fakeNpm = path.join(fakeBin, "fake-npm.js");
+  writeFileSync(
+    fakeNpm,
+    [
+      "#!/usr/bin/env node",
+      "import { appendFileSync } from 'node:fs';",
+      "const args = process.argv.slice(2);",
+      `appendFileSync(${JSON.stringify(logFile)}, 'npm ' + args.join(' ') + '\\n');`,
+      "if (args[0] === 'view') {",
+      "  process.stdout.write('0.8.1\\n');",
+      "}",
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(fakeNpm, 0o755);
+
+  const fakeCli = path.join(fakeBin, "fake-cli.js");
+  writeFileSync(
+    fakeCli,
+    [
+      "#!/usr/bin/env node",
+      "import { appendFileSync } from 'node:fs';",
+      `appendFileSync(${JSON.stringify(logFile)}, 'cli ' + process.argv.slice(2).join(' ') + '\\n');`,
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(fakeCli, 0o755);
+
+  const status = maybeUpgradeWaypointBeforeInit({
+    currentVersion: "0.8.0",
+    cliEntry: fakeCli,
+    initArgs: [root, "--with-roles"],
+    nodeBinary: process.execPath,
+    npmBinary: fakeNpm,
+    stdio: "pipe",
+  });
+
+  assert.equal(status, 0);
+  const log = readFileSync(logFile, "utf8");
+  assert.ok(log.includes("npm view waypoint-codex version"));
+  assert.ok(log.includes("npm install -g waypoint-codex@latest"));
+  assert.ok(log.includes(`cli init ${root} --with-roles --skip-cli-update`));
+});
+
+test("init skips auto-update when current CLI is already latest", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-init-upgrade-none-"));
+  const fakeBin = mkdtempSync(path.join(os.tmpdir(), "waypoint-fake-bin-"));
+  const logFile = path.join(root, "calls.log");
+
+  const fakeNpm = path.join(fakeBin, "fake-npm.js");
+  writeFileSync(
+    fakeNpm,
+    [
+      "#!/usr/bin/env node",
+      "import { appendFileSync } from 'node:fs';",
+      "const args = process.argv.slice(2);",
+      `appendFileSync(${JSON.stringify(logFile)}, 'npm ' + args.join(' ') + '\\n');`,
+      "if (args[0] === 'view') {",
+      "  process.stdout.write('0.8.0\\n');",
+      "}",
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(fakeNpm, 0o755);
+
+  const status = maybeUpgradeWaypointBeforeInit({
+    currentVersion: "0.8.0",
+    cliEntry: path.join(fakeBin, "unused-cli.js"),
+    initArgs: [root],
+    nodeBinary: process.execPath,
+    npmBinary: fakeNpm,
+    stdio: "pipe",
+  });
+
+  assert.equal(status, null);
+  const log = readFileSync(logFile, "utf8");
+  assert.ok(log.includes("npm view waypoint-codex version"));
+  assert.equal(log.includes("npm install -g waypoint-codex@latest"), false);
 });
 
 test("upgradeWaypoint updates cli then refreshes repo using existing config", () => {
