@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2
+
+### Patch Changes
+
+- Change the default `.gitignore` scaffold so new Waypoint installs ignore everything under `.waypoint/` except `.waypoint/docs/`, keeping durable docs trackable while workspace, context, indexes, and other operational state remain local by default.
+
 ## 0.9.1
 
 ### Patch Changes

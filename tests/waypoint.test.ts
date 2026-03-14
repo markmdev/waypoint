@@ -43,6 +43,12 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Trackers"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
+  const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
+  assert.ok(gitignore.includes(".waypoint/*"));
+  assert.ok(gitignore.includes("!.waypoint/docs/"));
+  assert.ok(gitignore.includes("!.waypoint/docs/**"));
+  assert.ok(gitignore.includes(".waypoint/docs/README.md"));
+  assert.ok(gitignore.includes(".waypoint/docs/code-guide.md"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
