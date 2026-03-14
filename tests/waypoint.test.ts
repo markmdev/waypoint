@@ -265,7 +265,7 @@ test("init scaffolds reviewer agent pack by default", () => {
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."plan-reviewer"]'));
   assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/agents/code-reviewer.md")
+    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes("You are a code reviewer.")
   );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
@@ -274,17 +274,14 @@ test("init scaffolds reviewer agent pack by default", () => {
     readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
   );
   assert.ok(
-    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(".waypoint/agents/plan-reviewer.md")
+    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
+      "You are an elite Plan Review Architect."
+    )
   );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
   );
-  assert.ok(
-    readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("You are a code reviewer")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("reviewable slice the main agent hands you")
-  );
+  assert.equal(existsSync(path.join(root, ".waypoint/agents/code-reviewer.md")), false);
 });
 
 test("prepare-context writes merged recent thread with redaction", () => {
@@ -671,7 +668,7 @@ test("prepare-context skips stale sessions whose cwd no longer exists", () => {
   assert.ok(!recentThread.includes("Old session that should be ignored."));
 });
 
-test("prepare-context captures repo state for commits, changes, and nested repos", () => {
+test("prepare-context captures repo state for commits and changes without extra context files", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-repo-state-"));
   const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
   process.env.CODEX_HOME = codexHome;
@@ -688,15 +685,6 @@ test("prepare-context captures repo state for commits, changes, and nested repos
   execFileSync("git", ["commit", "-m", "Initial commit"], { cwd: root, stdio: "pipe" });
   writeFileSync(path.join(root, "scratch.txt"), "local change\n", "utf8");
 
-  const nestedRepo = path.join(root, "nested-service");
-  mkdirp(nestedRepo);
-  execFileSync("git", ["init"], { cwd: nestedRepo, stdio: "pipe" });
-  execFileSync("git", ["config", "user.name", "Waypoint Test"], { cwd: nestedRepo, stdio: "pipe" });
-  execFileSync("git", ["config", "user.email", "waypoint@example.com"], { cwd: nestedRepo, stdio: "pipe" });
-  writeFileSync(path.join(nestedRepo, "service.txt"), "nested\n", "utf8");
-  execFileSync("git", ["add", "service.txt"], { cwd: nestedRepo, stdio: "pipe" });
-  execFileSync("git", ["commit", "-m", "Nested commit"], { cwd: nestedRepo, stdio: "pipe" });
-
   execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
     cwd: root,
     env: { ...process.env, CODEX_HOME: codexHome },
@@ -705,12 +693,15 @@ test("prepare-context captures repo state for commits, changes, and nested repos
 
   const changes = readFileSync(path.join(root, ".waypoint/context/UNCOMMITTED_CHANGES.md"), "utf8");
   const commits = readFileSync(path.join(root, ".waypoint/context/RECENT_COMMITS.md"), "utf8");
-  const nested = readFileSync(path.join(root, ".waypoint/context/NESTED_REPOS.md"), "utf8");
+  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
 
   assert.ok(changes.includes("scratch.txt"));
   assert.ok(commits.includes("Initial commit"));
-  assert.ok(nested.includes("nested-service"));
-  assert.ok(nested.includes("Nested commit"));
+  assert.ok(manifest.includes("## Context Snapshot"));
+  assert.ok(manifest.includes("Local timezone:"));
+  assert.ok(manifest.includes("Current local datetime:"));
+  assert.equal(existsSync(path.join(root, ".waypoint/context/CURRENT_DATETIME.md")), false);
+  assert.equal(existsSync(path.join(root, ".waypoint/context/NESTED_REPOS.md")), false);
 });
 
 test("prepare-context explains PR context using gh output", () => {

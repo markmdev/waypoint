@@ -401,36 +401,6 @@ function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
   return filePath;
 }
 
-function collectNestedGitRepos(projectRoot) {
-  const repos = [];
-
-  function walk(currentDir) {
-    for (const entry of readdirSync(currentDir)) {
-      const fullPath = path.join(currentDir, entry);
-      let stats;
-      try {
-        stats = statSync(fullPath);
-      } catch {
-        continue;
-      }
-      if (!stats.isDirectory()) {
-        continue;
-      }
-      if (entry === ".git") {
-        repos.push(path.dirname(fullPath));
-        continue;
-      }
-      if (["node_modules", ".next", "dist", "build", "__pycache__", ".waypoint"].includes(entry)) {
-        continue;
-      }
-      walk(fullPath);
-    }
-  }
-
-  walk(projectRoot);
-  return repos.filter((repoPath) => path.resolve(repoPath) !== path.resolve(projectRoot));
-}
-
 function writeContextFile(contextDir, name, title, body) {
   const filePath = path.join(contextDir, name);
   const content = `# ${title}\n\n${body && body.trim().length > 0 ? body.trim() : "None."}\n`;
@@ -466,12 +436,8 @@ function main() {
   const docsIndexPath = writeDocsIndex(projectRoot);
   const { outputPath: tracksIndexPath, activeTracks } = writeTracksIndex(projectRoot);
 
-  const currentDatetimePath = writeContextFile(
-    contextDir,
-    "CURRENT_DATETIME.md",
-    "Current Datetime",
-    `Local timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n\nCurrent local datetime: ${new Date().toString()}`
-  );
+  const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const currentLocalDatetime = new Date().toString();
 
   const uncommittedChangesPath = writeContextFile(
     contextDir,
@@ -522,20 +488,6 @@ function main() {
       renderCommandBlock(recentCommitsResult, "No recent commits found for the current author."),
       "```",
     ].join("\n")
-  );
-
-  const nestedRepos = collectNestedGitRepos(projectRoot);
-  const nestedRepoSections = nestedRepos.map((repoPath) => {
-    const rel = path.relative(projectRoot, repoPath) || ".";
-    const branch = safeExec(["git", "branch", "--show-current"], repoPath) || "unknown";
-    const commits = safeExec(["git", "log", "--format=%h %s (%cr)", "-10"], repoPath) || "No recent commits found.";
-    return `## ${rel}\n\nBranch: ${branch}\n\n\`\`\`\n${commits}\n\`\`\``;
-  });
-  const nestedReposPath = writeContextFile(
-    contextDir,
-    "NESTED_REPOS.md",
-    "Nested Repositories",
-    nestedRepoSections.join("\n\n") || "No nested repositories found."
   );
 
   const prContext = githubPullRequestContext(projectRoot);
@@ -615,12 +567,15 @@ function main() {
     "",
     "Read every file listed below. This manifest is a required session-start context bundle.",
     "",
+    "## Context Snapshot",
+    "",
+    `- Local timezone: ${currentTimezone}`,
+    `- Current local datetime: ${currentLocalDatetime}`,
+    "",
     "## Required generated files",
     "",
-    `- \`${path.relative(projectRoot, currentDatetimePath)}\` — local datetime and timezone`,
     `- \`${path.relative(projectRoot, uncommittedChangesPath)}\` — uncommitted change summary`,
     `- \`${path.relative(projectRoot, recentCommitsPath)}\` — recent commits`,
-    `- \`${path.relative(projectRoot, nestedReposPath)}\` — recent commits in nested repositories`,
     `- \`${path.relative(projectRoot, prsPath)}\` — open and recently merged pull requests`,
     `- \`${path.relative(projectRoot, recentThreadPath)}\` — latest meaningful turns from the local Codex session for this repo`,
     `- \`${path.relative(projectRoot, docsIndexPath)}\` — current docs index`,

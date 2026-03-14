@@ -15,7 +15,6 @@
 3. **Reviewer agent layer**
    - `.codex/config.toml` with multi-agent enabled by default
    - `.codex/agents/*.toml`
-   - `.waypoint/agents/*.md`
 
 The default reviewer workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Slow reviewers should be allowed to finish unless they are clearly stuck or the user redirects the work.
 

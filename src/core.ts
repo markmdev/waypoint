@@ -118,7 +118,6 @@ function scaffoldSkills(projectRoot: string): void {
 }
 
 function scaffoldWaypointOptionalTemplates(projectRoot: string): void {
-  copyTemplateTree(templatePath(".waypoint/agents"), path.join(projectRoot, ".waypoint/agents"));
   copyTemplateTree(templatePath(".waypoint/scripts"), path.join(projectRoot, ".waypoint/scripts"));
   copyTemplateTree(templatePath(".waypoint/track"), path.join(projectRoot, ".waypoint/track"));
 }

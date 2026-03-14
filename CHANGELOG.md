@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+### Patch Changes
+
+- Embed the reviewer-agent prompts directly into `.codex/agents/*.toml` so the shipped agent definitions are single-file and cannot drift from separate `.waypoint/agents/*.md` prompt files. Remove the old scaffolded reviewer prompt markdown files and update the docs and tests to reflect the simpler reviewer-agent model.
+
 ## 0.9.0
 
 ### Minor Changes
