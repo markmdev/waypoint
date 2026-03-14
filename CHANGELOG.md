@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.3
+
+### Patch Changes
+
+- Extend the default `.gitignore` scaffold so Waypoint-created `.codex/` and `.agents/` artifacts are ignored by default alongside Waypoint operational state, while still leaving user-authored docs under `.waypoint/docs/` trackable.
+
 ## 0.9.2
 
 ### Patch Changes
