@@ -5,7 +5,7 @@ import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
 
-import { doctorRepository, importLegacyRepo, initRepository, syncRepository } from "../src/core.js";
+import { doctorRepository, initRepository, syncRepository } from "../src/core.js";
 
 let originalCodexHome: string | undefined;
 
@@ -24,16 +24,18 @@ afterEach(() => {
 test("init scaffolds core files", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-init-"));
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("<!-- waypoint:start -->"));
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
       "If you need repo-specific AGENTS instructions, write them outside this managed block."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Before making meaningful implementation, review, architectural, or tradeoff decisions, inspect the project root guidance files for persisted project context."
     )
   );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
@@ -43,6 +45,9 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
+  assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
+  assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("rules"), false);
+  assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
@@ -61,7 +66,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers once there is a coherent slice of work worth reviewing."
+      "Run `code-reviewer` before considering any non-trivial implementation slice complete."
     )
   );
   assert.ok(
@@ -73,6 +78,26 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
   assert.ok(readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes("# Work Tracker"));
   assert.ok(readFileSync(path.join(root, ".agents/skills/docs-sync/SKILL.md"), "utf8").includes("# Docs Sync"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/backend-ship-audit/SKILL.md"), "utf8").includes(
+      "# Backend ship audit"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/backend-context-interview/SKILL.md"), "utf8").includes(
+      "# Backend Context Interview"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/frontend-ship-audit/SKILL.md"), "utf8").includes(
+      "Audit ship-readiness like a strong frontend reviewer."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/frontend-context-interview/SKILL.md"), "utf8").includes(
+      "# Frontend Context Interview"
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
   );
@@ -100,10 +125,7 @@ test("init scaffolds core files", () => {
 test("doctor is clean after init", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-"));
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const findings = doctorRepository(root);
@@ -113,10 +135,7 @@ test("doctor is clean after init", () => {
 test("init removes retired audit skill directories on refresh", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-audit-skills-"));
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   mkdirSync(path.join(root, ".agents/skills/error-audit"), { recursive: true });
@@ -127,10 +146,7 @@ test("init removes retired audit skill directories on refresh", () => {
   writeFileSync(path.join(root, ".agents/skills/ux-states-audit/SKILL.md"), "# UX States Audit\n", "utf8");
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   assert.equal(existsSync(path.join(root, ".agents/skills/error-audit")), false);
@@ -143,10 +159,7 @@ test("init removes retired audit skill directories on refresh", () => {
 test("doctor warns when workspace entries are not timestamped", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-workspace-timestamps-"));
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   writeFileSync(
@@ -196,10 +209,7 @@ test("doctor warns when workspace entries are not timestamped", () => {
 test("init preserves AGENTS content outside the managed block", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-agents-preserve-"));
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   writeFileSync(
@@ -215,10 +225,7 @@ test("init preserves AGENTS content outside the managed block", () => {
   );
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
@@ -226,45 +233,28 @@ test("init preserves AGENTS content outside the managed block", () => {
   assert.ok(agents.includes("<!-- waypoint:start -->"));
 });
 
-test("sync installs automation into CODEX_HOME", () => {
+test("sync rebuilds docs and tracks indexes only", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-sync-"));
-  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
-  process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: true
+    profile: "universal"
   });
 
-  writeFileSync(
-    path.join(root, ".waypoint/automations/daily-brief.toml"),
-    [
-      'id = "daily-brief"',
-      'name = "Daily brief"',
-      'prompt = "Summarize recent project movement."',
-      'rrule = "RRULE:FREQ=WEEKLY;BYHOUR=9;BYMINUTE=0;BYDAY=FR"',
-      'execution_environment = "worktree"',
-      "enabled = true"
-    ].join("\n") + "\n",
-    "utf8"
-  );
+  writeFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "stale docs index\n", "utf8");
+  writeFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "stale tracks index\n", "utf8");
 
   const result = syncRepository(root);
-  assert.ok(result.some((item) => item.includes("daily-brief")));
-  const installed = readFileSync(path.join(codexHome, "automations/daily-brief/automation.toml"), "utf8");
-  assert.ok(installed.includes('id = "daily-brief"'));
-  assert.ok(installed.includes('execution_environment = "worktree"'));
+  assert.deepEqual(result, ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"]);
+  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
+  assert.equal(existsSync(path.join(root, ".waypoint/automations")), false);
+  assert.equal(existsSync(path.join(root, ".waypoint/rules")), false);
 });
 
-test("init with roles scaffolds optional codex role pack", () => {
+test("init scaffolds reviewer agent pack by default", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-roles-"));
   initRepository(root, {
-    profile: "universal",
-    withRoles: true,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const codexConfig = readFileSync(path.join(root, ".codex/config.toml"), "utf8");
@@ -287,6 +277,9 @@ test("init with roles scaffolds optional codex role pack", () => {
     readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(".waypoint/agents/plan-reviewer.md")
   );
   assert.ok(
+    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
+  );
+  assert.ok(
     readFileSync(path.join(root, ".waypoint/agents/code-reviewer.md"), "utf8").includes("You are a code reviewer")
   );
   assert.ok(
@@ -300,10 +293,7 @@ test("prepare-context writes merged recent thread with redaction", () => {
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const sessionDir = path.join(codexHome, "sessions/2026/03/06");
@@ -391,10 +381,7 @@ test("prepare-context includes active trackers in generated context", () => {
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   writeFileSync(
@@ -441,10 +428,7 @@ test("prepare-context prefers turns before the last compaction", () => {
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const sessionDir = path.join(codexHome, "sessions/2026/03/06");
@@ -530,10 +514,7 @@ test("prepare-context does not inject current thread when no compaction exists",
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const sessionDir = path.join(codexHome, "sessions/2026/03/06");
@@ -573,10 +554,7 @@ test("prepare-context can target an explicit thread id", () => {
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const sessionDir = path.join(codexHome, "sessions/2026/03/06");
@@ -642,10 +620,7 @@ test("prepare-context skips stale sessions whose cwd no longer exists", () => {
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   const sessionDir = path.join(codexHome, "sessions/2026/03/06");
@@ -702,10 +677,7 @@ test("prepare-context captures repo state for commits, changes, and nested repos
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   execFileSync("git", ["init"], { cwd: root, stdio: "pipe" });
@@ -748,10 +720,7 @@ test("prepare-context explains PR context using gh output", () => {
   process.env.CODEX_HOME = codexHome;
 
   initRepository(root, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
+    profile: "universal"
   });
 
   execFileSync("git", ["init"], { cwd: root, stdio: "pipe" });
@@ -806,46 +775,6 @@ test("prepare-context explains PR context using gh output", () => {
   assert.ok(prs.includes("GitHub repo: markmdev/waypoint-test"));
   assert.ok(prs.includes("#12 Fix transfer bug"));
   assert.ok(prs.includes("#11 Ship continuity fixes"));
-});
-
-test("import-legacy writes report and imported docs", () => {
-  const source = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-source-"));
-  const target = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-target-"));
-
-  initRepository(target, {
-    profile: "universal",
-    withRoles: false,
-    withRules: false,
-    withAutomations: false
-  });
-
-  const sourceDocsDir = path.join(source, ".meridian/docs");
-  const sourceSkillsDir = path.join(source, "skills/planning");
-  const sourceHooksDir = path.join(source, "hooks");
-  const sourceScriptsDir = path.join(source, "scripts");
-  const sourceAgentsDir = path.join(source, "agents");
-
-  mkdirp(sourceDocsDir);
-  mkdirp(sourceSkillsDir);
-  mkdirp(sourceHooksDir);
-  mkdirp(sourceScriptsDir);
-  mkdirp(sourceAgentsDir);
-
-  writeFileSync(
-    path.join(sourceDocsDir, "example.md"),
-    "---\nsummary: Example doc\nlast_updated: \"2026-03-06 19:55 PST\"\nread_when:\n  - example\n---\n\n# Example\n",
-    "utf8"
-  );
-  writeFileSync(path.join(sourceSkillsDir, "SKILL.md"), "---\nname: planning\ndescription: test\n---\n", "utf8");
-  writeFileSync(path.join(sourceHooksDir, "hooks.json"), "{}", "utf8");
-  writeFileSync(path.join(sourceScriptsDir, "context.py"), "print('x')\n", "utf8");
-  writeFileSync(path.join(sourceAgentsDir, "reviewer.md"), "---\nname: reviewer\n---\n", "utf8");
-
-  const result = importLegacyRepo(source, target, { initTarget: false });
-  writeFileSync(path.join(target, ".waypoint/IMPORT_LEGACY.md"), result.report, "utf8");
-  assert.ok(result.report.includes("Legacy Repository Adoption Report"));
-  assert.ok(existsSync(path.join(target, ".waypoint/IMPORT_LEGACY.md")));
-  assert.ok(existsSync(path.join(target, ".waypoint/docs/legacy-import/example.md")));
 });
 
 test("built cli can read package version", () => {

@@ -1,0 +1,3 @@
+display_name: Backend Ship Audit
+short_description: Audit a backend scope for real ship risk and write an evidence-based readiness report.
+default_prompt: Audit this backend scope for ship readiness. Resolve scope from the repository, read relevant backend code and docs completely, ask only missing high-leverage questions, persist durable backend context, and write a prioritized audit under .waypoint/audit/.

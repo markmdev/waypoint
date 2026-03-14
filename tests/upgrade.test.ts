@@ -13,24 +13,18 @@ import {
   upgradeWaypoint,
 } from "../src/upgrade.js";
 
-test("buildInitArgs preserves config feature flags", () => {
-  const args = buildInitArgs("/tmp/repo", {
+test("buildInitArgs preserves the app-friendly profile and ignores retired features", () => {
+  const legacyConfig = {
     profile: "app-friendly",
     features: {
-      roles: true,
+      // Old repos may still carry retired Codex integration flags.
       rules: true,
       automations: true,
     },
-  });
+  } as unknown as Parameters<typeof buildInitArgs>[1];
+  const args = buildInitArgs("/tmp/repo", legacyConfig);
 
-  assert.deepEqual(args, [
-    "init",
-    "/tmp/repo",
-    "--app-friendly",
-    "--with-roles",
-    "--with-rules",
-    "--with-automations",
-  ]);
+  assert.deepEqual(args, ["init", "/tmp/repo", "--app-friendly"]);
 });
 
 test("npmBinaryForPlatform maps windows to npm.cmd", () => {
@@ -82,7 +76,7 @@ test("init auto-updates and re-execs when a newer CLI is published", () => {
   const status = maybeUpgradeWaypointBeforeInit({
     currentVersion: "0.8.0",
     cliEntry: fakeCli,
-    initArgs: [root, "--with-roles"],
+    initArgs: [root],
     nodeBinary: process.execPath,
     npmBinary: fakeNpm,
     stdio: "pipe",
@@ -92,7 +86,7 @@ test("init auto-updates and re-execs when a newer CLI is published", () => {
   const log = readFileSync(logFile, "utf8");
   assert.ok(log.includes("npm view waypoint-codex version"));
   assert.ok(log.includes("npm install -g waypoint-codex@latest"));
-  assert.ok(log.includes(`cli init ${root} --with-roles --skip-cli-update`));
+  assert.ok(log.includes(`cli init ${root} --skip-cli-update`));
 });
 
 test("init skips auto-update when current CLI is already latest", () => {
@@ -137,7 +131,11 @@ test("upgradeWaypoint updates cli then refreshes repo using existing config", ()
   const logFile = path.join(root, "calls.log");
 
   mkdirSync(path.join(root, ".waypoint"), { recursive: true });
-  writeFileSync(path.join(root, ".waypoint/config.toml"), "profile = \"app-friendly\"\n[features]\nroles = true\nautomations = true\n", "utf8");
+  writeFileSync(
+    path.join(root, ".waypoint/config.toml"),
+    "profile = \"app-friendly\"\n[features]\nrules = true\nautomations = true\n",
+    "utf8"
+  );
 
   const fakeNpm = path.join(fakeBin, "fake-npm.js");
   writeFileSync(
@@ -168,10 +166,10 @@ test("upgradeWaypoint updates cli then refreshes repo using existing config", ()
     config: {
       profile: "app-friendly",
       features: {
-        roles: true,
+        rules: true,
         automations: true,
       },
-    },
+    } as unknown as Parameters<typeof upgradeWaypoint>[0]["config"],
     cliEntry: fakeCli,
     nodeBinary: process.execPath,
     npmBinary: fakeNpm,
@@ -182,7 +180,9 @@ test("upgradeWaypoint updates cli then refreshes repo using existing config", ()
 
   const log = readFileSync(logFile, "utf8");
   assert.ok(log.includes("npm install -g waypoint-codex@latest"));
-  assert.ok(log.includes(`cli init ${root} --app-friendly --with-roles --with-automations`));
+  assert.ok(log.includes(`cli init ${root} --app-friendly`));
+  assert.equal(log.includes("--with-rules"), false);
+  assert.equal(log.includes("--with-automations"), false);
   assert.ok(log.includes(`cli doctor ${root}`));
 });
 

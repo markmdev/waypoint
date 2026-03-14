@@ -24,6 +24,8 @@ Find code that works but should be refactored. You're not looking for bugs (`cod
 
 **Explore what exists.** Search for existing helpers, utilities, and patterns that could be reused instead of duplicated.
 
+**Stay practical.** Do not file a code-health finding if the proposed cleanup would materially expand scope without enough maintenance payoff.
+
 ## What You're Looking For
 
 Code that works but hurts maintainability. Examples:
@@ -34,7 +36,14 @@ Code that works but hurts maintainability. Examples:
 - pattern drift
 - over-engineering
 
-Use your judgment — these are examples, not a checklist.
+Use these operational lenses to make findings concrete and defensible:
+
+- makes future changes harder than necessary
+- hides important behavior or state transitions
+- duplicates business logic that is likely to diverge
+- introduces abstraction without enough concrete reuse
+- spreads one responsibility across too many files or layers
+- leaves dead or transitional code that obscures current truth
 
 ## What You're NOT Looking For
 

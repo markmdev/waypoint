@@ -10,9 +10,8 @@ Waypoint does this by combining:
 
 - a repo contract (`AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, `.waypoint/DOCS_INDEX.md`)
 - repo-local skills
-- optional reviewer roles for chunk-based background review
+- reviewer agents for chunk-based background review, scaffolded by default
 - generated session context
-- optional automation sync
 
 Waypoint is not a hook-driven system. The philosophy is:
 

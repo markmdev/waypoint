@@ -12,16 +12,16 @@
    - repo-local skills under `.agents/skills/`
    - includes planning, audits, workspace compression, pre-PR hygiene, PR review, and adversarial QA workflows
 
-3. **Optional role layer**
-   - `.codex/config.toml` with multi-agent enabled when roles are scaffolded
+3. **Reviewer agent layer**
+   - `.codex/config.toml` with multi-agent enabled by default
    - `.codex/agents/*.toml`
    - `.waypoint/agents/*.md`
 
-The default intent for the reviewer pair is a chunk-based review loop: once there is a meaningful reviewable slice, spawn `code-reviewer` and `code-health-reviewer` in parallel, then reconcile and fix findings before final closeout. A recent self-authored commit is the preferred scope anchor when one cleanly represents that slice, but it is not the only valid trigger. Slow reviewers should be allowed to finish unless they are clearly stuck or the user redirects the work.
+The default reviewer workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Slow reviewers should be allowed to finish unless they are clearly stuck or the user redirects the work.
 
-4. **Optional sync layer**
-   - rules
-   - automations
+4. **Index rebuild layer**
+   - `.waypoint/DOCS_INDEX.md`
+   - `.waypoint/TRACKS_INDEX.md`
 
 ## Session bootstrap
 

@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import {
   copyFileSync,
   existsSync,
@@ -9,14 +8,13 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import * as TOML from "@iarna/toml";
 
 import { renderDocsIndex } from "./docs-index.js";
 import { renderTracksIndex } from "./track-index.js";
 import { readTemplate, renderWaypointConfig, MANAGED_BLOCK_END, MANAGED_BLOCK_START, templatePath } from "./templates.js";
-import type { AutomationSpec, Finding, SyncRecord, WaypointConfig } from "./types.js";
+import type { Finding, WaypointConfig } from "./types.js";
 
 const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
 const DEFAULT_DOCS_DIR = ".waypoint/docs";
@@ -24,8 +22,6 @@ const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_TRACK_DIR = ".waypoint/track";
 const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
-const STATE_DIR = ".waypoint/state";
-const SYNC_RECORDS_FILE = ".waypoint/state/sync-records.json";
 const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
   "## Active Trackers",
   "## Current State",
@@ -123,8 +119,6 @@ function scaffoldSkills(projectRoot: string): void {
 
 function scaffoldWaypointOptionalTemplates(projectRoot: string): void {
   copyTemplateTree(templatePath(".waypoint/agents"), path.join(projectRoot, ".waypoint/agents"));
-  copyTemplateTree(templatePath(".waypoint/automations"), path.join(projectRoot, ".waypoint/automations"));
-  copyTemplateTree(templatePath(".waypoint/rules"), path.join(projectRoot, ".waypoint/rules"));
   copyTemplateTree(templatePath(".waypoint/scripts"), path.join(projectRoot, ".waypoint/scripts"));
   copyTemplateTree(templatePath(".waypoint/track"), path.join(projectRoot, ".waypoint/track"));
 }
@@ -137,9 +131,6 @@ export function initRepository(
   projectRoot: string,
   options: {
     profile: "universal" | "app-friendly";
-    withRoles: boolean;
-    withRules: boolean;
-    withAutomations: boolean;
   },
 ): string[] {
   ensureDir(projectRoot);
@@ -166,12 +157,12 @@ export function initRepository(
     ".codex/agents/reviewer.toml",
     ".codex/agents/architect.toml",
     ".codex/agents/implementer.toml",
+    ".waypoint/automations",
+    ".waypoint/rules",
+    ".waypoint/state",
   ]) {
     removePathIfExists(path.join(projectRoot, deprecatedPath));
   }
-  ensureDir(path.join(projectRoot, ".waypoint/automations"));
-  ensureDir(path.join(projectRoot, ".waypoint/rules"));
-  ensureDir(path.join(projectRoot, STATE_DIR));
 
   writeText(path.join(projectRoot, ".waypoint/README.md"), readTemplate(".waypoint/README.md"));
   writeText(path.join(projectRoot, ".waypoint/SOUL.md"), readTemplate(".waypoint/SOUL.md"));
@@ -185,9 +176,6 @@ export function initRepository(
     path.join(projectRoot, DEFAULT_CONFIG_PATH),
     renderWaypointConfig({
       profile: options.profile,
-      roles: options.withRoles,
-      rules: options.withRules,
-      automations: options.withAutomations,
     }),
   );
   writeIfMissing(path.join(projectRoot, DEFAULT_WORKSPACE), readTemplate("WORKSPACE.md"));
@@ -197,9 +185,7 @@ export function initRepository(
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/code-guide.md"), readTemplate(".waypoint/docs/code-guide.md"));
   upsertManagedBlock(path.join(projectRoot, "AGENTS.md"), readTemplate("managed-agents-block.md"));
   scaffoldSkills(projectRoot);
-  if (options.withRoles) {
-    scaffoldOptionalCodex(projectRoot);
-  }
+  scaffoldOptionalCodex(projectRoot);
   appendGitignoreSnippet(projectRoot);
   const docsIndex = renderDocsIndex(projectRoot, path.join(projectRoot, DEFAULT_DOCS_DIR));
   const tracksIndex = renderTracksIndex(projectRoot, path.join(projectRoot, DEFAULT_TRACK_DIR));
@@ -211,6 +197,7 @@ export function initRepository(
     "Installed managed AGENTS block",
     "Created .waypoint/WORKSPACE.md, .waypoint/docs/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
+    "Installed reviewer agents and project Codex config",
     "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
   ];
 }
@@ -221,30 +208,6 @@ export function loadWaypointConfig(projectRoot: string): WaypointConfig {
     return {};
   }
   return TOML.parse(readFileSync(configPath, "utf8")) as unknown as WaypointConfig;
-}
-
-function loadSyncRecords(projectRoot: string): Record<string, SyncRecord> {
-  const syncPath = path.join(projectRoot, SYNC_RECORDS_FILE);
-  if (!existsSync(syncPath)) {
-    return {};
-  }
-  try {
-    return JSON.parse(readFileSync(syncPath, "utf8")) as Record<string, SyncRecord>;
-  } catch {
-    return {};
-  }
-}
-
-function saveSyncRecords(projectRoot: string, records: Record<string, SyncRecord>): void {
-  writeText(path.join(projectRoot, SYNC_RECORDS_FILE), `${JSON.stringify(records, null, 2)}\n`);
-}
-
-function hashFile(filePath: string): string {
-  return createHash("sha256").update(readFileSync(filePath)).digest("hex");
-}
-
-function codexHome(): string {
-  return process.env.CODEX_HOME ?? path.join(os.homedir(), ".codex");
 }
 
 function findWorkspaceTimestampViolations(workspaceText: string): string[] {
@@ -269,124 +232,6 @@ function findWorkspaceTimestampViolations(workspaceText: string): string[] {
   }
 
   return [...violations];
-}
-
-function renderCodexAutomation(spec: AutomationSpec, cwd: string): string {
-  const now = Date.now();
-  const rrule = spec.rrule?.startsWith("RRULE:") ? spec.rrule : `RRULE:${spec.rrule}`;
-  return [
-    "version = 1",
-    `id = ${JSON.stringify(spec.id)}`,
-    `name = ${JSON.stringify(spec.name)}`,
-    `prompt = ${JSON.stringify(spec.prompt)}`,
-    `status = ${JSON.stringify(spec.status ?? "ACTIVE")}`,
-    `rrule = ${JSON.stringify(rrule)}`,
-    `execution_environment = ${JSON.stringify(spec.execution_environment ?? "worktree")}`,
-    `cwds = ${JSON.stringify(spec.cwds ?? [cwd])}`,
-    `created_at = ${now}`,
-    `updated_at = ${now}`,
-  ].join("\n") + "\n";
-}
-
-function isKebabCase(value: string): boolean {
-  return /^[a-z0-9-]+$/.test(value);
-}
-
-function validateAutomationSpecFile(filePath: string): string[] {
-  const errors: string[] = [];
-  let parsed: AutomationSpec;
-  try {
-    parsed = TOML.parse(readFileSync(filePath, "utf8")) as unknown as AutomationSpec;
-  } catch (error) {
-    return [`invalid TOML: ${error instanceof Error ? error.message : String(error)}`];
-  }
-
-  for (const key of ["id", "name", "prompt", "rrule"] as const) {
-    if (!parsed[key]) {
-      errors.push(`missing required key \`${key}\``);
-    }
-  }
-
-  if (parsed.id && !isKebabCase(parsed.id)) {
-    errors.push("automation id must use lowercase kebab-case");
-  }
-
-  return errors;
-}
-
-function syncAutomations(projectRoot: string): string[] {
-  const sourceDir = path.join(projectRoot, ".waypoint/automations");
-  if (!existsSync(sourceDir)) {
-    return [];
-  }
-
-  const targetRoot = path.join(codexHome(), "automations");
-  ensureDir(targetRoot);
-  const records = loadSyncRecords(projectRoot);
-  const results: string[] = [];
-
-  for (const entry of readdirSync(sourceDir)) {
-    if (!entry.endsWith(".toml")) {
-      continue;
-    }
-    const sourcePath = path.join(sourceDir, entry);
-    const errors = validateAutomationSpecFile(sourcePath);
-    if (errors.length > 0) {
-      results.push(`Skipped ${entry}: ${errors.join("; ")}`);
-      continue;
-    }
-    const spec = TOML.parse(readFileSync(sourcePath, "utf8")) as unknown as AutomationSpec;
-    if (spec.enabled === false) {
-      continue;
-    }
-    const targetDir = path.join(targetRoot, spec.id!);
-    const targetPath = path.join(targetDir, "automation.toml");
-    ensureDir(targetDir);
-    writeText(targetPath, renderCodexAutomation(spec, projectRoot));
-    records[sourcePath] = {
-      artifact_type: "automation",
-      source_path: sourcePath,
-      target_path: targetPath,
-      source_hash: hashFile(sourcePath),
-      target_hash: hashFile(targetPath),
-    };
-    results.push(`Synced automation \`${spec.id}\``);
-  }
-
-  saveSyncRecords(projectRoot, records);
-  return results;
-}
-
-function syncRules(projectRoot: string): string[] {
-  const sourceDir = path.join(projectRoot, ".waypoint/rules");
-  if (!existsSync(sourceDir)) {
-    return [];
-  }
-
-  const targetRoot = path.join(codexHome(), "rules");
-  ensureDir(targetRoot);
-  const records = loadSyncRecords(projectRoot);
-  const results: string[] = [];
-
-  for (const entry of readdirSync(sourceDir)) {
-    if (!entry.endsWith(".rules")) {
-      continue;
-    }
-    const sourcePath = path.join(sourceDir, entry);
-    const targetPath = path.join(targetRoot, `waypoint-${entry}`);
-    copyFileSync(sourcePath, targetPath);
-    records[sourcePath] = {
-      artifact_type: "rules",
-      source_path: sourcePath,
-      target_path: targetPath,
-      source_hash: hashFile(sourcePath),
-      target_hash: hashFile(targetPath),
-    };
-    results.push(`Synced rules \`${entry}\``);
-  }
-
-  saveSyncRecords(projectRoot, records);
-  return results;
 }
 
 export function doctorRepository(projectRoot: string): Finding[] {
@@ -597,56 +442,15 @@ export function doctorRepository(projectRoot: string): Finding[] {
     }
   }
 
-  const featureMap = config.features ?? {};
-  if (featureMap.automations) {
-    const records = loadSyncRecords(projectRoot);
-    const automationDir = path.join(projectRoot, ".waypoint/automations");
-    if (existsSync(automationDir)) {
-      for (const entry of readdirSync(automationDir)) {
-        if (!entry.endsWith(".toml")) {
-          continue;
-        }
-        const filePath = path.join(automationDir, entry);
-        const errors = validateAutomationSpecFile(filePath);
-        for (const error of errors) {
-          findings.push({
-            severity: "error",
-            category: "automations",
-            message: `${path.relative(projectRoot, filePath)}: ${error}`,
-            remediation: "Fix the automation spec and rerun `waypoint sync`.",
-            paths: [filePath],
-          });
-        }
-        if (errors.length === 0) {
-          const spec = TOML.parse(readFileSync(filePath, "utf8")) as unknown as AutomationSpec;
-          if (spec.enabled === false) {
-            continue;
-          }
-        }
-        if (errors.length === 0 && !records[filePath]) {
-          findings.push({
-            severity: "info",
-            category: "automations",
-            message: `Automation \`${path.basename(entry, ".toml")}\` has not been synced.`,
-            remediation: "Run `waypoint sync` to install it into Codex home.",
-            paths: [filePath],
-          });
-        }
-      }
-    }
-  }
-
-  if (featureMap.roles) {
-    const codexConfigPath = path.join(projectRoot, ".codex/config.toml");
-    if (!existsSync(codexConfigPath)) {
-      findings.push({
-        severity: "warn",
-        category: "roles",
-        message: "Role support is enabled but .codex/config.toml is missing.",
-        remediation: "Run `waypoint init --with-roles` or create the project Codex config files.",
-        paths: [codexConfigPath],
-      });
-    }
+  const codexConfigPath = path.join(projectRoot, ".codex/config.toml");
+  if (!existsSync(codexConfigPath)) {
+    findings.push({
+      severity: "warn",
+      category: "roles",
+      message: "Reviewer agent config is missing from .codex/config.toml.",
+      remediation: "Run `waypoint init` or create the project Codex config files.",
+      paths: [codexConfigPath],
+    });
   }
 
   return findings;
@@ -663,147 +467,5 @@ export function syncRepository(projectRoot: string): string[] {
   writeText(docsIndexPath, `${docsIndex.content}\n`);
   writeText(tracksIndexPath, `${tracksIndex.content}\n`);
 
-  const results = ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"];
-  const featureMap = config.features ?? {};
-  if (featureMap.rules) {
-    results.push(...syncRules(projectRoot));
-  }
-  if (featureMap.automations) {
-    results.push(...syncAutomations(projectRoot));
-  }
-  return results;
-}
-
-export function importLegacyRepo(
-  sourceRepo: string,
-  targetRepo?: string,
-  options: { initTarget?: boolean } = {},
-): { report: string; actions: string[] } {
-  const sourceDocsDir = path.join(sourceRepo, ".meridian/docs");
-  const sourceSkillsDir = path.join(sourceRepo, "skills");
-  const sourceCommandsDir = path.join(sourceRepo, "commands");
-  const sourceAgentsDir = path.join(sourceRepo, "agents");
-  const sourceHooksPath = path.join(sourceRepo, "hooks/hooks.json");
-  const sourceScriptsDir = path.join(sourceRepo, "scripts");
-
-  const portableDocs = existsSync(sourceDocsDir)
-    ? readdirSync(sourceDocsDir).filter((entry) => entry.endsWith(".md")).sort()
-    : [];
-  const portableSkills = existsSync(sourceSkillsDir)
-    ? readdirSync(sourceSkillsDir)
-        .map((entry) => path.join("skills", entry, "SKILL.md"))
-        .filter((relPath) => existsSync(path.join(sourceRepo, relPath)))
-        .sort()
-    : [];
-  const portableCommands = existsSync(sourceCommandsDir)
-    ? readdirSync(sourceCommandsDir)
-        .filter((entry) => entry.endsWith(".md"))
-        .map((entry) => path.join("commands", entry))
-        .sort()
-    : [];
-  const agentFiles = existsSync(sourceAgentsDir)
-    ? readdirSync(sourceAgentsDir)
-        .filter((entry) => entry.endsWith(".md"))
-        .map((entry) => path.join("agents", entry))
-        .sort()
-    : [];
-  const hookFiles = existsSync(sourceHooksPath) ? [path.join("hooks", "hooks.json")] : [];
-  const scriptFiles = existsSync(sourceScriptsDir)
-    ? collectFiles(sourceScriptsDir)
-        .filter((filePath) => filePath.endsWith(".py"))
-        .map((filePath) => path.relative(sourceRepo, filePath))
-        .sort()
-    : [];
-
-  const actions: string[] = [];
-  if (targetRepo && options.initTarget) {
-    actions.push(...initRepository(targetRepo, {
-      profile: "universal",
-      withRoles: false,
-      withRules: false,
-      withAutomations: false,
-    }));
-  }
-
-  if (targetRepo) {
-    const importDir = path.join(targetRepo, ".waypoint/docs/legacy-import");
-    ensureDir(importDir);
-    for (const docName of portableDocs) {
-      copyFileSync(path.join(sourceDocsDir, docName), path.join(importDir, docName));
-    }
-    if (portableDocs.length > 0) {
-      actions.push(`Copied ${portableDocs.length} legacy docs into ${importDir}`);
-    }
-    const docsIndex = renderDocsIndex(targetRepo, path.join(targetRepo, DEFAULT_DOCS_DIR));
-    writeText(path.join(targetRepo, DEFAULT_DOCS_INDEX), `${docsIndex.content}\n`);
-  }
-
-  const report = [
-    "# Legacy Repository Adoption Report",
-    "",
-    `Source: \`${sourceRepo}\``,
-    "",
-    "## Portable as-is or with light rewriting",
-    "",
-    `- Docs: ${portableDocs.length}`,
-    `- Skills: ${portableSkills.length}`,
-    `- Commands/prompts worth reviewing for skill conversion: ${portableCommands.length}`,
-    "",
-    "### Docs",
-    ...(portableDocs.length > 0
-      ? portableDocs.map((entry) => `- \`.meridian/docs/${entry}\``)
-      : ["- None"]),
-    "",
-    "### Skills",
-    ...(portableSkills.length > 0 ? portableSkills.map((entry) => `- \`${entry}\``) : ["- None"]),
-    "",
-    "## Replace with explicit Waypoint patterns",
-    "",
-    "- hook-based session injection -> AGENTS routing, context generation, repo-local skills, doctor/sync",
-    "- hidden stop-hook policing -> advisory workflow skills and visible repo state",
-    "- transcript learners -> maintenance skills and optional app automations",
-    "- opaque reviewer plumbing -> optional Codex roles where actually useful",
-    "",
-    "## Legacy machinery to drop",
-    "",
-    `- Hook registration files: ${hookFiles.length}`,
-    `- Hook/runtime scripts: ${scriptFiles.length}`,
-    "",
-    "### Hook/runtime files",
-    ...((hookFiles.length + scriptFiles.length) > 0
-      ? [...hookFiles, ...scriptFiles].map((entry) => `- \`${entry}\``)
-      : ["- None"]),
-    "",
-    "## Agent files to reinterpret, not port literally",
-    "",
-    ...(agentFiles.length > 0 ? agentFiles.map((entry) => `- \`${entry}\``) : ["- None"]),
-    "",
-    "## Notes",
-    "",
-    "- The strongest reusable assets are methodology, docs patterns, and review/planning discipline.",
-    "- The weakest portability surface is hook-dependent session machinery and transcript-coupled automation.",
-    "",
-  ].join("\n");
-
-  if (targetRepo) {
-    const reportPath = path.join(targetRepo, ".waypoint/IMPORT_LEGACY.md");
-    writeText(reportPath, report);
-    actions.push(`Wrote migration report to ${reportPath}`);
-  }
-
-  return { report, actions };
-}
-
-function collectFiles(rootDir: string): string[] {
-  const output: string[] = [];
-  for (const entry of readdirSync(rootDir)) {
-    const fullPath = path.join(rootDir, entry);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      output.push(...collectFiles(fullPath));
-    } else {
-      output.push(fullPath);
-    }
-  }
-  return output;
+  return ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"];
 }

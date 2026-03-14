@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import process from "node:process";
 
-import { doctorRepository, importLegacyRepo, initRepository, loadWaypointConfig, syncRepository } from "./core.js";
+import { doctorRepository, initRepository, loadWaypointConfig, syncRepository } from "./core.js";
 import type { Finding } from "./types.js";
 import { maybeUpgradeWaypointBeforeInit, upgradeWaypoint } from "./upgrade.js";
 
@@ -39,9 +39,8 @@ function printHelp(): void {
 Commands:
   init                Initialize a repository with Waypoint scaffolding (auto-updates CLI unless skipped)
   doctor              Validate repository health and report drift
-  sync                Rebuild docs index and sync optional user-home artifacts
+  sync                Rebuild docs and tracker indexes
   upgrade             Update the global Waypoint CLI and refresh this repo using existing config
-  import-legacy       Analyze a legacy repository layout and produce a Waypoint adoption report
 `);
 }
 
@@ -64,9 +63,6 @@ async function main(): Promise<number> {
       args: argv.slice(1),
       options: {
         "app-friendly": { type: "boolean", default: false },
-        "with-roles": { type: "boolean", default: false },
-        "with-rules": { type: "boolean", default: false },
-        "with-automations": { type: "boolean", default: false },
         "skip-cli-update": { type: "boolean", default: false }
       },
       allowPositionals: true
@@ -84,9 +80,6 @@ async function main(): Promise<number> {
     }
     const results = initRepository(projectRoot, {
       profile: values["app-friendly"] ? "app-friendly" : "universal",
-      withRoles: values["with-roles"],
-      withRules: values["with-rules"],
-      withAutomations: values["with-automations"]
     });
     for (const line of results) {
       console.log(`- ${line}`);
@@ -128,32 +121,6 @@ async function main(): Promise<number> {
     const results = syncRepository(projectRoot);
     for (const line of results) {
       console.log(`- ${line}`);
-    }
-    return 0;
-  }
-
-  if (command === "import-legacy") {
-    const { values, positionals } = parseArgs({
-      args: argv.slice(1),
-      options: {
-        "init-target": { type: "boolean", default: false }
-      },
-      allowPositionals: true
-    });
-    if (positionals.length === 0) {
-      console.error("import-legacy requires a source repository path.");
-      return 2;
-    }
-    const sourceRepo = resolveRepo(positionals[0]);
-    const targetRepo = positionals[1] ? resolveRepo(positionals[1]) : undefined;
-    const result = importLegacyRepo(sourceRepo, targetRepo, {
-      initTarget: values["init-target"]
-    });
-    for (const line of result.actions) {
-      console.log(`- ${line}`);
-    }
-    if (!targetRepo) {
-      console.log(result.report);
     }
     return 0;
   }

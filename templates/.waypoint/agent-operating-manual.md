@@ -48,7 +48,7 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
-- Use the repo-local skills and optional reviewer agents instead of improvising from scratch.
+- Use the repo-local skills and reviewer agents instead of improvising from scratch.
 - Do not kill long-running subagents or reviewer agents just because they are slow. Wait unless they are clearly stuck, failed, or the user redirects the work.
 
 ## Documentation expectations
@@ -71,13 +71,14 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
 - `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
+- `frontend-ship-audit` and `backend-ship-audit` only when the user explicitly requests a ship-readiness audit; do not trigger them autonomously as part of the default Waypoint workflow
 - `workspace-compress` after meaningful chunks, before stopping, and before review when the live handoff needs compression
 - `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work
 - `pr-review` once a PR has active review comments or automated review in progress
 
-## When to use the optional reviewer agents
+## When to use the reviewer agents
 
-If the repo was initialized with Waypoint roles enabled, use them as focused second-pass specialists:
+Waypoint scaffolds these focused second-pass specialists by default:
 
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability drift
@@ -85,13 +86,15 @@ If the repo was initialized with Waypoint roles enabled, use them as focused sec
 
 ## Review Loop
 
-If Waypoint's optional roles are enabled, run the reviewer pair after a meaningful reviewable implementation chunk, not just as a reflex after every tiny commit.
+Use reviewer agents before considering the work complete, not just as a reflex after every tiny commit.
 
-1. Launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers once there is a coherent slice of work worth reviewing.
-2. If you have a recent self-authored commit that cleanly represents that slice, use it as the default review scope anchor. Otherwise scope the reviewers to the current changed slice.
-3. Widen only when surrounding files are needed to validate a finding.
-4. Do not call the work finished before you read both reviewer results.
-5. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
+1. Run `code-reviewer` before considering any non-trivial implementation slice complete.
+2. Run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions.
+3. If both apply, launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers.
+4. If you have a recent self-authored commit that cleanly represents the reviewable slice, use it as the default review scope anchor. Otherwise scope the reviewers to the current changed slice.
+5. Widen only when surrounding files are needed to validate a finding.
+6. Do not call the work finished before you read the required reviewer results.
+7. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
 
 ## Quality bar
 

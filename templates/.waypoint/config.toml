@@ -7,6 +7,3 @@ docs_index_file = ".waypoint/DOCS_INDEX.md"
 [features]
 repo_skills = true
 docs_index = true
-roles = __ROLES__
-rules = __RULES__
-automations = __AUTOMATIONS__

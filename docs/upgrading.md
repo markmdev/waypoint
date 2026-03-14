@@ -32,7 +32,7 @@ npx waypoint-codex@latest --help
 If you updated the CLI outside `waypoint upgrade`, refresh the repo scaffold manually:
 
 ```bash
-waypoint init --with-automations --with-roles
+waypoint init
 waypoint doctor
 ```
 
@@ -47,4 +47,4 @@ waypoint doctor
 - `.waypoint/agent-operating-manual.md`
 - `.waypoint/scripts/prepare-context.mjs`
 - `.agents/skills/`
-- `.codex/agents/` if roles are enabled
+- `.codex/agents/`

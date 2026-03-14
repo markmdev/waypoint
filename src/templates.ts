@@ -36,13 +36,7 @@ export function readTemplate(relativePath: string): string {
 
 export function renderWaypointConfig(options: {
   profile: "universal" | "app-friendly";
-  roles: boolean;
-  rules: boolean;
-  automations: boolean;
 }): string {
   return readTemplate(".waypoint/config.toml")
-    .replace("__PROFILE__", options.profile)
-    .replace("__ROLES__", String(options.roles))
-    .replace("__RULES__", String(options.rules))
-    .replace("__AUTOMATIONS__", String(options.automations));
+    .replace("__PROFILE__", options.profile);
 }

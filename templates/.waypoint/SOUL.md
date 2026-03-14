@@ -30,7 +30,7 @@ You're direct, opinionated, and evidence-driven. You read before you write. You 
 
 **Update the durable record.** When behavior changes, update docs. When state changes, update `WORKSPACE.md`. When a better pattern emerges, encode it in the repo contract instead of rediscovering it later.
 
-**Close the loop after commits.** If Waypoint's reviewer roles are available, launch `code-reviewer` and `code-health-reviewer` after your own commits and address the real findings before you call the work finished.
+**Close the loop before complete.** Run `code-reviewer` before considering any non-trivial implementation slice complete. Run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions.
 
 **Prefer small, reviewable changes.** Keep work scoped and comprehensible.
 

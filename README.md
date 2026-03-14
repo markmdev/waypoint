@@ -28,6 +28,7 @@ Waypoint scaffolds a Codex-friendly repo structure built around a few core piece
 - `.waypoint/TRACKS_INDEX.md` for tracker routing
 - `.waypoint/context/` for generated startup context
 - `.agents/skills/` for repo-local workflows like planning, tracking, audits, and QA
+- `.codex/` for the default reviewer-agent pack
 
 The philosophy is simple:
 
@@ -66,7 +67,7 @@ npx waypoint-codex@latest --help
 Inside the repo you want to prepare for Codex:
 
 ```bash
-waypoint init --with-roles --with-automations
+waypoint init
 waypoint doctor
 ```
 
@@ -75,6 +76,9 @@ That gives you a repo that looks roughly like this:
 ```text
 repo/
 ├── AGENTS.md
+├── .codex/
+│   ├── agents/
+│   └── config.toml
 ├── .agents/
 │   └── skills/
 └── .waypoint/
@@ -98,39 +102,29 @@ From there, start your Codex session in the repo and follow the generated bootst
 waypoint init
 ```
 
-By default, `waypoint init` updates the global CLI to the latest published `waypoint-codex` first, then scaffolds with that fresh version. If you want to scaffold with the currently installed binary instead, use:
+By default, `waypoint init` updates the global CLI to the latest published `waypoint-codex` first, then scaffolds with that fresh version. It also installs the reviewer-agent pack by default. If you want to scaffold with the currently installed binary instead, use:
 
 ```bash
 waypoint init --skip-cli-update
 ```
 
-### Full local workflow setup
-
-```bash
-waypoint init --with-roles --with-rules --with-automations
-```
-
 ### App-friendly profile
 
 ```bash
-waypoint init --app-friendly --with-roles --with-automations
+waypoint init --app-friendly
 ```
 
 Flags you can combine:
 
 - `--app-friendly`
-- `--with-roles`
-- `--with-rules`
-- `--with-automations`
 - `--skip-cli-update`
 
 ## Main commands
 
 - `waypoint init` — update the CLI to latest by default, then scaffold or refresh the repo
 - `waypoint doctor` — validate health and report drift
-- `waypoint sync` — rebuild the docs index and sync optional user-home artifacts
+- `waypoint sync` — rebuild the docs and tracker indexes
 - `waypoint upgrade` — update the CLI and refresh the current repo using its saved config
-- `waypoint import-legacy` — analyze an older repo layout and produce an adoption report
 
 ## Built-in skills
 
@@ -141,21 +135,24 @@ Waypoint ships a strong default skill pack for real coding work:
 - `docs-sync`
 - `code-guide-audit`
 - `break-it-qa`
+- `frontend-ship-audit`
+- `backend-ship-audit`
 - `workspace-compress`
 - `pre-pr-hygiene`
 - `pr-review`
 
 These are repo-local, so the workflow travels with the project.
+`break-it-qa`, `frontend-ship-audit`, and `backend-ship-audit` are user-invoked audit skills, not default autonomous agent steps.
 
-## Optional reviewer roles
+## Reviewer agents
 
-If you initialize with `--with-roles`, Waypoint scaffolds:
+Waypoint scaffolds these reviewer agents by default:
 
 - `code-health-reviewer`
 - `code-reviewer`
 - `plan-reviewer`
 
-The intended workflow is chunk-based: once there is a meaningful reviewable slice, run the reviewers in parallel, fix real findings, then close out. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger.
+The intended workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger.
 
 ## What makes it different
 
@@ -185,22 +182,11 @@ If you only want to update the CLI:
 waypoint upgrade --skip-repo-refresh
 ```
 
-## Importing an existing repo
-
-If you already have an older assistant setup or repo-memory system:
-
-```bash
-waypoint import-legacy /path/to/source-repo /path/to/new-repo --init-target
-```
-
-This generates an adoption report and helps separate durable docs from old runtime-specific scaffolding.
-
 ## Learn more
 
 - [Overview](docs/overview.md)
 - [Architecture](docs/architecture.md)
 - [Upgrading](docs/upgrading.md)
-- [Importing Existing Repositories](docs/importing-existing-repos.md)
 - [Releasing](docs/releasing.md)
 
 ## License

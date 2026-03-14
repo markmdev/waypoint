@@ -5,8 +5,6 @@ export type FindingCategory =
   | "workspace"
   | "skills"
   | "roles"
-  | "rules"
-  | "automations"
   | "install";
 
 export interface Finding {
@@ -26,27 +24,5 @@ export interface WaypointConfig {
   features?: {
     repo_skills?: boolean;
     docs_index?: boolean;
-    roles?: boolean;
-    rules?: boolean;
-    automations?: boolean;
   };
-}
-
-export interface SyncRecord {
-  artifact_type: "rules" | "automation";
-  source_path: string;
-  target_path: string;
-  source_hash: string;
-  target_hash: string;
-}
-
-export interface AutomationSpec {
-  id?: string;
-  name?: string;
-  prompt?: string;
-  rrule?: string;
-  execution_environment?: "local" | "worktree";
-  cwds?: string[];
-  status?: "ACTIVE" | "PAUSED";
-  enabled?: boolean;
 }

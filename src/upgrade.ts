@@ -15,17 +15,6 @@ export function buildInitArgs(projectRoot: string, config: WaypointConfig): stri
     args.push("--app-friendly");
   }
 
-  const featureMap = config.features ?? {};
-  if (featureMap.roles) {
-    args.push("--with-roles");
-  }
-  if (featureMap.rules) {
-    args.push("--with-rules");
-  }
-  if (featureMap.automations) {
-    args.push("--with-automations");
-  }
-
   return args;
 }
 

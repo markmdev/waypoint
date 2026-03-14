@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0
+
+### Minor Changes
+
+- Refocus Waypoint on its repo-local core by removing the legacy import command and dropping Codex rules/automations from the supported surface. Reviewer agents now scaffold by default, the review loop is explicit about when `code-reviewer` vs `code-health-reviewer` should run before work is considered complete, and the managed AGENTS guidance now keeps user-facing audit skills out of the default autonomous workflow.
+
+  Ship the new `backend-context-interview`, `frontend-context-interview`, `backend-ship-audit`, and `frontend-ship-audit` skills in the scaffold, while keeping `break-it-qa` and the ship-audit skills user-invoked rather than default agent steps.
+
 ## 0.8.1
 
 ### Patch Changes
