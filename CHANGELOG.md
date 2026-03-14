@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.4
+
+### Patch Changes
+
+- Tighten the default `.gitignore` scaffold so it ignores the exact Waypoint-created `.agents/skills/`, `.codex/config.toml`, and `.codex/agents/` artifacts, instead of blanket-ignoring all of `.agents/` and `.codex/`.
+
 ## 0.9.3
 
 ### Patch Changes
