@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.5
+
+### Patch Changes
+
+- Refine the default `.gitignore` scaffold so it names each Waypoint-created skill directory and reviewer-agent config file explicitly, instead of blanket-ignoring all of `.agents/` or `.codex/`.
+
 ## 0.9.4
 
 ### Patch Changes

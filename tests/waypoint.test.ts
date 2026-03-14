@@ -45,8 +45,14 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
   assert.ok(gitignore.includes(".codex/config.toml"));
-  assert.ok(gitignore.includes(".codex/agents/"));
-  assert.ok(gitignore.includes(".agents/skills/"));
+  assert.ok(gitignore.includes(".codex/agents/code-reviewer.toml"));
+  assert.ok(gitignore.includes(".codex/agents/code-health-reviewer.toml"));
+  assert.ok(gitignore.includes(".codex/agents/plan-reviewer.toml"));
+  assert.ok(gitignore.includes(".agents/skills/planning/"));
+  assert.ok(gitignore.includes(".agents/skills/backend-context-interview/"));
+  assert.ok(gitignore.includes(".agents/skills/frontend-context-interview/"));
+  assert.ok(gitignore.includes(".agents/skills/backend-ship-audit/"));
+  assert.ok(gitignore.includes(".agents/skills/frontend-ship-audit/"));
   assert.ok(gitignore.includes(".waypoint/*"));
   assert.ok(gitignore.includes("!.waypoint/docs/"));
   assert.ok(gitignore.includes("!.waypoint/docs/**"));
