@@ -91,11 +91,24 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".waypoint/scripts/build-track-index.mjs"), "utf8").includes("TRACKS_INDEX.md")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/agents/openai.yaml"), "utf8").includes("display_name: \"Planning\"")
+  );
   assert.ok(readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes("# Work Tracker"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/work-tracker/agents/openai.yaml"), "utf8").includes(
+      "display_name: \"Work Tracker\""
+    )
+  );
   assert.ok(readFileSync(path.join(root, ".agents/skills/docs-sync/SKILL.md"), "utf8").includes("# Docs Sync"));
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/backend-ship-audit/SKILL.md"), "utf8").includes(
       "# Backend ship audit"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/backend-context-interview/agents/openai.yaml"), "utf8").includes(
+      "display_name: \"Backend Context Interview\""
     )
   );
   assert.ok(
@@ -106,6 +119,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/frontend-ship-audit/SKILL.md"), "utf8").includes(
       "Audit ship-readiness like a strong frontend reviewer."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/frontend-context-interview/agents/openai.yaml"), "utf8").includes(
+      "display_name: \"Frontend Context Interview\""
     )
   );
   assert.ok(

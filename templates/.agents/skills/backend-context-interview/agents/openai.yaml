@@ -1,0 +1,4 @@
+interface:
+  display_name: "Backend Context Interview"
+  short_description: "Ask only the backend context questions that materially change implementation or review decisions"
+  default_prompt: "Use this skill to inspect persisted project context, identify only the missing backend deployment or reliability facts that materially affect the work, ask a concise high-leverage interview if needed, and persist durable Backend Context into AGENTS.md."

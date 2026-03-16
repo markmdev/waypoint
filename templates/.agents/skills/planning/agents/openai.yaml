@@ -1,0 +1,4 @@
+interface:
+  display_name: "Planning"
+  short_description: "Interview, explore, and write an implementation-ready plan into the repo"
+  default_prompt: "Use this skill to deeply explore the repository, interview for the product and architectural details that materially affect the work, and write an implementation-ready plan into .waypoint/docs/."

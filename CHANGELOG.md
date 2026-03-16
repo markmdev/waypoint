@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.6
+
+### Patch Changes
+
+- Add missing `agents/openai.yaml` interface files for the `planning`, `work-tracker`, `backend-context-interview`, and `frontend-context-interview` skills in both the scaffold and repo-local skill packs.
+
 ## 0.9.5
 
 ### Patch Changes
