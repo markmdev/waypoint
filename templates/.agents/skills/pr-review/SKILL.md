@@ -10,8 +10,10 @@ Use this skill to drive the PR through review instead of treating review as a on
 ## Step 1: Wait For Review To Settle
 
 - Check the PR's current review and CI status.
+- If CI is red or pending, inspect the failed check logs before triaging review comments so you do not chase comment fixes while a separate blocker is breaking the branch.
 - If automated review is still running, wait for it to finish instead of racing it.
 - If comments are still arriving, do not prematurely declare the loop complete.
+- For stacked or non-`main` PRs, explicitly compare the PR head against its base branch and make sure later fixes on the base branch have actually been merged or rebased forward. Do not assume a sibling/base PR fix is already present in the dependent PR.
 
 ## Step 2: Read Every Review Comment
 
@@ -33,6 +35,7 @@ Do not leave comments unanswered.
 
 - Make the needed fixes.
 - rerun the relevant verification
+- if the PR is stacked, repeat the base-vs-head sanity check after pushes so you catch missing forward-merges before the next CI cycle
 - push follow-up commit(s)
 - return to the PR and continue the loop
 
