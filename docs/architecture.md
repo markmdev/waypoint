@@ -10,7 +10,7 @@
 
 2. **Skill layer**
    - repo-local skills under `.agents/skills/`
-   - includes planning, conversation retrospectives, audits, workspace compression, pre-PR hygiene, PR review, and adversarial QA workflows
+   - includes planning, visual explanations, conversation retrospectives, audits, workspace compression, pre-PR hygiene, PR review, and adversarial QA workflows
 
 3. **Reviewer agent layer**
    - `.codex/config.toml` with multi-agent enabled by default
@@ -21,6 +21,8 @@ The default reviewer workflow is closeout-based: run `code-reviewer` before cons
 Waypoint's execution model is ownership-based after plan approval: once a reviewed plan is approved, the agent should continue through implementation and closeout without stopping for incremental permission unless a real blocker or risky unresolved decision appears.
 
 When that execution uses a browser for reproduction or verification, the workflow should surface screenshots of the relevant UI states back to the user instead of relying on text-only descriptions.
+
+When a concept, plan, or tradeoff would be clearer visually, the workflow should bias toward Mermaid diagrams directly in chat before falling back to longer prose. When Mermaid is not expressive enough, the workflow should reach for richer generated images or annotated screenshots.
 
 4. **Index rebuild layer**
    - `.waypoint/DOCS_INDEX.md`

@@ -58,6 +58,11 @@ test("init scaffolds core files", () => {
       "When using a browser to reproduce a bug, verify behavior, or confirm that a fix works, send the user screenshots"
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "When an explanation would be clearer as a visual than as prose, bias toward visual artifacts."
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -73,6 +78,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/frontend-context-interview/"));
   assert.ok(gitignore.includes(".agents/skills/backend-ship-audit/"));
   assert.ok(gitignore.includes(".agents/skills/frontend-ship-audit/"));
+  assert.ok(gitignore.includes(".agents/skills/visual-explanations/"));
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".waypoint/*"));
   assert.ok(gitignore.includes("!.waypoint/docs/"));
@@ -127,6 +133,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run."
     )
   );
@@ -162,6 +173,16 @@ test("init scaffolds core files", () => {
     )
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/docs-sync/SKILL.md"), "utf8").includes("# Docs Sync"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/visual-explanations/SKILL.md"), "utf8").includes(
+      "# Visual Explanations"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/visual-explanations/agents/openai.yaml"), "utf8").includes(
+      'display_name: "Visual Explanations"'
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/backend-ship-audit/SKILL.md"), "utf8").includes(
       "# Backend ship audit"

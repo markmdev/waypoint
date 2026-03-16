@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual Explanations"
+  short_description: "Create generated images and annotated screenshots"
+  default_prompt: "Use this skill to create a generated image or annotated screenshot when a visual artifact would explain the point more clearly than prose alone. Prefer Mermaid directly when a simple in-chat diagram is enough."

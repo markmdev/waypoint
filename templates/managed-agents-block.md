@@ -69,6 +69,7 @@ Prefer existing persisted context over re-interviewing the user.
 If the user approves a plan or explicitly tells you to proceed, treat that as authorization to execute the work end to end. Do not stop mid-implementation for incremental permission unless a real blocker, hidden-risk decision, or explicit user redirect requires a pause.
 When work is in flight elsewhere — reviewer agents, subagents, CI, automated review, external jobs, or other waiting periods — wait as long as required. There is no fixed waiting limit, and slowness alone is not a reason to interrupt or abandon the work.
 When using a browser to reproduce a bug, verify behavior, or confirm that a fix works, send the user screenshots of the relevant UI states so they can see the evidence directly. If screenshots are not possible in the current environment, say so explicitly.
+When an explanation would be clearer as a visual than as prose, bias toward visual artifacts. Prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans; use `visual-explanations` for richer generated images and for annotated screenshots that call out concrete UI states.
 
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
@@ -78,6 +79,7 @@ Working rules:
 - Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
 - Use `code-guide-audit` for a targeted coding-guide compliance pass on a specific feature, file set, or change slice
+- Use `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams can be written directly in chat without invoking a skill
 - Use `conversation-retrospective` after major completed work pieces to preserve durable learnings, capture user feedback and errors, improve any skills that were exercised, and record real new-skill candidates
 - Do not invoke `break-it-qa`, `frontend-ship-audit`, or `backend-ship-audit` yourself from the managed AGENTS block workflow; they are user-facing skills for explicit human-requested QA or ship-readiness audits, not default agent steps
 - Before presenting a non-trivial implementation plan to the user, run `plan-reviewer` and iterate on the plan until it has no meaningful review findings left

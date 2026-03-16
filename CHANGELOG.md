@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.5
+
+### Patch Changes
+
+- Add the `visual-explanations` skill and bias Waypoint's workflow toward Mermaid-first visual explanations, richer generated images, and annotated screenshots when visuals communicate more clearly than prose.
+
 ## 0.10.4
 
 ### Patch Changes

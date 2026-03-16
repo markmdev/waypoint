@@ -57,6 +57,8 @@ If something important lives only in your head or in the chat transcript, the re
 - When browser work is part of reproduction or verification, send screenshots of the relevant UI states to the user so they can visually confirm what you observed.
 - Capture the states that matter, such as the broken state, the fixed state, or an important intermediate state that explains the issue.
 - If the current environment cannot provide screenshots, state that explicitly instead of silently omitting visual evidence.
+- When an explanation would be clearer visually, prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans instead of over-explaining in prose.
+- Use `visual-explanations` when the explanation needs a richer generated image or an annotated screenshot rather than only text or Mermaid.
 
 ## Execution autonomy
 
@@ -95,6 +97,7 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `work-tracker` when large multi-step work needs durable progress tracking in `.waypoint/track/`
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
+- `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams do not need a skill
 - `conversation-retrospective` after major completed work pieces so the active conversation is distilled into durable memory, user feedback and errors are preserved, exercised skills are improved, and real new-skill candidates are recorded
 - `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
 - `frontend-ship-audit` and `backend-ship-audit` only when the user explicitly requests a ship-readiness audit; do not trigger them autonomously as part of the default Waypoint workflow
