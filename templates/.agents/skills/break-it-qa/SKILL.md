@@ -118,6 +118,7 @@ Anti-cheating rules:
 - Use `playwright-interactive`.
 - Exercise the actual UI instead of mocking the flow in code.
 - Keep the scope focused on the feature the user asked you to verify.
+- Capture screenshots of the important states you observe so the user can see the evidence directly.
 
 ## Step 7: Try To Break It On Purpose
 
@@ -151,6 +152,7 @@ As you test, keep expanding the break log with new "What if...?" cases that emer
 - Update docs when the verification exposes stale assumptions about how the feature works.
 - Update the break log entry for each attempted action with what happened and whether the feature survived.
 - Require a short observed-result note for every executed item. "Worked" is too weak; capture what actually happened.
+- Save screenshots for the key broken, risky, or fixed states as you go.
 
 Do not stop at the first bug.
 
@@ -174,6 +176,7 @@ Summarize:
 - the path to the break log markdown file
 - how many attack items were recorded and exercised
 - how coverage was distributed across steps and categories
+- which screenshots you captured and what each one shows
 - what break attempts you tried
 - which issues you found
 - what you fixed

@@ -54,6 +54,9 @@ If something important lives only in your head or in the chat transcript, the re
 - When waiting on reviewers, subagents, CI, automated review, or external jobs, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
 - Never interrupt in-flight work just to force a partial result, salvage something quickly, or avoid making the user wait longer.
 - Only stop waiting when the work has actually finished, clearly failed, or the user explicitly redirects the work.
+- When browser work is part of reproduction or verification, send screenshots of the relevant UI states to the user so they can visually confirm what you observed.
+- Capture the states that matter, such as the broken state, the fixed state, or an important intermediate state that explains the issue.
+- If the current environment cannot provide screenshots, state that explicitly instead of silently omitting visual evidence.
 
 ## Execution autonomy
 

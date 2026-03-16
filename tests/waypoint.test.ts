@@ -53,6 +53,11 @@ test("init scaffolds core files", () => {
       "Use `conversation-retrospective` after major completed work pieces"
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "When using a browser to reproduce a bug, verify behavior, or confirm that a fix works, send the user screenshots"
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -113,6 +118,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Treat `conversation-retrospective` as a default closeout step for major work pieces"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "When browser work is part of reproduction or verification, send screenshots of the relevant UI states to the user"
     )
   );
   assert.ok(
@@ -181,6 +191,11 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/break-it-qa/SKILL.md"), "utf8").includes("# Break-It QA"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/break-it-qa/SKILL.md"), "utf8").includes(
+      "Capture screenshots of the important states you observe"
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
       "Keep waiting as long as required."

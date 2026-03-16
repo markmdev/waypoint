@@ -163,6 +163,8 @@ For planning work, run `plan-reviewer` before presenting a non-trivial implement
 
 When the user approves a reviewed plan or explicitly says to proceed, the intended Waypoint behavior is autonomous execution: keep going through implementation, verification, review, and repo-memory updates unless a real blocker or materially risky unresolved decision requires a pause. If reviewers, subagents, CI, or other external work are still running, Waypoint should wait as long as necessary rather than interrupting them for speed.
 
+When browser-based reproduction or verification is part of the work, Waypoint should also send screenshots of the relevant UI states so the user can see the evidence directly.
+
 ## What makes it different
 
 Waypoint is not trying to hide everything behind hooks and background machinery.

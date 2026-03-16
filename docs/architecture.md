@@ -20,6 +20,8 @@ The default reviewer workflow is closeout-based: run `code-reviewer` before cons
 
 Waypoint's execution model is ownership-based after plan approval: once a reviewed plan is approved, the agent should continue through implementation and closeout without stopping for incremental permission unless a real blocker or risky unresolved decision appears.
 
+When that execution uses a browser for reproduction or verification, the workflow should surface screenshots of the relevant UI states back to the user instead of relying on text-only descriptions.
+
 4. **Index rebuild layer**
    - `.waypoint/DOCS_INDEX.md`
    - `.waypoint/TRACKS_INDEX.md`
