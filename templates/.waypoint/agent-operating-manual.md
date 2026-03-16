@@ -82,7 +82,15 @@ Waypoint scaffolds these focused second-pass specialists by default:
 
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability drift
-- `plan-reviewer` to challenge weak implementation plans before execution
+- `plan-reviewer` to challenge non-trivial implementation plans before they are shown to the user
+
+## Plan Review
+
+Run `plan-reviewer` before presenting a non-trivial implementation plan to the user.
+
+- Use it when the plan includes meaningful design choices, multiple work phases, migrations, or non-obvious tradeoffs.
+- Skip it for tiny obvious plans or when no plan will be presented.
+- Read the reviewer result, strengthen the plan, and rerun `plan-reviewer` until there are no meaningful issues left before showing the plan to the user.
 
 ## Review Loop
 

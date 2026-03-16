@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.9
+
+### Patch Changes
+
+- Require `plan-reviewer` to run before presenting a non-trivial implementation plan to the user and to be rerun until the plan has no meaningful review findings left.
+
 ## 0.9.8
 
 ### Patch Changes

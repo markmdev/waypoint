@@ -75,6 +75,7 @@ Working rules:
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
 - Use `code-guide-audit` for a targeted coding-guide compliance pass on a specific feature, file set, or change slice
 - Do not invoke `break-it-qa`, `frontend-ship-audit`, or `backend-ship-audit` yourself from the managed AGENTS block workflow; they are user-facing skills for explicit human-requested QA or ship-readiness audits, not default agent steps
+- Before presenting a non-trivial implementation plan to the user, run `plan-reviewer` and iterate on the plan until it has no meaningful review findings left
 - Before considering a non-trivial implementation slice complete, run `code-reviewer`; use a recent self-authored commit as the default scope anchor when one cleanly represents that slice
 - Before considering medium or large changes complete, run `code-health-reviewer`, especially when they add structure, duplicate logic, or introduce new abstractions
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`

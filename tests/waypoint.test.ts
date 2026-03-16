@@ -81,6 +81,16 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Run `plan-reviewer` before presenting a non-trivial implementation plan to the user."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "rerun `plan-reviewer` until there are no meaningful issues left"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Run `code-reviewer` before considering any non-trivial implementation slice complete."
     )
   );

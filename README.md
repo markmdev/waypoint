@@ -156,6 +156,8 @@ Waypoint scaffolds these reviewer agents by default:
 
 The intended workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger.
 
+For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left.
+
 ## What makes it different
 
 Waypoint is not trying to hide everything behind hooks and background machinery.
