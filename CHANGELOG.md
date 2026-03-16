@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.7
+
+### Patch Changes
+
+- Make `waypoint init` and `waypoint upgrade` prune the retired `.waypoint/agents/` subtree so stale files like `docs-researcher.md` and old reviewer prompt markdown files are removed automatically on refresh.
+
 ## 0.9.6
 
 ### Patch Changes

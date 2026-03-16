@@ -134,6 +134,8 @@ export function initRepository(
 ): string[] {
   ensureDir(projectRoot);
   migrateLegacyRootFiles(projectRoot);
+  // Any Waypoint-owned path removed from the scaffold should be added here
+  // so `waypoint init` / `waypoint upgrade` can actively prune stale copies.
   for (const deprecatedPath of [
     "docs/README.md",
     "docs/code-guide.md",
@@ -156,6 +158,7 @@ export function initRepository(
     ".codex/agents/reviewer.toml",
     ".codex/agents/architect.toml",
     ".codex/agents/implementer.toml",
+    ".waypoint/agents",
     ".waypoint/automations",
     ".waypoint/rules",
     ".waypoint/state",

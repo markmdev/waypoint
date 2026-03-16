@@ -189,6 +189,26 @@ test("init removes retired audit skill directories on refresh", () => {
   assert.equal(existsSync(path.join(root, ".agents/skills/pr-review/SKILL.md")), true);
 });
 
+test("init removes retired .waypoint agent prompt files on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-waypoint-agents-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  mkdirSync(path.join(root, ".waypoint/agents"), { recursive: true });
+  writeFileSync(
+    path.join(root, ".waypoint/agents/docs-researcher.md"),
+    "---\nname: docs-researcher\n---\n",
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  assert.equal(existsSync(path.join(root, ".waypoint/agents")), false);
+});
+
 test("doctor warns when workspace entries are not timestamped", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-workspace-timestamps-"));
   initRepository(root, {
