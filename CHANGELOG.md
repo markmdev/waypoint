@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.4
+
+### Patch Changes
+
+- 2b3e7ef: Fix the shipped PR workflow so placeholder automated-review states like CodeRabbit's "review in progress" are treated as unfinished, and so PRs are not considered clear until the required Waypoint reviewer-agent passes have actually run.
+
 ## 0.10.3
 
 ### Patch Changes
