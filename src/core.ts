@@ -428,6 +428,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     "docs-sync",
     "code-guide-audit",
     "break-it-qa",
+    "conversation-retrospective",
     "workspace-compress",
     "pre-pr-hygiene",
     "pr-review",

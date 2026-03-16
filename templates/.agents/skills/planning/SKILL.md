@@ -145,6 +145,7 @@ When the plan doc is written:
 - give a short chat summary
 - include the doc path
 - call out any unresolved decisions that still need the user's input
+- if there are no unresolved decisions and the user approves the plan, treat that approval as authorization to execute the plan end to end rather than asking again at each obvious next step
 
 ## Quality Bar
 

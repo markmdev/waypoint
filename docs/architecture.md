@@ -10,13 +10,15 @@
 
 2. **Skill layer**
    - repo-local skills under `.agents/skills/`
-   - includes planning, audits, workspace compression, pre-PR hygiene, PR review, and adversarial QA workflows
+   - includes planning, conversation retrospectives, audits, workspace compression, pre-PR hygiene, PR review, and adversarial QA workflows
 
 3. **Reviewer agent layer**
    - `.codex/config.toml` with multi-agent enabled by default
    - `.codex/agents/*.toml`
 
 The default reviewer workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Slow reviewers should be allowed to finish unless they are clearly stuck or the user redirects the work.
+
+Waypoint's execution model is ownership-based after plan approval: once a reviewed plan is approved, the agent should continue through implementation and closeout without stopping for incremental permission unless a real blocker or risky unresolved decision appears.
 
 4. **Index rebuild layer**
    - `.waypoint/DOCS_INDEX.md`

@@ -38,6 +38,11 @@ test("init scaffolds core files", () => {
       "Before making meaningful implementation, review, architectural, or tradeoff decisions, inspect the project root guidance files for persisted project context."
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "If the user approves a plan or explicitly tells you to proceed, treat that as authorization to execute the work end to end."
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -53,6 +58,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/frontend-context-interview/"));
   assert.ok(gitignore.includes(".agents/skills/backend-ship-audit/"));
   assert.ok(gitignore.includes(".agents/skills/frontend-ship-audit/"));
+  assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".waypoint/*"));
   assert.ok(gitignore.includes("!.waypoint/docs/"));
   assert.ok(gitignore.includes("!.waypoint/docs/**"));
@@ -86,6 +92,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "rerun `plan-reviewer` until there are no meaningful issues left"
     )
   );
@@ -101,6 +112,11 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".waypoint/scripts/build-track-index.mjs"), "utf8").includes("TRACKS_INDEX.md")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "treat that approval as authorization to execute the plan end to end"
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/planning/agents/openai.yaml"), "utf8").includes("display_name: \"Planning\"")
   );
@@ -145,6 +161,16 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/break-it-qa/SKILL.md"), "utf8").includes("# Break-It QA"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/conversation-retrospective/SKILL.md"), "utf8").includes(
+      "# Conversation Retrospective"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/conversation-retrospective/agents/openai.yaml"), "utf8").includes(
+      'display_name: "Conversation Retrospective"'
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/workspace-compress/SKILL.md"), "utf8").includes("# Workspace Compress")
   );

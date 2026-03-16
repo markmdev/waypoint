@@ -66,6 +66,8 @@ If some uncertainty still remains after checking persisted context and interview
 
 Prefer existing persisted context over re-interviewing the user.
 
+If the user approves a plan or explicitly tells you to proceed, treat that as authorization to execute the work end to end. Do not stop mid-implementation for incremental permission unless a real blocker, hidden-risk decision, or explicit user redirect requires a pause.
+
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
 - For large multi-step work, create or update `.waypoint/track/<slug>.md`, keep detailed execution state there, and point to it from `## Active Trackers` in `.waypoint/WORKSPACE.md`
@@ -81,4 +83,5 @@ Working rules:
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - Use `pr-review` once a PR has active review comments or automated review in progress
 - Treat the generated context bundle as required session bootstrap, not optional reference material
+- After plan approval, own the execution through implementation, verification, review, and repo-memory updates before surfacing a final completion report
 <!-- waypoint:end -->

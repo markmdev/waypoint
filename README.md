@@ -137,6 +137,7 @@ Waypoint ships a strong default skill pack for real coding work:
 - `docs-sync`
 - `code-guide-audit`
 - `break-it-qa`
+- `conversation-retrospective`
 - `frontend-ship-audit`
 - `backend-ship-audit`
 - `workspace-compress`
@@ -144,7 +145,7 @@ Waypoint ships a strong default skill pack for real coding work:
 - `pr-review`
 
 These are repo-local, so the workflow travels with the project.
-`break-it-qa`, `frontend-ship-audit`, and `backend-ship-audit` are user-invoked audit skills, not default autonomous agent steps.
+`conversation-retrospective`, `break-it-qa`, `frontend-ship-audit`, and `backend-ship-audit` are on-demand skills, not default autonomous agent steps.
 
 ## Reviewer agents
 
@@ -157,6 +158,8 @@ Waypoint scaffolds these reviewer agents by default:
 The intended workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger.
 
 For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left.
+
+When the user approves a reviewed plan or explicitly says to proceed, the intended Waypoint behavior is autonomous execution: keep going through implementation, verification, review, and repo-memory updates unless a real blocker or materially risky unresolved decision requires a pause.
 
 ## What makes it different
 

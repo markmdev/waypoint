@@ -43,6 +43,7 @@ If something important lives only in your head or in the chat transcript, the re
 
 - Read code before editing it.
 - Follow the repo's documented patterns when they are healthy.
+- If the user approves a plan or explicitly tells you to proceed, treat that as authorization to finish the approved work end to end.
 - Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
 - For large multi-step work, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
@@ -50,6 +51,24 @@ If something important lives only in your head or in the chat transcript, the re
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
 - Use the repo-local skills and reviewer agents instead of improvising from scratch.
 - Do not kill long-running subagents or reviewer agents just because they are slow. Wait unless they are clearly stuck, failed, or the user redirects the work.
+
+## Execution autonomy
+
+Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete.
+
+That means:
+
+- continue through implementation, verification, reviewer passes, and required docs/workspace updates without asking for incremental permission
+- use commentary for short progress updates, not as a handoff back to the user
+- do not stop just to announce the next obvious step and ask whether to do it
+
+Pause only when:
+
+- a real blocker prevents forward progress
+- a hidden-risk or non-obvious decision would materially change scope, behavior, cost, or data safety
+- the user explicitly redirects, pauses, or narrows the work
+
+If none of those are true, keep going.
 
 ## Documentation expectations
 
