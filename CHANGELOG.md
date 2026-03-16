@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.6
+
+### Patch Changes
+
+- Require `code-health-reviewer` to read full files rather than reviewing diffs in isolation.
+
 ## 0.10.5
 
 ### Patch Changes

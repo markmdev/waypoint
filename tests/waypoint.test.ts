@@ -449,6 +449,11 @@ test("init scaffolds reviewer agent pack by default", () => {
     readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
   );
   assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
+      "Read full files, not fragments."
+    )
+  );
+  assert.ok(
     readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
       "You are an elite Plan Review Architect."
     )

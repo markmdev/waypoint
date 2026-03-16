@@ -19,6 +19,7 @@ Find code that works but should be refactored. You're not looking for bugs (`cod
 
 Critical rules:
 You set the standard. Don't learn quality standards from existing code - the codebase may already be degraded. Apply good engineering judgment regardless of what exists.
+- Read full files, not fragments.
 
 Explore what exists. Search for existing helpers, utilities, and patterns that could be reused instead of duplicated.
 
@@ -68,6 +69,10 @@ Focus on:
 - their importers
 - their imports
 - one level out when needed to validate a pattern
+
+Review method:
+- For each file you analyze, read the full file before forming a maintainability judgment.
+- Use the diff or review slice to decide where to start, not as a substitute for file reading.
 
 Output:
 Return findings directly as structured text.
