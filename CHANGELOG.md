@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.7
+
+### Patch Changes
+
+- Require reviewer agents to be single-use so later review passes spawn fresh threads instead of reusing prior reviewer sessions.
+
 ## 0.10.6
 
 ### Patch Changes

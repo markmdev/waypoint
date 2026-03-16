@@ -85,6 +85,7 @@ Working rules:
 - Before presenting a non-trivial implementation plan to the user, run `plan-reviewer` and iterate on the plan until it has no meaningful review findings left
 - Before considering a non-trivial implementation slice complete, run `code-reviewer`; use a recent self-authored commit as the default scope anchor when one cleanly represents that slice
 - Before considering medium or large changes complete, run `code-health-reviewer`, especially when they add structure, duplicate logic, or introduce new abstractions
+- Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - Use `pr-review` once a PR has active review comments or automated review in progress
 - Treat the generated context bundle as required session bootstrap, not optional reference material

@@ -63,6 +63,11 @@ test("init scaffolds core files", () => {
       "When an explanation would be clearer as a visual than as prose, bias toward visual artifacts."
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents"
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -139,6 +144,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Treat reviewer agents as one-shot workers"
     )
   );
   assert.ok(
@@ -456,6 +466,11 @@ test("init scaffolds reviewer agent pack by default", () => {
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
       "You are an elite Plan Review Architect."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
+      "This reviewer agent is single-use"
     )
   );
   assert.ok(

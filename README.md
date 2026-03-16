@@ -157,9 +157,9 @@ Waypoint scaffolds these reviewer agents by default:
 - `code-reviewer`
 - `plan-reviewer`
 
-The intended workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger.
+The intended workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Reviewer agents are one-shot workers: once a reviewer returns findings, close it, and if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread.
 
-For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left.
+For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left. Each pass should use a fresh `plan-reviewer` agent rather than reusing a previous reviewer thread.
 
 When the user approves a reviewed plan or explicitly says to proceed, the intended Waypoint behavior is autonomous execution: keep going through implementation, verification, review, and repo-memory updates unless a real blocker or materially risky unresolved decision requires a pause. If reviewers, subagents, CI, or other external work are still running, Waypoint should wait as long as necessary rather than interrupting them for speed. For PR work, placeholder automated-review states like CodeRabbit's "review in progress" do not count as a completed review.
 
