@@ -49,6 +49,7 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
+- When spawning reviewer agents or other subagents, explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning.
 - Use the repo-local skills and reviewer agents instead of improvising from scratch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
 - Do not kill long-running subagents or reviewer agents just because they are slow.

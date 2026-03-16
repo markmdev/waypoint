@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.8
+
+### Patch Changes
+
+- Default reviewer agents to GPT-5.4 with high reasoning and strengthen review prompts so they read full changed files plus related code instead of stopping at diffs.
+
 ## 0.10.7
 
 ### Patch Changes

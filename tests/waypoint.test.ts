@@ -68,6 +68,11 @@ test("init scaffolds core files", () => {
       "Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents"
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high`"
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -149,6 +154,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Treat reviewer agents as one-shot workers"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high`"
     )
   );
   assert.ok(
@@ -453,19 +463,53 @@ test("init scaffolds reviewer agent pack by default", () => {
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes("You are a code reviewer.")
   );
   assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes('model = "gpt-5.4"')
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(
+      "A diff-only review is a failed review."
+    )
+  );
+  assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
   );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
   );
   assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes('model = "gpt-5.4"')
+  );
+  assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
-      "Read full files, not fragments."
+      "Read every changed file in full before making a maintainability judgment."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(
+      'model_reasoning_effort = "high"'
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
+      'model_reasoning_effort = "high"'
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
+      "A diff-only review is a failed review."
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
       "You are an elite Plan Review Architect."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes('model = "gpt-5.4"')
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
+      'model_reasoning_effort = "high"'
     )
   );
   assert.ok(

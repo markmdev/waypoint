@@ -75,6 +75,7 @@ Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
 - For large multi-step work, create or update `.waypoint/track/<slug>.md`, keep detailed execution state there, and point to it from `## Active Trackers` in `.waypoint/WORKSPACE.md`
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
+- When spawning reviewer agents or other subagents, explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
 - Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
