@@ -1,11 +1,11 @@
 ---
 name: backend-context-interview
-description: Gather and persist durable backend project context when missing or insufficient for implementation, architecture decisions, or ship-readiness review. Use when backend choices depend on scale, criticality, compliance, tenant model, compatibility, reliability, security posture, or similar context that is not clearly documented.
+description: Gather and persist durable backend project context when missing or insufficient for implementation, architecture decisions, or ship-readiness review. Use this to ask project-level questions about deployment reality, scale, criticality, compatibility, tenant model, security posture, reliability expectations, and other durable backend context that is not clearly documented. This is not a feature-discovery skill.
 ---
 
 # Backend Context Interview
 
-Use this skill when relevant backend context is missing, stale, contradictory, or too weak to support correct implementation or review decisions.
+Use this skill when relevant backend project context is missing, stale, contradictory, or too weak to support correct implementation or review decisions.
 
 ## Goals
 
@@ -13,6 +13,8 @@ Use this skill when relevant backend context is missing, stale, contradictory, o
 2. ask only high-leverage questions that cannot be answered from the repo or guidance files
 3. persist durable context into the project root guidance file
 4. avoid repeated questioning in future tasks
+
+This skill is for project-level operating context, not feature requirements gathering.
 
 ## When to use
 
@@ -29,6 +31,7 @@ Use this skill when the current task depends on context such as:
 - infrastructure constraints that materially affect design
 
 Do not use this skill when the answer is already clearly present in `AGENTS.md`, architecture docs, runbooks, or the task itself.
+Do not use this skill to ask about feature-specific behavior, UX details, endpoint shapes, acceptance criteria, implementation preferences, or other concrete requirements that belong in planning or normal task clarification.
 
 ## Workflow
 
@@ -57,6 +60,7 @@ Good triggers:
 - tenant model changes authorization and data-isolation design
 
 Do not ask broad or low-value questions.
+Do not ask feature-specific product questions.
 
 ### 3. Ask concise grouped questions
 
@@ -68,3 +72,9 @@ Suggested categories:
 - data sensitivity and compliance
 
 Do not ask generic product questions that do not affect backend engineering.
+Do ask project-level questions like:
+- whether the product is internal, customer-facing, partner-facing, or public
+- whether there are real users yet or only development/staging use
+- expected traffic, concurrency, or import/job intensity
+- whether backward compatibility is required
+- how costly outages, corruption, or security mistakes would be

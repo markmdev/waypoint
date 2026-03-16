@@ -1,11 +1,11 @@
 ---
 name: frontend-context-interview
-description: Gather and persist durable frontend project context when missing or insufficient for implementation or review work. Use when frontend decisions depend on product type, audience, support matrix, accessibility, SEO, localization, design-system constraints, or similar context that is not clearly documented.
+description: Gather and persist durable frontend project context when missing or insufficient for implementation or review work. Use this to ask project-level questions about audience, deployment surface, browser/device expectations, accessibility, SEO, localization, analytics obligations, and other durable frontend context that is not clearly documented. This is not a feature-discovery skill.
 ---
 
 # Frontend Context Interview
 
-Use this skill when relevant frontend context is missing, stale, contradictory, or too weak to support correct implementation or review decisions.
+Use this skill when relevant frontend project context is missing, stale, contradictory, or too weak to support correct implementation or review decisions.
 
 ## Goals
 
@@ -13,6 +13,8 @@ Use this skill when relevant frontend context is missing, stale, contradictory, 
 2. ask only high-leverage questions that cannot be answered from the repo or guidance files
 3. persist durable context into the project root guidance file
 4. avoid repeated questioning in future tasks
+
+This skill is for project-level operating context, not feature requirements gathering.
 
 ## When to use
 
@@ -29,6 +31,7 @@ Use this skill when the current task depends on context such as:
 - security or privacy expectations that change frontend behavior
 
 Do not use this skill when the answer is already clearly present in `AGENTS.md`, product docs, or the task itself.
+Do not use this skill to ask about feature-specific UX, copy, flows, acceptance criteria, implementation preferences, or detailed product behavior that belongs in planning or normal task clarification.
 
 ## Workflow
 
@@ -58,3 +61,12 @@ Good triggers:
 
 Do not ask broad or low-value questions.
 Do not ask generic discovery questions that do not affect implementation.
+Do not ask feature-specific product questions.
+
+Good project-level question areas include:
+- whether the product is internal, customer-facing, partner-facing, or public marketing
+- whether there are real users yet or only development/staging use
+- expected device mix and browser support
+- accessibility expectations or compliance targets
+- whether SEO matters for any routes
+- whether backward compatibility in user workflows matters

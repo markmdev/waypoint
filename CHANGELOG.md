@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.8
+
+### Patch Changes
+
+- Refine the frontend and backend context-interview skills so they explicitly ask only project-level operating-context questions, not feature-specific planning or product-detail questions.
+
 ## 0.9.7
 
 ### Patch Changes

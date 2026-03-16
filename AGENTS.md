@@ -52,9 +52,10 @@ Examples of durable context that can materially change the correct approach:
 
 If relevant context is missing, empty, stale, or insufficient and that gap would materially change the correct approach:
 - do not guess silently
-- use `frontend-context-interview` when frontend or product-surface context is missing
-- use `backend-context-interview` when backend, reliability, tenant, compatibility, or security context is missing
+- use `frontend-context-interview` when project-level frontend context is missing
+- use `backend-context-interview` when project-level backend context is missing
 - ask only the missing high-leverage questions
+- ask about the project, deployment reality, and operating constraints rather than the concrete feature
 - persist only durable context back into the project guidance file
 - do not write transient task-specific details into context sections
 
