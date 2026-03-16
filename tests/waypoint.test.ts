@@ -43,6 +43,11 @@ test("init scaffolds core files", () => {
       "If the user approves a plan or explicitly tells you to proceed, treat that as authorization to execute the work end to end."
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "There is no fixed waiting limit, and slowness alone is not a reason to interrupt or abandon the work."
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -93,6 +98,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "When waiting on reviewers, subagents, CI, automated review, or external jobs, wait as long as required."
     )
   );
   assert.ok(
@@ -161,6 +171,21 @@ test("init scaffolds core files", () => {
     readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/break-it-qa/SKILL.md"), "utf8").includes("# Break-It QA"));
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
+      "Keep waiting as long as required."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
+      "wait for the next round of CI, automated review, and human review comments"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
+      "The loop is not complete while any meaningful review thread still lacks an inline response."
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/conversation-retrospective/SKILL.md"), "utf8").includes(
       "# Conversation Retrospective"

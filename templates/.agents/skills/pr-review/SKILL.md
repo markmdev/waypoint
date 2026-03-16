@@ -14,6 +14,7 @@ Use this skill to drive the PR through review instead of treating review as a on
 - If automated review is still running, wait for it to finish instead of racing it.
 - If comments are still arriving, do not prematurely declare the loop complete.
 - For stacked or non-`main` PRs, explicitly compare the PR head against its base branch and make sure later fixes on the base branch have actually been merged or rebased forward. Do not assume a sibling/base PR fix is already present in the dependent PR.
+- Keep waiting as long as required. Do not interrupt or abandon the review loop just because CI, reviewers, or automated checks are taking a long time.
 
 ## Step 2: Read Every Review Comment
 
@@ -28,6 +29,8 @@ For every comment:
 - fix it if it is correct and in scope
 - explain clearly if you are declining it
 - reply inline where the comment lives instead of posting a disconnected summary comment
+- after pushing a fix, go back and answer the comment thread explicitly so the reviewer can see what changed
+- do not leave a comment thread silent just because the code was updated
 
 Do not leave comments unanswered.
 
@@ -37,9 +40,12 @@ Do not leave comments unanswered.
 - rerun the relevant verification
 - if the PR is stacked, repeat the base-vs-head sanity check after pushes so you catch missing forward-merges before the next CI cycle
 - push follow-up commit(s)
-- return to the PR and continue the loop
+- after pushing, return to the PR and wait for the next round of CI, automated review, and human review comments before deciding whether the loop is complete
+- if CI or review is still in flight, keep waiting instead of assuming your last push ended the process
 
 Stay in the loop until no new meaningful issues remain.
+Never cut the loop short by forcing a partial return from still-running review or verification systems.
+The loop is not complete while any meaningful review thread still lacks an inline response.
 
 ## Step 5: Close With A Crisp State Summary
 

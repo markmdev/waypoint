@@ -16,7 +16,7 @@
    - `.codex/config.toml` with multi-agent enabled by default
    - `.codex/agents/*.toml`
 
-The default reviewer workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Slow reviewers should be allowed to finish unless they are clearly stuck or the user redirects the work.
+The default reviewer workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Slow reviewers should be allowed to finish, and Waypoint should wait as long as required rather than interrupting them just because they are still running.
 
 Waypoint's execution model is ownership-based after plan approval: once a reviewed plan is approved, the agent should continue through implementation and closeout without stopping for incremental permission unless a real blocker or risky unresolved decision appears.
 

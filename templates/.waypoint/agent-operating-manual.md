@@ -50,7 +50,10 @@ If something important lives only in your head or in the chat transcript, the re
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
 - Use the repo-local skills and reviewer agents instead of improvising from scratch.
-- Do not kill long-running subagents or reviewer agents just because they are slow. Wait unless they are clearly stuck, failed, or the user redirects the work.
+- Do not kill long-running subagents or reviewer agents just because they are slow.
+- When waiting on reviewers, subagents, CI, automated review, or external jobs, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
+- Never interrupt in-flight work just to force a partial result, salvage something quickly, or avoid making the user wait longer.
+- Only stop waiting when the work has actually finished, clearly failed, or the user explicitly redirects the work.
 
 ## Execution autonomy
 
@@ -121,7 +124,8 @@ Use reviewer agents before considering the work complete, not just as a reflex a
 4. If you have a recent self-authored commit that cleanly represents the reviewable slice, use it as the default review scope anchor. Otherwise scope the reviewers to the current changed slice.
 5. Widen only when surrounding files are needed to validate a finding.
 6. Do not call the work finished before you read the required reviewer results.
-7. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
+7. Wait for reviewer outputs even if that requires repeated or long waits. Do not interrupt them just because they are still running.
+8. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
 
 ## Quality bar
 
