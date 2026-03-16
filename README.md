@@ -161,7 +161,7 @@ The intended workflow is closeout-based: run `code-reviewer` before considering 
 
 For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left.
 
-When the user approves a reviewed plan or explicitly says to proceed, the intended Waypoint behavior is autonomous execution: keep going through implementation, verification, review, and repo-memory updates unless a real blocker or materially risky unresolved decision requires a pause. If reviewers, subagents, CI, or other external work are still running, Waypoint should wait as long as necessary rather than interrupting them for speed.
+When the user approves a reviewed plan or explicitly says to proceed, the intended Waypoint behavior is autonomous execution: keep going through implementation, verification, review, and repo-memory updates unless a real blocker or materially risky unresolved decision requires a pause. If reviewers, subagents, CI, or other external work are still running, Waypoint should wait as long as necessary rather than interrupting them for speed. For PR work, placeholder automated-review states like CodeRabbit's "review in progress" do not count as a completed review.
 
 When browser-based reproduction or verification is part of the work, Waypoint should also send screenshots of the relevant UI states so the user can see the evidence directly.
 

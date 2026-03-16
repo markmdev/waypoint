@@ -127,6 +127,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "rerun `plan-reviewer` until there are no meaningful issues left"
     )
   );
@@ -208,7 +213,17 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
+      "CodeRabbit's \"review in progress\" as unfinished state"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
       "The loop is not complete while any meaningful review thread still lacks an inline response."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/pr-review/SKILL.md"), "utf8").includes(
+      "The loop is also not complete if required Waypoint reviewer-agent passes for the current slice have not been run yet."
     )
   );
   assert.ok(

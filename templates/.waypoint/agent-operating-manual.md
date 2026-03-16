@@ -132,6 +132,7 @@ Use reviewer agents before considering the work complete, not just as a reflex a
 6. Do not call the work finished before you read the required reviewer results.
 7. Wait for reviewer outputs even if that requires repeated or long waits. Do not interrupt them just because they are still running.
 8. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
+9. Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run.
 
 ## Quality bar
 

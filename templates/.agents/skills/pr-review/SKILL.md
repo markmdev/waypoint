@@ -12,6 +12,9 @@ Use this skill to drive the PR through review instead of treating review as a on
 - Check the PR's current review and CI status.
 - If CI is red or pending, inspect the failed check logs before triaging review comments so you do not chase comment fixes while a separate blocker is breaking the branch.
 - If automated review is still running, wait for it to finish instead of racing it.
+- Treat placeholder messages such as CodeRabbit's "review in progress" as unfinished state, not as a meaningful review result.
+- If an automated reviewer like CodeRabbit is still pending, in progress, or has not reached a green/completed check state yet, keep waiting before you conclude there are no findings.
+- Once the automated reviewer check turns green/completed, reread the review comments and threads because the real findings may only appear after the placeholder state clears.
 - If comments are still arriving, do not prematurely declare the loop complete.
 - For stacked or non-`main` PRs, explicitly compare the PR head against its base branch and make sure later fixes on the base branch have actually been merged or rebased forward. Do not assume a sibling/base PR fix is already present in the dependent PR.
 - Keep waiting as long as required. Do not interrupt or abandon the review loop just because CI, reviewers, or automated checks are taking a long time.
@@ -42,10 +45,12 @@ Do not leave comments unanswered.
 - push follow-up commit(s)
 - after pushing, return to the PR and wait for the next round of CI, automated review, and human review comments before deciding whether the loop is complete
 - if CI or review is still in flight, keep waiting instead of assuming your last push ended the process
+- before declaring the PR clear or ready, make sure the required Waypoint reviewer agents for this slice have actually run and that their real findings, if any, were handled
 
 Stay in the loop until no new meaningful issues remain.
 Never cut the loop short by forcing a partial return from still-running review or verification systems.
 The loop is not complete while any meaningful review thread still lacks an inline response.
+The loop is also not complete if required Waypoint reviewer-agent passes for the current slice have not been run yet.
 
 ## Step 5: Close With A Crisp State Summary
 
