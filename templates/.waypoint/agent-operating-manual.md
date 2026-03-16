@@ -92,11 +92,14 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `work-tracker` when large multi-step work needs durable progress tracking in `.waypoint/track/`
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
+- `conversation-retrospective` after major completed work pieces so the active conversation is distilled into durable memory, user feedback and errors are preserved, exercised skills are improved, and real new-skill candidates are recorded
 - `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
 - `frontend-ship-audit` and `backend-ship-audit` only when the user explicitly requests a ship-readiness audit; do not trigger them autonomously as part of the default Waypoint workflow
 - `workspace-compress` after meaningful chunks, before stopping, and before review when the live handoff needs compression
 - `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work
 - `pr-review` once a PR has active review comments or automated review in progress
+
+Treat `conversation-retrospective` as a default closeout step for major work pieces, not as a rare manual tool.
 
 ## When to use the reviewer agents
 

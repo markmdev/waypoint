@@ -28,8 +28,11 @@ Review the current conversation and separate:
 - durable project knowledge
 - live execution state
 - transient chatter
+- direct user feedback, corrections, complaints, and preferences
 
 Persist without asking follow-up questions when the correct destination is clear.
+
+Treat explicit user feedback as a high-priority signal. If the user corrected the approach, rejected a behavior, called out friction, or stated a standing preference, prefer preserving that over the agent's earlier assumptions.
 
 Write durable knowledge to the smallest truthful home the repo already uses:
 
@@ -48,11 +51,33 @@ Do not leave important truths only in chat.
 
 Identify which skills were actually used in this conversation, or which existing skills clearly should have covered the workflow but left avoidable gaps.
 
+For each used or clearly relevant skill, explicitly decide whether it:
+
+- succeeded
+- partially succeeded
+- failed
+
+Base that judgment on the actual conversation, especially:
+
+- direct user feedback
+- whether the skill helped complete the task
+- whether the agent had to work around missing guidance
+- whether concrete errors, dead ends, or repeated corrections happened while using it
+
+Distinguish between:
+
+- a skill problem
+- an execution mistake by the agent
+- an external/tooling failure
+- a one-off user preference that should not be generalized
+
+Only change the skill when the problem is truly in the skill guidance.
+
 For each affected skill:
 
 - read the existing skill before editing it
 - update only reusable guidance, not one-off transcript details
-- add missing guardrails, path hints, failure modes, decision rules, or references that would have made the conversation easier to complete
+- add missing guardrails, path hints, failure modes, error-handling guidance, decision rules, or references that would have made the conversation easier to complete
 - keep `SKILL.md` concise; prefer targeted structural improvements over turning the skill into a diary
 
 If the environment has both a source-of-truth skill and one or more mirrored or installed copies, update the source-of-truth version and any copies the user expects to stay in sync.
@@ -91,7 +116,9 @@ Do not invent a refresh command when the repo does not have one.
 Summarize:
 
 - what durable knowledge you saved and where
+- which skills you evaluated and whether they succeeded, partially succeeded, or failed
 - which skills you improved
+- which concrete errors, failure modes, or repeated friction points you captured
 - which new skill ideas you recorded, if any
 - what you intentionally left unpersisted because it was transient
 

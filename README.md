@@ -147,6 +147,8 @@ Waypoint ships a strong default skill pack for real coding work:
 These are repo-local, so the workflow travels with the project.
 `conversation-retrospective`, `break-it-qa`, `frontend-ship-audit`, and `backend-ship-audit` are on-demand skills, not default autonomous agent steps.
 
+In practice, Waypoint now expects `conversation-retrospective` to run automatically after major completed work pieces so durable learnings, user feedback, errors, and skill improvements do not stay trapped in chat.
+
 ## Reviewer agents
 
 Waypoint scaffolds these reviewer agents by default:
