@@ -65,12 +65,57 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Delivery expectations:"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      'Before you start, decide what "done" means for the task.'
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "explain the result in plain, direct language"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "This communication rule applies to how you explain the work, not to how you do it."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Before you say the work is complete, verify it yourself whenever you reasonably can"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Match the verification to the task."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Use representative or real inputs when practical instead of toy examples"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Return finished work when possible, not a first pass that still depends on the user to spot-check it for you."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Only come back before that if you hit a genuine blocker"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
       "Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents"
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high`"
+      "explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
     )
   );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));

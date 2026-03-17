@@ -71,11 +71,24 @@ When work is in flight elsewhere — reviewer agents, subagents, CI, automated r
 When using a browser to reproduce a bug, verify behavior, or confirm that a fix works, send the user screenshots of the relevant UI states so they can see the evidence directly. If screenshots are not possible in the current environment, say so explicitly.
 When an explanation would be clearer as a visual than as prose, bias toward visual artifacts. Prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans; use `visual-explanations` for richer generated images and for annotated screenshots that call out concrete UI states.
 
+Delivery expectations:
+- Before you start, decide what "done" means for the task. Set your own finish line and use it as your checklist while you work.
+- When you report back to the user, explain the result in plain, direct language. Say what you changed, what happened, and anything the user actually needs to know, but do not lean on jargon, low-level implementation detail, or code-heavy narration unless the user asks for it.
+- Write for a smart person who is not looking at the code. The goal is clarity, not technical performance.
+- This communication rule applies to how you explain the work, not to how you do it. Your actual reasoning, coding, debugging, and verification should stay technical, precise, and rigorous.
+- Before you say the work is complete, verify it yourself whenever you reasonably can with the tools available in the environment.
+- Match the verification to the task. Run code and inspect real output for scripts and backend changes. Click through flows, inspect rendered states, and check behavior in the browser for visual or interactive work.
+- Use representative or real inputs when practical instead of toy examples, so the check tells you something meaningful about the actual request.
+- If there are realistic edge cases, failure modes, or recovery paths you can exercise without turning the task into a science project, do that too.
+- If something looks wrong, incomplete, or unproven, keep going. Fix it, rerun the check, and only report completion once the result matches the request.
+- The point of this is to keep iteration off the user's shoulders. Return finished work when possible, not a first pass that still depends on the user to spot-check it for you.
+- Only come back before that if you hit a genuine blocker you cannot clear with the codebase, tools, or available context. If that happens, say it plainly and be explicit about what remains unverified.
+
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
 - For large multi-step work, create or update `.waypoint/track/<slug>.md`, keep detailed execution state there, and point to it from `## Active Trackers` in `.waypoint/WORKSPACE.md`
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
-- When spawning reviewer agents or other subagents, explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning
+- When spawning reviewer agents or other subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
 - Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
