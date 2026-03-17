@@ -37,7 +37,7 @@ The philosophy is simple:
 - more markdown
 - better continuity for the next agent
 
-By default, Waypoint appends a `.gitignore` snippet that ignores the exact Waypoint-created skill directories and reviewer-agent config files, plus everything under `.waypoint/` except `.waypoint/docs/`, while still ignoring the scaffolded `.waypoint/docs/README.md` and `.waypoint/docs/code-guide.md` assets. User-authored durable docs stay trackable; workspace, context, indexes, and other operational state remain local.
+By default, Waypoint keeps its `.gitignore` rules inside a comment-delimited `# Waypoint state` section. That section ignores the exact Waypoint-created skill directories and reviewer-agent config files, plus everything under `.waypoint/` except `.waypoint/docs/`, while still ignoring the scaffolded `.waypoint/docs/README.md` and `.waypoint/docs/code-guide.md` assets. User-authored durable docs stay trackable; workspace, context, indexes, and other operational state remain local.
 
 ## Best fit
 

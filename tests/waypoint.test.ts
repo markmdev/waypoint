@@ -141,6 +141,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes("!.waypoint/docs/**"));
   assert.ok(gitignore.includes(".waypoint/docs/README.md"));
   assert.ok(gitignore.includes(".waypoint/docs/code-guide.md"));
+  assert.ok(gitignore.includes("# End Waypoint state"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
@@ -465,6 +466,7 @@ test("init adds missing gitignore lines without duplicating the full waypoint bl
 
   const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
   assert.equal(gitignore.match(/^# Waypoint state$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^# End Waypoint state$/gm)?.length ?? 0, 1);
   assert.equal(gitignore.match(/^\.agents\/skills\/adversarial-review\/$/gm)?.length ?? 0, 1);
 });
 
@@ -502,6 +504,7 @@ test("init restores the waypoint gitignore block in snippet order", () => {
       "!.waypoint/docs/**",
       ".waypoint/docs/README.md",
       ".waypoint/docs/code-guide.md",
+      "# End Waypoint state",
       "",
     ].join("\n"),
     "utf8"
@@ -603,6 +606,106 @@ test("init does not delete user rules when an old waypoint gitignore block is ma
   const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
   assert.equal(gitignore.match(/^dist\/$/gm)?.length ?? 0, 1);
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
+});
+
+test("init upgrades a legacy root-scoped waypoint gitignore block in place", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-legacy-root-scoped-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "node_modules/",
+      "",
+      "# Waypoint state",
+      "/.waypoint/DOCS_INDEX.md",
+      "/.waypoint/state/",
+      "/.waypoint/context/",
+      "/.waypoint/",
+      "/.agents/",
+      "",
+      "dist/",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^# Waypoint state$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^# End Waypoint state$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^\.agents\/skills\/adversarial-review\/$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^\/\.waypoint\/state\/$/gm)?.length ?? 0, 0);
+  assert.equal(gitignore.match(/^dist\/$/gm)?.length ?? 0, 1);
+});
+
+test("init collapses an already-duplicated waypoint gitignore section back to one block", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-dedup-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "# Waypoint state",
+      "/.waypoint/DOCS_INDEX.md",
+      "/.waypoint/state/",
+      "/.waypoint/context/",
+      "/.waypoint/",
+      "/.agents/",
+      "",
+      "# Waypoint state",
+      ".codex/config.toml",
+      ".codex/agents/code-reviewer.toml",
+      ".codex/agents/code-health-reviewer.toml",
+      ".codex/agents/plan-reviewer.toml",
+      ".agents/skills/planning/",
+      ".agents/skills/work-tracker/",
+      ".agents/skills/docs-sync/",
+      ".agents/skills/code-guide-audit/",
+      ".agents/skills/adversarial-review/",
+      ".agents/skills/visual-explanations/",
+      ".agents/skills/break-it-qa/",
+      ".agents/skills/frontend-context-interview/",
+      ".agents/skills/backend-context-interview/",
+      ".agents/skills/frontend-ship-audit/",
+      ".agents/skills/backend-ship-audit/",
+      ".agents/skills/conversation-retrospective/",
+      ".agents/skills/workspace-compress/",
+      ".agents/skills/pre-pr-hygiene/",
+      ".agents/skills/pr-review/",
+      ".waypoint/*",
+      "!.waypoint/docs/",
+      "!.waypoint/docs/**",
+      ".waypoint/docs/README.md",
+      ".waypoint/docs/code-guide.md",
+      "# End Waypoint state",
+      "",
+      "dist/",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^# Waypoint state$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^# End Waypoint state$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^dist\/$/gm)?.length ?? 0, 1);
 });
 
 test("init does not delete user rules inserted inside an old waypoint gitignore block", () => {

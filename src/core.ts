@@ -22,6 +22,42 @@ const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_TRACK_DIR = ".waypoint/track";
 const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
+const GITIGNORE_WAYPOINT_START = "# Waypoint state";
+const GITIGNORE_WAYPOINT_END = "# End Waypoint state";
+const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
+  ".codex/",
+  ".codex/config.toml",
+  ".codex/agents/",
+  ".codex/agents/code-reviewer.toml",
+  ".codex/agents/code-health-reviewer.toml",
+  ".codex/agents/plan-reviewer.toml",
+  ".agents/",
+  ".agents/skills/",
+  ".agents/skills/planning/",
+  ".agents/skills/work-tracker/",
+  ".agents/skills/docs-sync/",
+  ".agents/skills/code-guide-audit/",
+  ".agents/skills/adversarial-review/",
+  ".agents/skills/visual-explanations/",
+  ".agents/skills/break-it-qa/",
+  ".agents/skills/frontend-context-interview/",
+  ".agents/skills/backend-context-interview/",
+  ".agents/skills/frontend-ship-audit/",
+  ".agents/skills/backend-ship-audit/",
+  ".agents/skills/conversation-retrospective/",
+  ".agents/skills/workspace-compress/",
+  ".agents/skills/pre-pr-hygiene/",
+  ".agents/skills/pr-review/",
+  ".waypoint/",
+  ".waypoint/DOCS_INDEX.md",
+  ".waypoint/state/",
+  ".waypoint/context/",
+  ".waypoint/*",
+  "!.waypoint/docs/",
+  "!.waypoint/docs/**",
+  ".waypoint/docs/README.md",
+  ".waypoint/docs/code-guide.md",
+]);
 const SHIPPED_SKILL_NAMES = [
   "planning",
   "work-tracker",
@@ -92,7 +128,8 @@ function appendGitignoreSnippet(projectRoot: string): void {
   const content = readFileSync(gitignorePath, "utf8");
   const normalizedLines = content.split(/\r?\n/);
   const normalizedContent = normalizedLines.join("\n");
-  if (normalizedContent.includes(snippet)) {
+  const headerCount = normalizedLines.filter((line) => line === GITIGNORE_WAYPOINT_START).length;
+  if (normalizedContent.includes(snippet) && headerCount <= 1) {
     return;
   }
   const startIndex = normalizedLines.findIndex((line) => line === snippetLines[0]);
@@ -101,30 +138,107 @@ function appendGitignoreSnippet(projectRoot: string): void {
     return;
   }
   const managedLineSet = new Set(snippetLines);
-  const managedEndLine = snippetLines[snippetLines.length - 1];
-  let endIndex = normalizedLines.findIndex((line, index) => index >= startIndex && line === managedEndLine);
+  const endIndex = findWaypointGitignoreBlockEnd(normalizedLines, startIndex);
   if (endIndex === -1) {
     writeText(gitignorePath, `${content.trimEnd()}\n\n${snippet}\n`);
     return;
   }
   const hasForeignLineInsideBlock = normalizedLines
     .slice(startIndex + 1, endIndex)
-    .some((line) => line.length > 0 && !managedLineSet.has(line));
+    .some((line) => line.length > 0 && !isManagedWaypointGitignoreLine(line, managedLineSet));
+  const trailingLines = stripSubsequentWaypointGitignoreBlocks(normalizedLines.slice(endIndex + 1), managedLineSet);
   if (hasForeignLineInsideBlock) {
     const foreignLines = normalizedLines
       .slice(startIndex + 1, endIndex)
-      .filter((line) => line.length > 0 && !managedLineSet.has(line))
+      .filter((line) => line.length > 0 && !isManagedWaypointGitignoreLine(line, managedLineSet))
       .join("\n");
     const before = normalizedLines.slice(0, startIndex).join("\n").trimEnd();
-    const after = normalizedLines.slice(endIndex + 1).join("\n").trimStart();
+    const after = trailingLines.join("\n").trimStart();
     const merged = [before, snippet, foreignLines, after].filter((piece) => piece.length > 0).join("\n\n");
     writeText(gitignorePath, `${merged}\n`);
     return;
   }
   const before = normalizedLines.slice(0, startIndex).join("\n").trimEnd();
-  const after = normalizedLines.slice(endIndex + 1).join("\n").trimStart();
+  const after = trailingLines.join("\n").trimStart();
   const merged = [before, snippet, after].filter((piece) => piece.length > 0).join("\n\n");
   writeText(gitignorePath, `${merged}\n`);
+}
+
+function findWaypointGitignoreBlockEnd(lines: string[], startIndex: number): number {
+  const explicitEndIndex = lines.findIndex((line, index) => index > startIndex && line === GITIGNORE_WAYPOINT_END);
+  if (explicitEndIndex !== -1) {
+    return explicitEndIndex;
+  }
+  return findLegacyWaypointGitignoreBlockEnd(lines, startIndex);
+}
+
+function findLegacyWaypointGitignoreBlockEnd(lines: string[], startIndex: number): number {
+  let scanEndExclusive = lines.length;
+  for (let index = startIndex + 1; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line.length === 0) {
+      scanEndExclusive = index;
+      break;
+    }
+    if (line.startsWith("#") && line !== GITIGNORE_WAYPOINT_START) {
+      scanEndExclusive = index;
+      break;
+    }
+  }
+
+  let endIndex = -1;
+  for (let index = startIndex + 1; index < scanEndExclusive; index += 1) {
+    if (isLegacyWaypointGitignoreRule(lines[index])) {
+      endIndex = index;
+    }
+  }
+  return endIndex;
+}
+
+function isLegacyWaypointGitignoreRule(line: string): boolean {
+  const normalizedLine = line.startsWith("/") ? line.slice(1) : line;
+  return LEGACY_WAYPOINT_GITIGNORE_RULES.has(normalizedLine);
+}
+
+function isManagedWaypointGitignoreLine(line: string, managedLineSet: Set<string>): boolean {
+  return managedLineSet.has(line) || isLegacyWaypointGitignoreRule(line);
+}
+
+function stripSubsequentWaypointGitignoreBlocks(lines: string[], managedLineSet: Set<string>): string[] {
+  const keptLines: string[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    if (lines[index] !== GITIGNORE_WAYPOINT_START) {
+      keptLines.push(lines[index]);
+      index += 1;
+      continue;
+    }
+
+    const endIndex = findWaypointGitignoreBlockEnd(lines, index);
+    if (endIndex === -1) {
+      keptLines.push(lines[index]);
+      index += 1;
+      continue;
+    }
+
+    const foreignLines = lines
+      .slice(index + 1, endIndex)
+      .filter((line) => line.length > 0 && !isManagedWaypointGitignoreLine(line, managedLineSet));
+    if (foreignLines.length > 0) {
+      if (keptLines.length > 0 && keptLines[keptLines.length - 1] !== "") {
+        keptLines.push("");
+      }
+      keptLines.push(...foreignLines);
+      if (endIndex + 1 < lines.length && lines[endIndex + 1] !== "") {
+        keptLines.push("");
+      }
+    }
+
+    index = endIndex + 1;
+  }
+
+  return keptLines;
 }
 
 function upsertManagedBlock(filePath: string, block: string): void {
