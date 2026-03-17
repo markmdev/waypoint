@@ -1,6 +1,6 @@
 ---
 name: conversation-retrospective
-description: Analyze the active conversation for durable repo knowledge, skill improvements, and repeated workflow patterns. Use when the user asks to save what was learned from the current conversation, update memory/docs without more prompting, improve skills that were used or exposed gaps, or propose new skills based on repetitive work in the live thread.
+description: Harvest durable knowledge, user feedback, skill lessons, and repeated workflow patterns from the active conversation into the repo's existing memory system. Use when the user asks to save what was learned, write down what changed, capture lessons from this thread, update docs or handoff state without more prompting, improve skills that were used or exposed gaps, or record new skill ideas based on repetitive work in the live conversation. Do not use this for generic planning, broad docs audits, or digging through archived session history unless the user explicitly asks for that.
 ---
 
 # Conversation Retrospective
@@ -10,6 +10,13 @@ Use this skill to harvest the active conversation into the repo's existing memor
 This skill works from the live conversation already in context. Do not go hunting through archived session files unless the user explicitly asks for that.
 
 This is a closeout and distillation workflow, not a generic planning pass or a broad docs audit.
+
+## When Not To Use This Skill
+
+- Skip it for generic planning or implementation design; use the planning workflow for that.
+- Skip it for broad docs audits that are not driven by what happened in this conversation.
+- Skip it when the user wants archived history analysis rather than the live thread; only dig into old sessions if they explicitly ask.
+- Skip it when there is nothing durable to preserve and no skill or workflow lesson to capture.
 
 ## Read First
 
@@ -123,3 +130,17 @@ Summarize:
 - what you intentionally left unpersisted because it was transient
 
 If no substantive persistence changes were needed, say that explicitly instead of inventing updates.
+
+## Gotchas
+
+- Do not turn this skill into a transcript dump. Persist only durable knowledge, live state, or reusable lessons.
+- Do not scatter the same learning across multiple files. Pick the smallest truthful home the repo already uses.
+- Do not blame a skill for a problem that was really an execution mistake or an external tool failure.
+- Do not preserve one-off user phrasing or temporary frustration as if it were standing repo policy unless the user clearly framed it that way.
+- Do not go hunting through archived session files just because the live thread feels incomplete. This skill should work from the current conversation unless the user explicitly broadens the scope.
+
+## Keep This Skill Sharp
+
+- After meaningful retrospectives, add new gotchas when the same persistence mistake, memory-placement mistake, or skill-triage mistake keeps recurring.
+- Tighten the description if the skill misses real prompts like "save what we learned here" or fires on requests that are really planning or docs-audit work.
+- If the same kind of durable learning keeps needing a custom destination, add that routing guidance to the skill instead of leaving the decision to be rediscovered in chat.

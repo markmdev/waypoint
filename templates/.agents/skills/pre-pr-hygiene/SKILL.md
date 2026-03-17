@@ -7,6 +7,12 @@ description: Run a broad final hygiene pass before pushing, before opening or up
 
 Use this skill for the larger final audit before code leaves the machine.
 
+## When Not To Use This Skill
+
+- Skip it for tiny changes that do not justify a broad hygiene pass.
+- Skip it after a PR already has active review comments; use `pr-review` for that loop.
+- Skip it when the task is only a narrow coding-guide check or only a docs sync pass.
+
 ## Read First
 
 Before the hygiene pass:
@@ -61,3 +67,17 @@ Summarize:
 - what you fixed
 - what verification ran
 - what residual risks remain, if any
+
+## Gotchas
+
+- Do not turn this into a whole-repo cleanup mission. Keep the pass tied to the change surface that is about to leave the machine.
+- Do not stop at reporting obvious fixable issues if the correct remediation is clear.
+- Do not call the pass complete without real verification that matches the risk of the change.
+- Do not let docs, contracts, and code drift just because the implementation itself "works."
+- Do not use this as a replacement for active PR review or the normal closeout loop.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same hygiene blind spot, contract drift, or verification miss keeps recurring.
+- Tighten the description if the skill fires on tiny edits or misses real prompts about "do a final pass before I push."
+- If the same cross-cutting checks keep being rediscovered, encode them more explicitly here instead of relying on chat memory.

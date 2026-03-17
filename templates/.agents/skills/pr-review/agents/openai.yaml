@@ -1,4 +1,4 @@
 interface:
   display_name: "PR Review"
   short_description: "Close the review loop on an active PR"
-  default_prompt: "Use this skill when a PR has active review comments or automated review in progress. Wait for review to settle, triage every comment, reply inline, fix meaningful issues, push follow-up commits, and repeat until no new meaningful findings remain."
+  default_prompt: "Use $pr-review when a PR has active review comments or automated review in progress. Wait for review to settle, triage every comment, reply inline, fix meaningful issues, push follow-up commits, and repeat until no new meaningful findings remain."

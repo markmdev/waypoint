@@ -15,6 +15,12 @@ Good plans prove you understand the problem. Size matches complexity — a renam
 
 **The handoff test:** Could someone implement this plan without asking you questions? If not, find what's missing.
 
+## When Not To Use This Skill
+
+- Skip it for tiny obvious edits where a full planning pass would cost more than it saves.
+- Skip it when the user explicitly wants implementation right away and the work is already straightforward.
+- Skip it for post-implementation closeout; use the review or hygiene workflows for that.
+
 ## Read First
 
 Before planning:
@@ -150,3 +156,17 @@ When the plan doc is written:
 ## Quality Bar
 
 If the plan would make the implementer ask "where does this hook in?" or "what exactly am I changing?", it is not done.
+
+## Gotchas
+
+- Do not spend interview turns on implementation facts that are already in the code or routed docs.
+- Do not stop exploring just because you have a plausible plan. The usual failure mode is shallow repo understanding.
+- Do not leave unresolved architecture or product decisions hidden behind "we can figure that out during implementation."
+- Do not dump a transcript into the plan doc. Distill the decisions and requirements into a clean implementation handoff.
+- Do not treat a reviewed plan as a stopping point. Once the user approves it, the workflow expects execution to continue.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same planning blind spot, under-explored area, or vague plan failure keeps recurring.
+- Tighten the description if the skill fires on tiny tasks or misses real prompts about migrations, refactors, and implementation-ready design work.
+- If planning keeps depending on the same durable context or external reference paths, encode that routing into the skill instead of rediscovering it in chat.

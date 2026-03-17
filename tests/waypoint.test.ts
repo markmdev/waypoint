@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -110,7 +110,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents"
+      "Use `adversarial-review` before considering a non-trivial implementation slice complete"
     )
   );
   assert.ok(
@@ -135,6 +135,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/frontend-ship-audit/"));
   assert.ok(gitignore.includes(".agents/skills/visual-explanations/"));
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
+  assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
   assert.ok(gitignore.includes(".waypoint/*"));
   assert.ok(gitignore.includes("!.waypoint/docs/"));
   assert.ok(gitignore.includes("!.waypoint/docs/**"));
@@ -198,12 +199,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Treat reviewer agents as one-shot workers"
+      "Run `adversarial-review` before considering any non-trivial implementation slice complete."
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high`"
+      "explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
     )
   );
   assert.ok(
@@ -213,7 +214,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Run `code-reviewer` before considering any non-trivial implementation slice complete."
+      "run `code-reviewer`, run `code-health-reviewer` when applicable, run `code-guide-audit`"
     )
   );
   assert.ok(
@@ -280,6 +281,22 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8").includes("# Code Guide Audit")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/adversarial-review/SKILL.md"), "utf8").includes("# Adversarial Review")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/adversarial-review/SKILL.md"), "utf8").includes(
+      "asks for a final review pass"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/adversarial-review/SKILL.md"), "utf8").includes("## Gotchas")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/adversarial-review/agents/openai.yaml"), "utf8").includes(
+      'display_name: "Adversarial Review"'
+    )
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/break-it-qa/SKILL.md"), "utf8").includes("# Break-It QA"));
   assert.ok(
@@ -352,6 +369,277 @@ test("doctor is clean after init", () => {
   assert.equal(findings.length, 0);
 });
 
+test("doctor flags missing adversarial-review skill", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-missing-adversarial-review-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  rmSync(path.join(root, ".agents/skills/adversarial-review"), { recursive: true, force: true });
+
+  const findings = doctorRepository(root);
+  assert.ok(
+    findings.some(
+      (finding) =>
+        finding.category === "skills" && finding.message.includes("Repo skill `adversarial-review` is missing.")
+    )
+  );
+  assert.equal(
+    findings.filter((finding) => finding.message.includes("Repo skill `adversarial-review`")).length,
+    1
+  );
+});
+
+test("doctor flags missing adversarial-review skill metadata", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-missing-adversarial-review-metadata-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  rmSync(path.join(root, ".agents/skills/adversarial-review/agents/openai.yaml"), { force: true });
+
+  const findings = doctorRepository(root);
+  assert.ok(
+    findings.some(
+      (finding) =>
+        finding.category === "skills" && finding.message.includes("Repo skill `adversarial-review` metadata is missing.")
+    )
+  );
+});
+
+test("doctor flags missing built-in ship-audit skill", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-missing-ship-audit-skill-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  rmSync(path.join(root, ".agents/skills/frontend-ship-audit"), { recursive: true, force: true });
+
+  const findings = doctorRepository(root);
+  assert.ok(
+    findings.some(
+      (finding) =>
+        finding.category === "skills" && finding.message.includes("Repo skill `frontend-ship-audit` is missing.")
+    )
+  );
+});
+
+test("init adds missing gitignore lines without duplicating the full waypoint block", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-merge-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  const oldSnippet = [
+    "# Waypoint state",
+    ".codex/config.toml",
+    ".codex/agents/code-reviewer.toml",
+    ".codex/agents/code-health-reviewer.toml",
+    ".codex/agents/plan-reviewer.toml",
+    ".agents/skills/planning/",
+    ".agents/skills/work-tracker/",
+    ".agents/skills/docs-sync/",
+    ".agents/skills/code-guide-audit/",
+    ".agents/skills/visual-explanations/",
+    ".agents/skills/break-it-qa/",
+    ".agents/skills/frontend-context-interview/",
+    ".agents/skills/backend-context-interview/",
+    ".agents/skills/frontend-ship-audit/",
+    ".agents/skills/backend-ship-audit/",
+    ".agents/skills/conversation-retrospective/",
+    ".agents/skills/workspace-compress/",
+    ".agents/skills/pre-pr-hygiene/",
+    ".agents/skills/pr-review/",
+    ".waypoint/*",
+    "!.waypoint/docs/",
+    "!.waypoint/docs/**",
+    ".waypoint/docs/README.md",
+    ".waypoint/docs/code-guide.md",
+  ].join("\r\n");
+  writeFileSync(gitignorePath, oldSnippet, "utf8");
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^# Waypoint state$/gm)?.length ?? 0, 1);
+  assert.equal(gitignore.match(/^\.agents\/skills\/adversarial-review\/$/gm)?.length ?? 0, 1);
+});
+
+test("init restores the waypoint gitignore block in snippet order", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-order-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "# Waypoint state",
+      ".codex/config.toml",
+      ".codex/agents/code-reviewer.toml",
+      ".codex/agents/code-health-reviewer.toml",
+      ".codex/agents/plan-reviewer.toml",
+      ".agents/skills/planning/",
+      ".agents/skills/work-tracker/",
+      ".agents/skills/docs-sync/",
+      ".agents/skills/code-guide-audit/",
+      ".agents/skills/adversarial-review/",
+      ".agents/skills/visual-explanations/",
+      ".agents/skills/break-it-qa/",
+      ".agents/skills/frontend-context-interview/",
+      ".agents/skills/backend-context-interview/",
+      ".agents/skills/frontend-ship-audit/",
+      ".agents/skills/backend-ship-audit/",
+      ".agents/skills/conversation-retrospective/",
+      ".agents/skills/workspace-compress/",
+      ".agents/skills/pre-pr-hygiene/",
+      ".agents/skills/pr-review/",
+      "!.waypoint/docs/",
+      "!.waypoint/docs/**",
+      ".waypoint/docs/README.md",
+      ".waypoint/docs/code-guide.md",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  const ignoreIndex = gitignore.indexOf(".waypoint/*");
+  const docsIndex = gitignore.indexOf("!.waypoint/docs/");
+  const docsRecursiveIndex = gitignore.indexOf("!.waypoint/docs/**");
+  assert.notEqual(ignoreIndex, -1);
+  assert.notEqual(docsIndex, -1);
+  assert.notEqual(docsRecursiveIndex, -1);
+  assert.ok(ignoreIndex < docsIndex);
+  assert.ok(docsIndex < docsRecursiveIndex);
+  assert.equal(gitignore.match(/^\.waypoint\/docs\/\*\*$/gm)?.length ?? 0, 0);
+});
+
+test("init preserves user gitignore rules that follow the waypoint block", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-trailing-user-rule-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "# Waypoint state",
+      ".codex/config.toml",
+      ".codex/agents/code-reviewer.toml",
+      ".codex/agents/code-health-reviewer.toml",
+      ".codex/agents/plan-reviewer.toml",
+      ".agents/skills/planning/",
+      ".agents/skills/work-tracker/",
+      ".agents/skills/docs-sync/",
+      ".agents/skills/code-guide-audit/",
+      ".agents/skills/visual-explanations/",
+      ".agents/skills/break-it-qa/",
+      ".agents/skills/frontend-context-interview/",
+      ".agents/skills/backend-context-interview/",
+      ".agents/skills/frontend-ship-audit/",
+      ".agents/skills/backend-ship-audit/",
+      ".agents/skills/conversation-retrospective/",
+      ".agents/skills/workspace-compress/",
+      ".agents/skills/pre-pr-hygiene/",
+      ".agents/skills/pr-review/",
+      ".waypoint/*",
+      "!.waypoint/docs/",
+      "!.waypoint/docs/**",
+      ".waypoint/docs/README.md",
+      ".waypoint/docs/code-guide.md",
+      "dist/",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^dist\/$/gm)?.length ?? 0, 1);
+});
+
+test("init does not delete user rules when an old waypoint gitignore block is malformed", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-malformed-block-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "# Waypoint state",
+      ".codex/config.toml",
+      ".codex/agents/code-reviewer.toml",
+      ".codex/agents/code-health-reviewer.toml",
+      ".codex/agents/plan-reviewer.toml",
+      ".agents/skills/planning/",
+      ".agents/skills/work-tracker/",
+      ".agents/skills/docs-sync/",
+      ".agents/skills/code-guide-audit/",
+      "dist/",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^dist\/$/gm)?.length ?? 0, 1);
+  assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
+});
+
+test("init does not delete user rules inserted inside an old waypoint gitignore block", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-user-rule-inside-block-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "# Waypoint state",
+      ".codex/config.toml",
+      ".codex/agents/code-reviewer.toml",
+      ".codex/agents/code-health-reviewer.toml",
+      ".codex/agents/plan-reviewer.toml",
+      ".agents/skills/planning/",
+      ".agents/skills/work-tracker/",
+      ".agents/skills/docs-sync/",
+      ".agents/skills/code-guide-audit/",
+      "dist/",
+      ".waypoint/docs/code-guide.md",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^dist\/$/gm)?.length ?? 0, 1);
+  assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
+});
+
 test("init removes retired audit skill directories on refresh", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-audit-skills-"));
   initRepository(root, {
@@ -374,6 +662,7 @@ test("init removes retired audit skill directories on refresh", () => {
   assert.equal(existsSync(path.join(root, ".agents/skills/ux-states-audit")), false);
   assert.equal(existsSync(path.join(root, ".agents/skills/planning/SKILL.md")), true);
   assert.equal(existsSync(path.join(root, ".agents/skills/pr-review/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/adversarial-review/SKILL.md")), true);
 });
 
 test("init removes retired .waypoint agent prompt files on refresh", () => {
@@ -527,6 +816,16 @@ test("init scaffolds reviewer agent pack by default", () => {
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
       "Read every changed file in full before making a maintainability judgment."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(
+      "Do not clear a change unless you can explain the critical paths you traced"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
+      "Do not clear a change as healthy unless you can explain which surrounding files"
     )
   );
   assert.ok(

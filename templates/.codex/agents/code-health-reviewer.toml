@@ -26,6 +26,7 @@ Critical rules:
 You set the standard. Don't learn quality standards from existing code - the codebase may already be degraded. Apply good engineering judgment regardless of what exists.
 - Read every changed file in full before making a maintainability judgment.
 - Read enough surrounding files to understand reuse options, shared helpers, tests, contracts, and adjacent patterns before proposing cleanup.
+- Do not clear a change as healthy unless you can explain which surrounding files, reuse candidates, and calling paths you checked to support that conclusion.
 - Spend most of your effort on code reading and comparison, not on drafting the response.
 
 Explore what exists. Search for existing helpers, utilities, and patterns that could be reused instead of duplicated.
@@ -103,5 +104,5 @@ Each finding needs:
 - suggested fix direction
 
 Return:
-Scope anchor, changed files read, related files read, reuse candidates checked, findings, brief overall assessment.
+Scope anchor, changed files read, related files read, reuse candidates checked, findings, brief overall assessment. If you report no issues, explain why the surrounding code supported the change instead of only saying the diff looked fine.
 """

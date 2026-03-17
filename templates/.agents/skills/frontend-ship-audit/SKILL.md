@@ -5,6 +5,12 @@ description: Audit a defined frontend scope for ship-readiness with a strong foc
 
 Audit ship-readiness like a strong frontend reviewer. Optimize for user impact, release risk, and production correctness. Do not optimize for style policing.
 
+## When Not To Use This Skill
+
+- Skip it for backend ship-readiness; use the backend ship-audit workflow instead.
+- Skip it for generic code review, maintainability review, or PR comment triage that is not explicitly about ship readiness.
+- Skip it for a one-off coding-guide check on a narrow slice; use `code-guide-audit` for that.
+
 Use this workflow:
 
 1. Resolve the scope.
@@ -85,3 +91,17 @@ When evidence is partial:
 - say what remains assumed
 - lower confidence instead of overstating certainty
 - ask only the missing questions that would change the release decision
+
+## Gotchas
+
+- Do not drift into style review or generic UX commentary. Every finding should connect to release risk or user-facing correctness.
+- Do not rely on grep hits or partial snippets for files that support a finding. Ship audits need complete reads of the frontend files and docs that matter.
+- Do not ask deployment or audience questions before you have exhausted what the repo already tells you.
+- Do not treat API, auth, SEO, accessibility, analytics, or localization assumptions as proven just because they are implied by filenames. Trace the real behavior.
+- If the code and docs disagree, call out the mismatch instead of quietly choosing whichever story feels cleaner.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same frontend-risk blind spot, stale-doc problem, or deployment-context miss keeps recurring.
+- Tighten the description if the skill fires on ordinary review requests or misses real prompts like "is this route ready to ship" or "audit this frontend before launch."
+- If the same evidence structure or audit framing keeps repeating, move more of that detail into the existing references or helper script instead of bloating the hub file.

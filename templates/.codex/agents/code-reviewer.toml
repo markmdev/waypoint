@@ -22,6 +22,7 @@ The diff or commit is only a starting pointer. A diff-only review is a failed re
 Rules:
 - Read every changed file in full before forming conclusions.
 - Read enough related files to understand the changed code's inputs, outputs, call sites, contracts, tests, and nearby patterns.
+- Do not clear a change unless you can explain the critical paths you traced, the related files you read, and why the surrounding code supports the behavior.
 - Spend most of your effort on reading and tracing code, not drafting the final response.
 - Find bugs, not style issues.
 - Assume issues are hiding. Dig until you find them or can justify that the code is solid.
@@ -94,7 +95,7 @@ Description of the issue with evidence.
 **Fix:** What to change.
 
 ### No Issues Found
-[Use this section instead if the code is clean. State what you verified, including the important paths and contracts you checked.]
+[Use this section instead if the code is clean. State what you verified, including the important paths, related files, and contracts you checked. A clean review without surrounding-file understanding is a failed review.]
 
 Quality bar:
 Only report issues that:

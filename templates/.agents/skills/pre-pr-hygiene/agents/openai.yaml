@@ -1,4 +1,4 @@
 interface:
   display_name: "Pre-PR Hygiene"
   short_description: "Run the final cross-cutting ship audit"
-  default_prompt: "Use this skill before pushing or opening/updating a PR for substantial work to do a broader hygiene pass across code, docs, contracts, typing, UI rollback, persistence correctness, and code-guide compliance."
+  default_prompt: "Use $pre-pr-hygiene before pushing or opening/updating a PR for substantial work to do a broader hygiene pass across code, docs, contracts, typing, UI rollback, persistence correctness, and code-guide compliance."

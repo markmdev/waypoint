@@ -13,6 +13,12 @@ This skill owns the execution tracker layer:
 - keep `WORKSPACE.md` pointing at the active tracker
 - move detailed checklists and progress into the tracker instead of bloating the workspace
 
+## When Not To Use This Skill
+
+- Skip it for small single-shot tasks that fit comfortably in `WORKSPACE.md`.
+- Skip it when the work has already finished and does not need a durable execution log.
+- Skip it when the real need is docs compression or docs sync rather than active execution tracking.
+
 ## Read First
 
 Before tracking:
@@ -108,3 +114,17 @@ When you create or update a tracker, report:
 - the tracker path
 - the current status
 - what `WORKSPACE.md` now points to
+
+## Gotchas
+
+- Do not create a new tracker if a relevant active tracker already exists for the same workstream.
+- Do not let the tracker become fiction. Completed items, blockers, and verification state should match reality.
+- Do not stuff durable architecture or debugging knowledge into the tracker if it belongs in `.waypoint/docs/`.
+- Do not leave `WORKSPACE.md` carrying the full execution log after a tracker exists.
+- Do not keep trackers "active" forever after the work is done; update the status.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same tracker drift, duplicate-tracker pattern, or workspace-bloat problem keeps recurring.
+- Tighten the description if the skill fires for tiny work that does not need a tracker or misses long-running remediation campaigns.
+- If the tracker format keeps needing the same recurring section or checklist pattern, capture that reusable pattern in the skill instead of rediscovering it each time.

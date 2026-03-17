@@ -49,7 +49,7 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
-- When spawning reviewer agents or other subagents, explicitly set `model` to `gpt-5.4` and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning.
+- When spawning reviewer agents or other subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning.
 - Use the repo-local skills and reviewer agents instead of improvising from scratch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
 - Do not kill long-running subagents or reviewer agents just because they are slow.
@@ -99,6 +99,7 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 - `work-tracker` when large multi-step work needs durable progress tracking in `.waypoint/track/`
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
+- `adversarial-review` when a non-trivial implementation slice is nearing completion and needs the default closeout loop for reviewer agents plus code-guide checks
 - `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams do not need a skill
 - `conversation-retrospective` after major completed work pieces so the active conversation is distilled into durable memory, user feedback and errors are preserved, exercised skills are improved, and real new-skill candidates are recorded
 - `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
@@ -128,19 +129,17 @@ Run `plan-reviewer` before presenting a non-trivial implementation plan to the u
 
 ## Review Loop
 
-Use reviewer agents before considering the work complete, not just as a reflex after every tiny commit.
+Use `adversarial-review` before considering the work complete, not just as a reflex after every tiny commit.
 
-1. Run `code-reviewer` before considering any non-trivial implementation slice complete.
-2. Run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions.
-3. If both apply, launch `code-reviewer` and `code-health-reviewer` in parallel as background, read-only reviewers.
-4. Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
-5. If you need another review pass after changes, spawn a fresh reviewer agent rather than reusing the old thread.
-6. If you have a recent self-authored commit that cleanly represents the reviewable slice, use it as the default review scope anchor. Otherwise scope the reviewers to the current changed slice.
-7. Widen only when surrounding files are needed to validate a finding.
-8. Do not call the work finished before you read the required reviewer results.
-9. Wait for reviewer outputs even if that requires repeated or long waits. Do not interrupt them just because they are still running.
-10. Fix real findings, rerun the relevant verification, update workspace/docs if needed, and make a follow-up commit when fixes change the repo.
-11. Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run.
+1. Run `adversarial-review` before considering any non-trivial implementation slice complete.
+2. That skill owns the default closeout loop for the current slice: define the scope, run `code-reviewer`, run `code-health-reviewer` when applicable, run `code-guide-audit`, wait as long as needed, fix meaningful issues, and repeat with fresh reviewer rounds until no meaningful findings remain.
+3. Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
+4. If you need another review pass after changes, spawn a fresh reviewer agent rather than reusing the old thread.
+5. If you have a recent self-authored commit that cleanly represents the reviewable slice, use it as the default review scope anchor. Otherwise scope the review loop to the current changed slice.
+6. Widen only when surrounding files are needed to validate a finding.
+7. Do not call the work finished before you read the required closeout outputs.
+8. Wait for reviewer outputs even if that requires repeated or long waits. Do not interrupt them just because they are still running.
+9. Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run.
 
 ## Quality bar
 

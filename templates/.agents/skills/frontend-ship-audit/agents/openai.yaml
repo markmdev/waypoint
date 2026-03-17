@@ -1,3 +1,4 @@
-display_name: Frontend Ship Audit
-short_description: Audit a scoped frontend surface for ship-readiness with evidence-based findings and durable deployment context.
-default_prompt: Audit the ship-readiness of the requested frontend scope. Resolve the reviewable unit from the repo, read all relevant frontend files completely, ask only missing high-leverage questions, persist durable Frontend Context in the project root guidance file when present, and write a prioritized audit at .waypoint/audit/dd-mm-yyyy-hh-mm-frontend-audit.md.
+interface:
+  display_name: "Frontend Ship Audit"
+  short_description: "Audit frontend ship-readiness with evidence"
+  default_prompt: "Use $frontend-ship-audit to audit the requested frontend scope for ship readiness and write the resulting evidence-based report."

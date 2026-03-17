@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.10
+
+### Patch Changes
+
+- Refresh the shipped review workflow and skill pack guidance.
+
 ## 0.10.9
 
 ### Patch Changes

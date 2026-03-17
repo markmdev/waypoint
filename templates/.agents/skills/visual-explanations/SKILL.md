@@ -84,3 +84,17 @@ Do not trust the generation step blindly.
 - prefer a single strong visual over a pile of mediocre ones
 
 If the artifact is only for the current conversation, store it in a temp or scratch location. If the user wants a durable asset in the repo, place it in the repo's normal docs or asset structure instead of inventing a new convention.
+
+## Gotchas
+
+- Do not make an image when Mermaid or a short paragraph would already explain the point cleanly.
+- Do not annotate a screenshot until you have verified the source screenshot actually shows the right state.
+- Do not bury the main message under too many callouts or labels. One image should usually explain one thing.
+- Do not present a conceptual mockup as if it were a real current UI state. Label it clearly when it is illustrative.
+- Do not trust the rendering step blindly; clipped text, tiny labels, and misplaced arrows are common failure modes.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same visual clarity problem, screenshot mistake, or rendering failure keeps showing up.
+- Tighten the description if the skill fires when Mermaid would have been enough or misses real requests for annotated screenshots and concept cards.
+- If the same layout patterns or annotation helpers keep repeating, move them into reusable assets or scripts instead of rebuilding them from scratch.

@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend Context Interview"
-  short_description: "Ask only the frontend context questions that materially change implementation or review decisions"
-  default_prompt: "Use this skill to inspect persisted project context, identify only the missing frontend product or deployment facts that materially affect the work, ask a concise high-leverage interview if needed, and persist durable Frontend Context into AGENTS.md."
+  short_description: "Ask only the missing frontend context questions"
+  default_prompt: "Use $frontend-context-interview to inspect persisted project context, ask only the missing frontend deployment or product-context questions that materially affect the work, and persist durable Frontend Context into AGENTS.md when needed."

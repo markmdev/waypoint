@@ -1,4 +1,4 @@
 interface:
   display_name: "Work Tracker"
   short_description: "Create or maintain a durable tracker for a large workstream"
-  default_prompt: "Use this skill to create or update a tracker under .waypoint/track/, keep WORKSPACE.md pointing to it, and move detailed execution state out of chat and into the repo."
+  default_prompt: "Use $work-tracker to create or update a tracker under .waypoint/track/, keep WORKSPACE.md pointing to it, and move detailed execution state out of chat and into the repo."

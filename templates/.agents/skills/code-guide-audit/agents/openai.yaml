@@ -1,4 +1,4 @@
 interface:
   display_name: "Code Guide Audit"
-  short_description: "Audit scoped code against the coding guide"
-  default_prompt: "Use this skill to audit a specific feature, file set, or implementation slice against the coding guide and report only guide-related violations or risks in that scope."
+  short_description: "Audit code-guide compliance on a scoped slice"
+  default_prompt: "Use $code-guide-audit to audit this specific feature, file set, or implementation slice against the coding guide."

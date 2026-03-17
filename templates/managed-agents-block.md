@@ -93,12 +93,11 @@ Working rules:
 - Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
 - Use `code-guide-audit` for a targeted coding-guide compliance pass on a specific feature, file set, or change slice
+- Use `adversarial-review` before considering a non-trivial implementation slice complete; it owns the closeout loop for `code-reviewer`, `code-health-reviewer`, and `code-guide-audit`, reruns fresh review rounds after meaningful fixes, and stops only when no meaningful findings remain
 - Use `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams can be written directly in chat without invoking a skill
 - Use `conversation-retrospective` after major completed work pieces to preserve durable learnings, capture user feedback and errors, improve any skills that were exercised, and record real new-skill candidates
 - Do not invoke `break-it-qa`, `frontend-ship-audit`, or `backend-ship-audit` yourself from the managed AGENTS block workflow; they are user-facing skills for explicit human-requested QA or ship-readiness audits, not default agent steps
 - Before presenting a non-trivial implementation plan to the user, run `plan-reviewer` and iterate on the plan until it has no meaningful review findings left
-- Before considering a non-trivial implementation slice complete, run `code-reviewer`; use a recent self-authored commit as the default scope anchor when one cleanly represents that slice
-- Before considering medium or large changes complete, run `code-health-reviewer`, especially when they add structure, duplicate logic, or introduce new abstractions
 - Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - Use `pr-review` once a PR has active review comments or automated review in progress

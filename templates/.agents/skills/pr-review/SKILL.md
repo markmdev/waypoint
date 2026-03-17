@@ -7,6 +7,12 @@ description: Triage and close the review loop on an open PR after automated or h
 
 Use this skill to drive the PR through review instead of treating review as a one-shot comment sweep.
 
+## When Not To Use This Skill
+
+- Skip it before a PR has active review or automated review in flight.
+- Skip it for local pre-push hygiene; use `pre-pr-hygiene` for that workflow.
+- Skip it for the repo-internal closeout loop on an unpushed slice; use the normal review workflows instead.
+
 ## Step 1: Wait For Review To Settle
 
 - Check the PR's current review and CI status.
@@ -60,3 +66,17 @@ Summarize:
 - what was intentionally declined
 - what verification ran
 - whether the PR is clear or still waiting on reviewer response
+
+## Gotchas
+
+- Do not treat a placeholder like "review in progress" as a clean review result.
+- Do not leave comment threads silent just because the code changed. The reply is part of the workflow.
+- Do not assume stacked PR fixes have landed in the branch you are reviewing; compare against the actual base.
+- Do not leave the loop just because CI is slow. A pending review state is still unfinished.
+- Do not declare the PR clear if the required repo-level reviewer passes have not actually run.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same PR-review failure mode, automation blind spot, or reviewer-state confusion keeps recurring.
+- Tighten the description if the skill fires before review has actually started or misses real prompts about "address these PR comments" or "close the loop on this PR."
+- If the workflow keeps repeating the same review-system quirks, preserve them in the skill instead of letting them stay as one-off chat lessons.

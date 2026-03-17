@@ -1,6 +1,6 @@
 ---
 name: backend-ship-audit
-description: Audit a backend scope for practical ship readiness with evidence-based findings focused on real release risk rather than style. Use when reviewing a backend service, feature, endpoint group, worker, scheduler, API surface, pull request, or directory to decide whether it is ready to ship; when the backend scope must be resolved from repository structure; when complete-file reading is required to understand behavior and dependencies; when only high-leverage deployment-context questions should be asked after repository exploration; when durable backend context should be persisted in project-root AGENTS.md; or when a timestamped audit should be written under .waypoint/audit/.
+description: Audit a backend scope for practical ship readiness with evidence-based findings focused on real release risk rather than style. Use when the user asks whether a backend service, API, worker, scheduler, endpoint group, pull request, or backend directory is ready to ship; when Codex needs to perform a release-risk review before launch; when the audit scope must be resolved from repository structure; when complete-file reading is required to understand behavior and dependencies; when only high-leverage deployment-context questions should be asked after repository exploration; or when a timestamped backend audit should be written under `.waypoint/audit/`. Do not use this for frontend ship review, generic style review, PR comment triage, or a one-off coding-guide check.
 ---
 
 # Backend ship audit
@@ -10,6 +10,13 @@ Follow this workflow in order. Optimize for practical release readiness. Ignore 
 Use bundled resources as follows:
 - Use `references/audit-framework.md` for detailed evaluation prompts and severity calibration.
 - Use `references/report-template.md` for the audit structure and finding format.
+
+## When Not To Use This Skill
+
+- Skip it for frontend release review; use the frontend ship-audit workflow instead.
+- Skip it for generic code review or maintainability review that is not explicitly about ship readiness.
+- Skip it for active PR comment triage; use `pr-review` for that loop.
+- Skip it for a one-off coding-guide compliance check on a narrow slice; use `code-guide-audit` for that job.
 
 ## 1. Resolve the reviewable unit
 
@@ -121,30 +128,7 @@ Make this edit manually. Prefer the smallest precise change that preserves all u
 
 Assess the scoped backend like a strong backend reviewer. Focus on real ship risk, not code taste.
 
-Evaluate at least these categories when relevant:
-- scope and architecture fit
-- API and contract quality
-- input validation and trust boundaries
-- domain modeling correctness
-- data integrity and consistency
-- transaction boundaries and idempotency
-- migration safety and rollback safety
-- failure handling and retry semantics
-- timeouts, cancellation, and backpressure
-- concurrency and race risks
-- queue and background job correctness
-- authorization and access control
-- authentication assumptions
-- secret handling and configuration safety
-- tenant isolation
-- security vulnerabilities and unsafe defaults
-- boundary clarity between layers and services
-- reliability under expected production conditions
-- observability, alertability, and debuggability
-- test coverage for meaningful failure modes
-- future legibility and maintainability as it affects shipping risk
-
-Use judgment. Do not force findings in every category.
+Use `references/audit-framework.md` to drive the detailed category pass and severity calibration. Do not force findings in every category; use judgment and focus on the risks that actually matter for release readiness.
 
 Treat missing evidence carefully:
 - Missing tests, docs, or operational controls can be findings if the absence creates real release risk.
@@ -219,3 +203,17 @@ Do not include:
 - vague advice such as "add more tests" without naming the missing failure mode or blind spot
 
 Prefer a short audit with strong evidence over a long audit with weak claims.
+
+## Gotchas
+
+- Do not start asking deployment-context questions before you have read the scoped code and docs. This skill should ask only what the repository cannot answer.
+- Do not rely on grep hits or partial snippets for anything that informs a finding. Backend ship audits need complete-file reads for the code and docs that matter.
+- Do not drift into style review, generic refactor advice, or "nice to have" cleanup. Every finding should connect to real release risk.
+- Do not trust route names or file names alone to define the scope. Resolve the actual entry points, persistence paths, jobs, and external dependencies before judging readiness.
+- If deployment context is missing, state the assumption and calibrate confidence or severity accordingly. Do not present guessed operating conditions as established fact.
+
+## Keep This Skill Sharp
+
+- After meaningful audits, add new gotchas when the same backend-risk blind spot, scope mistake, or deployment-context question keeps recurring.
+- Tighten the description if the skill misses real prompts like "is this API ready to ship" or fires on requests that only need generic code review.
+- If the audit keeps reusing the same detailed evaluation logic or evidence format, move that reusable detail into `references/` instead of expanding the hub file.

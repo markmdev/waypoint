@@ -9,6 +9,12 @@ Keep `WORKSPACE.md` as a live handoff, not a project diary.
 
 This skill is for compression, not for erasing context. Preserve what the next agent needs in the first few minutes of a resume, and push durable detail into the docs layer that already exists in the repo.
 
+## When Not To Use This Skill
+
+- Skip it when the workspace is still short, current, and easy to resume from.
+- Skip it when the detail you want to remove is still active execution state that belongs in a tracker.
+- Skip it when the real problem is stale docs rather than stale workspace history.
+
 ## Read First
 
 Before compressing:
@@ -91,3 +97,17 @@ Summarize:
 - what was collapsed or removed
 - which durable docs now hold the preserved detail
 - any remaining risk that still belongs in the workspace
+
+## Gotchas
+
+- Do not compress away the active operational truth just because the workspace feels long.
+- Do not rely on `git diff` to decide what matters; the workspace must stay useful even in a dirty tree.
+- Do not delete detail unless you know which routed doc or tracker now preserves it.
+- Do not compress unresolved blockers or immediate next steps into vague summaries.
+- Do not rewrite over in-flight user edits in the workspace or linked docs.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same compression mistake, lost-context problem, or stale-workspace pattern keeps recurring.
+- Tighten the description if the skill fires on already-clean workspaces or misses real "clean up the handoff" requests.
+- If the same compression pattern keeps moving detail into the same durable home, make that routing more explicit in the skill.

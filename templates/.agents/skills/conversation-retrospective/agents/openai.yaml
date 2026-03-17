@@ -1,4 +1,4 @@
 interface:
   display_name: "Conversation Retrospective"
   short_description: "Harvest the live conversation into repo memory"
-  default_prompt: "Use this skill to analyze the active conversation, preserve durable knowledge and user feedback in the repo's existing memory surfaces, evaluate whether used skills succeeded or failed, capture concrete errors and friction points, improve skills whose guidance was insufficient, and record new skill ideas without asking follow-up questions when the correct destination is clear."
+  default_prompt: "Use $conversation-retrospective to preserve the durable lessons, repo-memory updates, and skill learnings from this live conversation."

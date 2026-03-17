@@ -16,6 +16,12 @@ Use this skill when relevant frontend project context is missing, stale, contrad
 
 This skill is for project-level operating context, not feature requirements gathering.
 
+## When Not To Use This Skill
+
+- Skip it when the needed context is already clearly documented in `AGENTS.md` or routed docs.
+- Skip it for feature-specific UX, copy, flow, or acceptance-criteria questions.
+- Skip it for implementation preferences that can be resolved from the codebase.
+
 ## When to use
 
 Use this skill when the current task depends on context such as:
@@ -70,3 +76,16 @@ Good project-level question areas include:
 - accessibility expectations or compliance targets
 - whether SEO matters for any routes
 - whether backward compatibility in user workflows matters
+
+## Gotchas
+
+- Do not re-ask stable context that is already present in `AGENTS.md` or routed docs.
+- Do not drift into feature discovery. This skill is about project context that changes implementation or review choices across many tasks.
+- Do not persist transient task details into `## Frontend Context`; only save durable deployment and product constraints.
+- Do not create a new guidance file if `AGENTS.md` is missing unless the user explicitly asked for that.
+
+## Keep This Skill Sharp
+
+- Add new gotchas when the same frontend-context blind spot or repeated unnecessary question keeps showing up in real work.
+- Tighten the description if the skill fires on feature-planning prompts or misses real requests about browser support, accessibility, SEO, or deployment context.
+- If the same stable setup facts keep being asked across repos, add sharper routing or persistence guidance instead of leaving that learning in chat.

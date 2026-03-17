@@ -136,6 +136,7 @@ Waypoint ships a strong default skill pack for real coding work:
 - `work-tracker`
 - `docs-sync`
 - `code-guide-audit`
+- `adversarial-review`
 - `break-it-qa`
 - `conversation-retrospective`
 - `frontend-ship-audit`
@@ -157,9 +158,9 @@ Waypoint scaffolds these reviewer agents by default:
 - `code-reviewer`
 - `plan-reviewer`
 
-The intended workflow is closeout-based: run `code-reviewer` before considering any non-trivial implementation slice complete, and run `code-health-reviewer` before considering medium or large changes complete, especially when they add structure, duplicate logic, or introduce new abstractions. If both apply, run them in parallel. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Reviewer agents are one-shot workers: once a reviewer returns findings, close it, and if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread.
+The intended workflow is closeout-based: run `adversarial-review` before considering any non-trivial implementation slice complete. That skill scopes the current slice, runs `code-reviewer`, runs `code-health-reviewer` when the change is medium or large or otherwise structurally risky, runs `code-guide-audit`, waits as long as needed, fixes meaningful findings, and reruns fresh reviewer rounds until no meaningful findings remain. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Reviewer agents are one-shot workers: once a reviewer returns findings, close it, and if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread.
 
-The shipped reviewer configs now default to `gpt-5.4` with `high` reasoning, and the main-agent guidance explicitly tells Codex to pass the same `model` and `reasoning_effort` values whenever it spawns reviewer agents or other subagents. The reviewer prompts also treat the diff as a starting pointer rather than the review itself: they must read each changed file in full, expand into related files, and only then conclude.
+The shipped reviewer configs now default to `gpt-5.4` with `high` reasoning, and the main-agent guidance explicitly tells Codex to pass `fork_context: false` plus the same `model` and `reasoning_effort` values whenever it spawns reviewer agents or other subagents. The reviewer prompts also treat the diff as a starting pointer rather than the review itself: they must read each changed file in full, expand into related files, and only then conclude.
 
 For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left. Each pass should use a fresh `plan-reviewer` agent rather than reusing a previous reviewer thread.
 

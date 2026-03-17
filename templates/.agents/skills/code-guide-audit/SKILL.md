@@ -1,6 +1,6 @@
 ---
 name: code-guide-audit
-description: Audit a specific feature, file set, or implementation slice against the coding guide and report only coding-guide-related violations or risks in that scope. Use after building a feature, when the user wants a coding-guide compliance check, before review on a targeted area, or when validating whether a change follows rules like no silent fallbacks, strong boundary validation, frontend reuse, explicit state handling, and behavior-focused verification.
+description: Audit a specific feature, file set, or implementation slice against the coding guide and report only coding-guide-related violations or risks in that scope. Use when the user asks for a code-guide audit, coding-guide compliance check, guide-specific review, or wants to know whether a change follows rules like no silent fallbacks, strong boundary validation, frontend reuse, explicit state handling, and behavior-focused verification. Do not use this for broad ship-readiness review, generic bug hunting, PR comment triage, or repo-wide cleanup.
 ---
 
 # Code Guide Audit
@@ -8,6 +8,13 @@ description: Audit a specific feature, file set, or implementation slice against
 Use this skill for a targeted audit against the coding guide, not for a whole-repo hygiene sweep.
 
 This skill owns one job: inspect the specific code the user points at, map it against the coding guide, and report only guide-related findings in that scope.
+
+## When Not To Use This Skill
+
+- Skip it for broad ship-readiness review; use `pre-pr-hygiene` or a ship-audit workflow for that.
+- Skip it for generic bug finding or regression review that is not specifically about the coding guide.
+- Skip it for active PR comment triage; use `pr-review` for that loop.
+- Skip it for repo-wide cleanup unless the user explicitly asked for a repo-wide coding-guide audit.
 
 ## Step 1: Load The Right Scope
 
@@ -67,3 +74,17 @@ Summarize the scoped result in review style:
 - each finding tied back to the relevant coding-guide rule
 - include exact file references
 - then note any skipped guide areas or residual uncertainty
+
+## Gotchas
+
+- Do not turn this into generic code review. Every finding should tie back to a specific coding-guide rule.
+- Do not audit the whole repo by accident. Resolve the narrow slice first, then stay inside it unless an out-of-scope issue would seriously mislead the user.
+- Do not report a guide violation from a grep hit alone. Read the real implementation and the nearby evidence before calling it a problem.
+- Do not force every coding-guide rule onto every change. Skip non-applicable rules explicitly instead of inventing weak findings.
+- If you notice a broader ship-risk issue that is not really a coding-guide issue, say it is outside this skill's scope instead of quietly drifting into another audit.
+
+## Keep This Skill Sharp
+
+- After meaningful runs, add new gotchas when the same guide-specific failure mode or scope-drift mistake keeps recurring.
+- Tighten the description if the skill fires on generic review requests or misses real prompts like "check this against the code guide."
+- If the same guide-rule translation logic keeps repeating, move that reusable detail into a supporting reference instead of expanding the hub file.

@@ -22,6 +22,23 @@ const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_TRACK_DIR = ".waypoint/track";
 const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
+const SHIPPED_SKILL_NAMES = [
+  "planning",
+  "work-tracker",
+  "docs-sync",
+  "code-guide-audit",
+  "adversarial-review",
+  "visual-explanations",
+  "break-it-qa",
+  "conversation-retrospective",
+  "workspace-compress",
+  "pre-pr-hygiene",
+  "pr-review",
+  "frontend-context-interview",
+  "backend-context-interview",
+  "frontend-ship-audit",
+  "backend-ship-audit",
+];
 const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
   "## Active Trackers",
   "## Current State",
@@ -67,15 +84,47 @@ function migrateLegacyRootFiles(projectRoot: string): void {
 function appendGitignoreSnippet(projectRoot: string): void {
   const gitignorePath = path.join(projectRoot, ".gitignore");
   const snippet = readTemplate(".gitignore.snippet").trim();
+  const snippetLines = snippet.split("\n");
   if (!existsSync(gitignorePath)) {
     writeText(gitignorePath, `${snippet}\n`);
     return;
   }
   const content = readFileSync(gitignorePath, "utf8");
-  if (content.includes(snippet)) {
+  const normalizedLines = content.split(/\r?\n/);
+  const normalizedContent = normalizedLines.join("\n");
+  if (normalizedContent.includes(snippet)) {
     return;
   }
-  writeText(gitignorePath, `${content.trimEnd()}\n\n${snippet}\n`);
+  const startIndex = normalizedLines.findIndex((line) => line === snippetLines[0]);
+  if (startIndex === -1) {
+    writeText(gitignorePath, `${content.trimEnd()}\n\n${snippet}\n`);
+    return;
+  }
+  const managedLineSet = new Set(snippetLines);
+  const managedEndLine = snippetLines[snippetLines.length - 1];
+  let endIndex = normalizedLines.findIndex((line, index) => index >= startIndex && line === managedEndLine);
+  if (endIndex === -1) {
+    writeText(gitignorePath, `${content.trimEnd()}\n\n${snippet}\n`);
+    return;
+  }
+  const hasForeignLineInsideBlock = normalizedLines
+    .slice(startIndex + 1, endIndex)
+    .some((line) => line.length > 0 && !managedLineSet.has(line));
+  if (hasForeignLineInsideBlock) {
+    const foreignLines = normalizedLines
+      .slice(startIndex + 1, endIndex)
+      .filter((line) => line.length > 0 && !managedLineSet.has(line))
+      .join("\n");
+    const before = normalizedLines.slice(0, startIndex).join("\n").trimEnd();
+    const after = normalizedLines.slice(endIndex + 1).join("\n").trimStart();
+    const merged = [before, snippet, foreignLines, after].filter((piece) => piece.length > 0).join("\n\n");
+    writeText(gitignorePath, `${merged}\n`);
+    return;
+  }
+  const before = normalizedLines.slice(0, startIndex).join("\n").trimEnd();
+  const after = normalizedLines.slice(endIndex + 1).join("\n").trimStart();
+  const merged = [before, snippet, after].filter((piece) => piece.length > 0).join("\n\n");
+  writeText(gitignorePath, `${merged}\n`);
 }
 
 function upsertManagedBlock(filePath: string, block: string): void {
@@ -422,18 +471,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     });
   }
 
-  for (const skillName of [
-    "planning",
-    "work-tracker",
-    "docs-sync",
-    "code-guide-audit",
-    "visual-explanations",
-    "break-it-qa",
-    "conversation-retrospective",
-    "workspace-compress",
-    "pre-pr-hygiene",
-    "pr-review",
-  ]) {
+  for (const skillName of SHIPPED_SKILL_NAMES) {
     const skillPath = path.join(projectRoot, ".agents/skills", skillName, "SKILL.md");
     if (!existsSync(skillPath)) {
       findings.push({
@@ -442,6 +480,17 @@ export function doctorRepository(projectRoot: string): Finding[] {
         message: `Repo skill \`${skillName}\` is missing.`,
         remediation: "Run `waypoint init` to restore repo-local skills.",
         paths: [skillPath],
+      });
+      continue;
+    }
+    const metadataPath = path.join(projectRoot, ".agents/skills", skillName, "agents", "openai.yaml");
+    if (!existsSync(metadataPath)) {
+      findings.push({
+        severity: "error",
+        category: "skills",
+        message: `Repo skill \`${skillName}\` metadata is missing.`,
+        remediation: "Run `waypoint init` to restore repo-local skill metadata.",
+        paths: [metadataPath],
       });
     }
   }
