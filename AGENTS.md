@@ -100,6 +100,7 @@ Working rules:
 - Before presenting a non-trivial implementation plan to the user, run `plan-reviewer` and iterate on the plan until it has no meaningful review findings left
 - Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
+- If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch
 - Use `pr-review` once a PR has active review comments or automated review in progress
 - Treat the generated context bundle as required session bootstrap, not optional reference material
 - After plan approval, own the execution through implementation, verification, review, and repo-memory updates before surfacing a final completion report

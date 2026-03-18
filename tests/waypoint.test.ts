@@ -118,6 +118,11 @@ test("init scaffolds core files", () => {
       "explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open."
+    )
+  );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
@@ -206,6 +211,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open."
     )
   );
   assert.ok(
