@@ -88,7 +88,10 @@ Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
 - For large multi-step work, create or update `.waypoint/track/<slug>.md`, keep detailed execution state there, and point to it from `## Active Trackers` in `.waypoint/WORKSPACE.md`
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
-- When spawning reviewer agents or other subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning
+- Default to the `coding-agent` for non-trivial implementation work so the main agent can preserve context for scoping, review, and closeout
+- Keep tiny or tightly coupled edits local when handing them off would add more churn than value
+- When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`, and `reasoning_effort` to `high`; step up to `gpt-5.4` for especially important or meticulous tasks, or when the user explicitly asks otherwise
+- When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning
 - Use the repo-local skills Waypoint ships for structured workflows when relevant
 - Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
 - Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands

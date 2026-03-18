@@ -49,7 +49,10 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
-- When spawning reviewer agents or other subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning.
+- Default to the `coding-agent` for non-trivial implementation work so the main agent can preserve context for scoping, review, and closeout.
+- Keep tiny or tightly coupled edits local when handing them off would add more churn than value.
+- When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`, and `reasoning_effort` to `high`; step up to `gpt-5.4` for especially important or meticulous tasks, or when the user explicitly asks otherwise.
+- When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning.
 - Use the repo-local skills and reviewer agents instead of improvising from scratch.
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
@@ -111,9 +114,11 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 
 Treat `conversation-retrospective` as a default closeout step for major work pieces, not as a rare manual tool.
 
-## When to use the reviewer agents
+## When to use the agent pack
 
-Waypoint scaffolds these focused second-pass specialists by default:
+Waypoint scaffolds these focused specialists by default:
+
+- `coding-agent` for bounded implementation slices the main agent wants to hand off while preserving its own context
 
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability drift

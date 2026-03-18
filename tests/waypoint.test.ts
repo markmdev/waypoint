@@ -115,7 +115,17 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
+      "Default to the `coding-agent` for non-trivial implementation work"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
     )
   );
   assert.ok(
@@ -130,6 +140,7 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
   assert.ok(gitignore.includes(".codex/config.toml"));
+  assert.ok(gitignore.includes(".codex/agents/coding-agent.toml"));
   assert.ok(gitignore.includes(".codex/agents/code-reviewer.toml"));
   assert.ok(gitignore.includes(".codex/agents/code-health-reviewer.toml"));
   assert.ok(gitignore.includes(".codex/agents/plan-reviewer.toml"));
@@ -151,6 +162,7 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("rules"), false);
+  assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."coding-agent"]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
@@ -166,6 +178,16 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "write it outside the managed `waypoint:start/end` block in `AGENTS.md`"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Default to the `coding-agent` for non-trivial implementation work"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`"
     )
   );
   assert.ok(
@@ -893,7 +915,7 @@ test("sync rebuilds docs and tracks indexes only", () => {
   assert.equal(existsSync(path.join(root, ".waypoint/rules")), false);
 });
 
-test("init scaffolds reviewer agent pack by default", () => {
+test("init scaffolds codex agent pack by default", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-roles-"));
   initRepository(root, {
     profile: "universal"
@@ -903,9 +925,29 @@ test("init scaffolds reviewer agent pack by default", () => {
   assert.ok(codexConfig.includes("[features]"));
   assert.ok(codexConfig.includes("multi_agent = true"));
   assert.ok(codexConfig.includes("max_threads = 24"));
+  assert.ok(codexConfig.includes('[agents."coding-agent"]'));
   assert.ok(codexConfig.includes('[agents."code-health-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."plan-reviewer"]'));
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes("You are the coding agent.")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes('model = "gpt-5.4-mini"')
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
+      'sandbox_mode = "workspace-write"'
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/docs/code-guide.md")
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
+      "Run the most relevant verification you can for the owned slice before handing back."
+    )
+  );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes("You are a code reviewer.")
   );

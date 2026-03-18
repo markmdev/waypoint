@@ -9,6 +9,10 @@ max_threads = 24
 description = "Read-only background reviewer for post-commit maintainability drift, dead code, duplication, and refactoring opportunities worth fixing."
 config_file = "agents/code-health-reviewer.toml"
 
+[agents."coding-agent"]
+description = "Workspace-writing implementation specialist for bounded coding tasks that should follow the code guide, verify changes, and hand the slice back cleanly."
+config_file = "agents/coding-agent.toml"
+
 [agents."code-reviewer"]
 description = "Read-only background reviewer for post-commit bugs, regressions, and integration mistakes."
 config_file = "agents/code-reviewer.toml"

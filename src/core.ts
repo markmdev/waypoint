@@ -28,6 +28,7 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".codex/",
   ".codex/config.toml",
   ".codex/agents/",
+  ".codex/agents/coding-agent.toml",
   ".codex/agents/code-reviewer.toml",
   ".codex/agents/code-health-reviewer.toml",
   ".codex/agents/plan-reviewer.toml",
@@ -362,7 +363,7 @@ export function initRepository(
     "Installed managed AGENTS block",
     "Created .waypoint/WORKSPACE.md, .waypoint/docs/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
-    "Installed reviewer agents and project Codex config",
+    "Installed coding/reviewer agents and project Codex config",
     "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
   ];
 }
@@ -614,7 +615,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     findings.push({
       severity: "warn",
       category: "roles",
-      message: "Reviewer agent config is missing from .codex/config.toml.",
+      message: "Codex agent config is missing from .codex/config.toml.",
       remediation: "Run `waypoint init` or create the project Codex config files.",
       paths: [codexConfigPath],
     });

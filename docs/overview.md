@@ -10,6 +10,7 @@ Waypoint does this by combining:
 
 - a repo contract (`AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, `.waypoint/DOCS_INDEX.md`)
 - repo-local skills
+- a coding agent for bounded implementation slices
 - reviewer agents for chunk-based background review, scaffolded by default
 - generated session context
 
