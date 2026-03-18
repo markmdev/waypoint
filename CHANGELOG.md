@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.13
+
+### Patch Changes
+
+- Add a first-class `coding-agent` scaffold and default it to `gpt-5.4-mini`, while keeping reviewer agents on `gpt-5.4` and documenting when to step implementation work back up for more meticulous tasks.
+
 ## 0.10.12
 
 ### Patch Changes
