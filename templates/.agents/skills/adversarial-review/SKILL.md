@@ -1,17 +1,18 @@
 ---
 name: adversarial-review
-description: Close out a meaningful implementation slice with the full iterative review loop. Use when the user asks for a final review pass, asks to "close the loop," asks whether work is ready to call done, or when Codex is about to say a non-trivial code change is complete. This skill scopes the slice, runs `code-reviewer`, runs `code-health-reviewer` when the change is medium or large or structurally risky, runs `code-guide-audit`, waits for the required outputs, fixes real findings, and repeats with fresh rounds until no meaningful issues remain. Do not use this for tiny obvious edits, pre-implementation plan review, or active PR comment triage.
+description: Run a deliberate second-pass review loop for ship-readiness or risky changes. Use when the user asks for a final review pass, asks whether something is ready to ship, asks to "close the loop," or when the implementation risk clearly warrants an explicit closeout workflow. This skill scopes the slice, runs `code-reviewer`, runs `code-health-reviewer` when the change is medium or large or structurally risky, runs `code-guide-audit`, waits for the required outputs, fixes real findings, and repeats with fresh rounds until no meaningful issues remain. Do not use this for tiny obvious edits, normal debugging back-and-forth, pre-implementation plan review, or active PR comment triage.
 ---
 
 # Adversarial Review
 
-Use this skill to close the loop on implementation work instead of treating review as a one-shot pass.
+Use this skill when you explicitly want a closeout-grade second pass instead of a normal implementation loop.
 
-This skill owns the default closeout workflow for a reviewable slice. It coordinates the specialist reviewers, keeps the scope tight, waits as long as needed, fixes meaningful findings, and reruns fresh review rounds until the remaining feedback is only optional polish or no findings at all.
+This skill coordinates the specialist reviewers, keeps the scope tight, waits as long as needed, fixes meaningful findings, and reruns fresh review rounds until the remaining feedback is only optional polish or no findings at all.
 
 ## When To Skip This Skill
 
 - Skip it for tiny obvious edits where launching the full closeout loop would be noise.
+- Skip it for normal debugging or investigation where the user needs diagnosis and forward motion more than formal ship-readiness.
 - Skip it for pre-implementation planning; that is `plan-reviewer` territory.
 - Skip it for active PR comment back-and-forth; use `pr-review` for that workflow.
 - Skip it when the user wants a one-off targeted coding-guide check and not the full closeout loop; use `code-guide-audit` directly in that case.

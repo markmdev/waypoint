@@ -4,10 +4,3 @@ dist/
 .tmp/
 coverage/
 *.tsbuildinfo
-
-# Waypoint state
-/.waypoint/DOCS_INDEX.md
-/.waypoint/state/
-/.waypoint/context/
-/.waypoint/
-/.agents/

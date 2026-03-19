@@ -17,10 +17,11 @@ Run the Waypoint bootstrap only in these cases:
 Bootstrap sequence:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
-3. Read `.waypoint/agent-operating-manual.md`
-4. Read `.waypoint/WORKSPACE.md`
-5. Read `.waypoint/context/MANIFEST.md`
-6. Read every file listed in the manifest
+3. Read `MEMORY.md` if it exists
+4. Read `.waypoint/agent-operating-manual.md`
+5. Read `.waypoint/WORKSPACE.md`
+6. Read `.waypoint/context/MANIFEST.md`
+7. Read every file listed in the manifest
 
 This is mandatory, not optional.
 
@@ -76,6 +77,10 @@ Delivery expectations:
 - When you report back to the user, explain the result in plain, direct language. Say what you changed, what happened, and anything the user actually needs to know, but do not lean on jargon, low-level implementation detail, or code-heavy narration unless the user asks for it.
 - Write for a smart person who is not looking at the code. The goal is clarity, not technical performance.
 - This communication rule applies to how you explain the work, not to how you do it. Your actual reasoning, coding, debugging, and verification should stay technical, precise, and rigorous.
+- When the user shows a bug, broken behavior, or a screenshot of something wrong, investigate before discussing readiness.
+- Lead with the useful truth: what is happening, the likely cause, what you checked, and what you are doing next.
+- Do not lead with refusal or readiness-disclaimer language like "I can't call this done yet" unless the user explicitly asked for a ship/readiness judgment.
+- Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean hiding behind procedural disclaimers when you could be investigating.
 - Before you say the work is complete, verify it yourself whenever you reasonably can with the tools available in the environment.
 - Match the verification to the task. Run code and inspect real output for scripts and backend changes. Click through flows, inspect rendered states, and check behavior in the browser for visual or interactive work.
 - Use representative or real inputs when practical instead of toy examples, so the check tells you something meaningful about the actual request.
@@ -86,25 +91,17 @@ Delivery expectations:
 
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
-- For large multi-step work, create or update `.waypoint/track/<slug>.md`, keep detailed execution state there, and point to it from `## Active Trackers` in `.waypoint/WORKSPACE.md`
+- Keep `MEMORY.md` for durable user/team preferences, collaboration context, and stable product defaults; keep task status and active execution state out of it
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
-- Default to the `coding-agent` for non-trivial implementation work so the main agent can preserve context for scoping, review, and closeout
-- Keep tiny or tightly coupled edits local when handing them off would add more churn than value
-- When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`, and `reasoning_effort` to `high`; step up to `gpt-5.4` for especially important or meticulous tasks, or when the user explicitly asks otherwise
-- When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning
-- Use the repo-local skills Waypoint ships for structured workflows when relevant
-- Use `work-tracker` when a long-running implementation, remediation, or verification campaign needs durable progress tracking
-- Use `docs-sync` when the docs may be stale or a change altered shipped behavior, contracts, routes, or commands
-- Use `code-guide-audit` for a targeted coding-guide compliance pass on a specific feature, file set, or change slice
-- Use `adversarial-review` before considering a non-trivial implementation slice complete; it owns the closeout loop for `code-reviewer`, `code-health-reviewer`, and `code-guide-audit`, reruns fresh review rounds after meaningful fixes, and stops only when no meaningful findings remain
-- Use `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams can be written directly in chat without invoking a skill
-- Use `conversation-retrospective` after major completed work pieces to preserve durable learnings, capture user feedback and errors, improve any skills that were exercised, and record real new-skill candidates
-- Do not invoke `break-it-qa`, `frontend-ship-audit`, or `backend-ship-audit` yourself from the managed AGENTS block workflow; they are user-facing skills for explicit human-requested QA or ship-readiness audits, not default agent steps
-- Before presenting a non-trivial implementation plan to the user, run `plan-reviewer` and iterate on the plan until it has no meaningful review findings left
+- Keep most work in the main agent. Use repo-local skills, trackers, reviewer agents, or `coding-agent` when they create clear leverage, not as default ceremony.
+- Use `work-tracker` when work is likely to span sessions or needs durable progress tracking.
+- Use review and ship-readiness skills such as `adversarial-review`, `pre-pr-hygiene`, `pr-review`, `frontend-ship-audit`, and `backend-ship-audit` when the user asks for them, when you are about to ship or open a PR, or when the risk clearly warrants a deliberate second pass.
+- Use `plan-reviewer` or other reviewer agents when an independent challenge would materially improve the result, not before every plan or fix by default.
+- Use `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams can be written directly in chat without invoking a skill.
 - Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
 - Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch
 - Use `pr-review` once a PR has active review comments or automated review in progress
 - Treat the generated context bundle as required session bootstrap, not optional reference material
-- After plan approval, own the execution through implementation, verification, review, and repo-memory updates before surfacing a final completion report
+- After plan approval, own the execution through implementation, verification, and necessary repo-memory updates before surfacing a final completion report
 <!-- waypoint:end -->

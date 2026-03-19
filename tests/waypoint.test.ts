@@ -50,7 +50,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Use `conversation-retrospective` after major completed work pieces"
+      "Read `MEMORY.md` if it exists"
     )
   );
   assert.ok(
@@ -110,22 +110,22 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Use `adversarial-review` before considering a non-trivial implementation slice complete"
+      "investigate before discussing readiness"
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Default to the `coding-agent` for non-trivial implementation work"
+      "Keep most work in the main agent."
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`"
+      "Use `plan-reviewer` or other reviewer agents when an independent challenge would materially improve the result"
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
+      "review and ship-readiness skills such as `adversarial-review`, `pre-pr-hygiene`, `pr-review`"
     )
   );
   assert.ok(
@@ -166,6 +166,7 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
+  assert.ok(readFileSync(path.join(root, "MEMORY.md"), "utf8").includes("# Memory"));
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
@@ -182,17 +183,17 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Default to the `coding-agent` for non-trivial implementation work"
+      "Keep most work in the main agent."
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`"
+      "Read `MEMORY.md` if it exists"
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Run `plan-reviewer` before presenting a non-trivial implementation plan to the user."
+      "Use `plan-reviewer` when a plan includes meaningful design choices"
     )
   );
   assert.ok(
@@ -202,12 +203,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "When waiting on reviewers, subagents, CI, automated review, or external jobs, wait as long as required."
+      "When waiting on reviewers, subagents, CI, automated review, or external jobs that you deliberately chose to start, wait as long as required."
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Treat `conversation-retrospective` as a default closeout step for major work pieces"
+      "when the user asks to save what was learned"
     )
   );
   assert.ok(
@@ -222,17 +223,17 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run."
+      "It is a tool, not the default voice of the system."
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Run `adversarial-review` before considering any non-trivial implementation slice complete."
+      "Did I solve the user's actual problem or clearly explain what remains and why?"
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high`"
+      "Use `adversarial-review` when you deliberately want a closeout loop for ship-readiness"
     )
   );
   assert.ok(
@@ -242,12 +243,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "rerun `plan-reviewer` until there are no meaningful issues left"
+      "Strengthen the plan when the reviewer surfaces real issues"
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "run `code-reviewer`, run `code-health-reviewer` when applicable, run `code-guide-audit`"
+      "If you use it, follow the skill's loop fully"
     )
   );
   assert.ok(
@@ -320,7 +321,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/adversarial-review/SKILL.md"), "utf8").includes(
-      "asks for a final review pass"
+      "ready to ship"
     )
   );
   assert.ok(
@@ -944,8 +945,16 @@ test("init scaffolds codex agent pack by default", () => {
     readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/docs/code-guide.md")
   );
   assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes("MEMORY.md if it exists")
+  );
+  assert.ok(
     readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
       "Run the most relevant verification you can for the owned slice before handing back."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
+      "Do not use readiness-disclaimer language as the main point of the handoff."
     )
   );
   assert.ok(

@@ -3,6 +3,8 @@
 This repository uses Waypoint as its operating system for Codex.
 
 If the repo needs custom AGENTS guidance, write it outside the managed `waypoint:start/end` block in `AGENTS.md`. Treat the managed block as Waypoint-owned and replaceable.
+Treat repo guidance as the authoritative repo-local contract, but not as something that can outrank higher-priority system or developer instructions injected by the environment.
+If a higher-priority instruction conflicts with Waypoint workflow, do not silently ignore the repo rule or pretend it happened anyway. State the conflict plainly, explain the practical consequence, and ask the user for the missing authorization or use a compliant fallback path.
 
 ## Session start
 
@@ -16,10 +18,11 @@ Bootstrap sequence:
 
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
-3. Read this file
-4. Read `.waypoint/WORKSPACE.md`
-5. Read `.waypoint/context/MANIFEST.md`
-6. Read every file listed in that manifest
+3. Read `MEMORY.md` if it exists
+4. Read this file
+5. Read `.waypoint/WORKSPACE.md`
+6. Read `.waypoint/context/MANIFEST.md`
+7. Read every file listed in that manifest
 
 Do not skip this sequence.
 
@@ -32,8 +35,9 @@ Do not skip this sequence.
 
 The repository should contain the context the next agent needs.
 
+- `MEMORY.md` is the durable user/team memory layer: collaboration preferences, stable defaults, and long-lived context that should survive across sessions
 - `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
-- `.waypoint/track/` is the durable execution-tracking layer for active long-running work
+- `.waypoint/track/` is the optional execution-tracking layer for active long-running work that genuinely needs durable progress state
 - `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
 - `.waypoint/context/` is the generated session context bundle: current git/PR/doc/track index state
 
@@ -44,20 +48,23 @@ If something important lives only in your head or in the chat transcript, the re
 - Read code before editing it.
 - Follow the repo's documented patterns when they are healthy.
 - If the user approves a plan or explicitly tells you to proceed, treat that as authorization to finish the approved work end to end.
+- When the user shows a bug, screenshot, or broken behavior, investigate first. Lead with what is happening, why it is likely happening, what you checked, and what you are doing next.
+- Do not lead with readiness disclaimers such as "I can't call this done yet" unless the user explicitly asked whether the work is ready, shippable, or complete.
+- Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean substituting process language for investigation.
+- Update `MEMORY.md` only when you learned a durable user/team preference, collaboration rule, or stable product default.
 - Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
-- For large multi-step work, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
+- For large multi-step work that is likely to span sessions or needs durable progress state, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
-- Default to the `coding-agent` for non-trivial implementation work so the main agent can preserve context for scoping, review, and closeout.
-- Keep tiny or tightly coupled edits local when handing them off would add more churn than value.
-- When spawning `coding-agent`, default to `fork_context: false`, `model` to `gpt-5.4-mini`, and `reasoning_effort` to `high`; step up to `gpt-5.4` for especially important or meticulous tasks, or when the user explicitly asks otherwise.
-- When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false`, `model` to `gpt-5.4`, and `reasoning_effort` to `high` unless the user explicitly requests a different model or lower reasoning.
-- Use the repo-local skills and reviewer agents instead of improvising from scratch.
+- Keep most work in the main agent. Use skills, trackers, `coding-agent`, or reviewer agents when they clearly add leverage, not as default ceremony.
+- When spawning `coding-agent`, default to `fork_context: false` and choose the model/reasoning pair that fits the slice. Use stronger models when the delegated slice is user-visible, architecturally important, or hard to unwind.
+- When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
+- Use the repo-local skills and reviewer agents deliberately, not reflexively.
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
 - Do not kill long-running subagents or reviewer agents just because they are slow.
-- When waiting on reviewers, subagents, CI, automated review, or external jobs, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
+- When waiting on reviewers, subagents, CI, automated review, or external jobs that you deliberately chose to start, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
 - Never interrupt in-flight work just to force a partial result, salvage something quickly, or avoid making the user wait longer.
 - Only stop waiting when the work has actually finished, clearly failed, or the user explicitly redirects the work.
 - When browser work is part of reproduction or verification, send screenshots of the relevant UI states to the user so they can visually confirm what you observed.
@@ -72,7 +79,7 @@ Once the user has approved a plan or otherwise told you to continue, own the wor
 
 That means:
 
-- continue through implementation, verification, reviewer passes, and required docs/workspace updates without asking for incremental permission
+- continue through implementation, verification, and required repo-memory updates without asking for incremental permission
 - use commentary for short progress updates, not as a handoff back to the user
 - do not stop just to announce the next obvious step and ask whether to do it
 
@@ -99,58 +106,49 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 
 ## When to use Waypoint skills
 
-- `planning` for non-trivial changes
-- `work-tracker` when large multi-step work needs durable progress tracking in `.waypoint/track/`
+- `planning` when a non-trivial change needs deliberate scoping, clarified behavior, or a durable implementation plan
+- `work-tracker` when large multi-step work is likely to span sessions or needs durable progress tracking in `.waypoint/track/`
 - `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
 - `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
-- `adversarial-review` when a non-trivial implementation slice is nearing completion and needs the default closeout loop for reviewer agents plus code-guide checks
+- `adversarial-review` when the user asks for a final review pass, asks whether something is ready to ship, or when the risk warrants a deliberate second-pass review loop
 - `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams do not need a skill
-- `conversation-retrospective` after major completed work pieces so the active conversation is distilled into durable memory, user feedback and errors are preserved, exercised skills are improved, and real new-skill candidates are recorded
+- `conversation-retrospective` when the user asks to save what was learned, when a major work piece produced durable learnings worth preserving, or when a skill clearly needs improvement based on what happened
 - `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
-- `frontend-ship-audit` and `backend-ship-audit` only when the user explicitly requests a ship-readiness audit; do not trigger them autonomously as part of the default Waypoint workflow
-- `workspace-compress` after meaningful chunks, before stopping, and before review when the live handoff needs compression
-- `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work
+- `frontend-ship-audit` and `backend-ship-audit` when the user explicitly requests a ship-readiness audit
+- `workspace-compress` after meaningful chunks or before pausing when the live handoff needs cleanup
+- `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work when you want an explicit hygiene pass
 - `pr-review` once a PR has active review comments or automated review in progress
-
-Treat `conversation-retrospective` as a default closeout step for major work pieces, not as a rare manual tool.
 
 ## When to use the agent pack
 
 Waypoint scaffolds these focused specialists by default:
 
-- `coding-agent` for bounded implementation slices the main agent wants to hand off while preserving its own context
-
+- `coding-agent` for bounded implementation slices the main agent deliberately wants to hand off because parallelism or context preservation will clearly help
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability drift
-- `plan-reviewer` to challenge non-trivial implementation plans before they are shown to the user
+- `plan-reviewer` to challenge non-trivial implementation plans when an independent second pass would materially improve the result
 
 ## Plan Review
 
-Run `plan-reviewer` before presenting a non-trivial implementation plan to the user.
+Use `plan-reviewer` when a plan includes meaningful design choices, multiple work phases, migrations, or non-obvious tradeoffs and you want an independent challenge before committing.
 
-- Use it when the plan includes meaningful design choices, multiple work phases, migrations, or non-obvious tradeoffs.
 - Skip it for tiny obvious plans or when no plan will be presented.
 - Use a fresh `plan-reviewer` agent for each pass. After you read its findings, close it instead of reusing the old reviewer thread.
-- Read the reviewer result, strengthen the plan, and rerun `plan-reviewer` until there are no meaningful issues left before showing the plan to the user.
+- Strengthen the plan when the reviewer surfaces real issues, but do not turn plan review into mandatory ceremony for every non-trivial task.
 
 ## Review Loop
 
-Use `adversarial-review` before considering the work complete, not just as a reflex after every tiny commit.
+Use `adversarial-review` when you deliberately want a closeout loop for ship-readiness, a final review request, or a risky change. It is a tool, not the default voice of the system.
 
-1. Run `adversarial-review` before considering any non-trivial implementation slice complete.
-2. That skill owns the default closeout loop for the current slice: define the scope, run `code-reviewer`, run `code-health-reviewer` when applicable, run `code-guide-audit`, wait as long as needed, fix meaningful issues, and repeat with fresh reviewer rounds until no meaningful findings remain.
-3. Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
-4. If you need another review pass after changes, spawn a fresh reviewer agent rather than reusing the old thread.
-5. If you have a recent self-authored commit that cleanly represents the reviewable slice, use it as the default review scope anchor. Otherwise scope the review loop to the current changed slice.
-6. Widen only when surrounding files are needed to validate a finding.
-7. Do not call the work finished before you read the required closeout outputs.
-8. Wait for reviewer outputs even if that requires repeated or long waits. Do not interrupt them just because they are still running.
-9. Do not call a PR clear, ready, or done until the required reviewer-agent passes for the current slice have actually run.
+- If you use it, follow the skill's loop fully: define the reviewable slice, run the needed reviewers, wait for the outputs, fix meaningful findings, and rerun fresh passes when warranted.
+- Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
+- Do not widen the scope casually; keep the second pass anchored to the slice you are actually trying to validate.
 
 ## Quality bar
 
 - No silent assumptions
 - No fake verification
+- No hiding behind process language when a useful diagnosis is possible
 - No skipping docs or workspace updates when they matter
 - No broad scope creep under the banner of "while I'm here"
 
@@ -158,6 +156,8 @@ Use `adversarial-review` before considering the work complete, not just as a ref
 
 Before wrapping up, ask:
 
+Did I solve the user's actual problem or clearly explain what remains and why?
+
 Can the next agent understand what is going on by reading the repo?
 
-If not, update the repo until the answer is yes.
+If either answer is no, keep going.

@@ -4,9 +4,9 @@
 
 Waypoint uses semantic versioning:
 
-- patch: fixes, docs, non-breaking polish
-- minor: new commands, new shipped skills, non-breaking scaffold changes
-- major: breaking repo contract or upgrade behavior changes
+- patch: fixes, docs improvements, non-breaking polish
+- minor: new commands, new shipped skills, or meaningful non-breaking scaffold changes
+- major: breaking changes to the repo contract, scaffold shape, or upgrade expectations
 
 ## Release workflow
 
@@ -14,15 +14,25 @@ Waypoint uses **Changesets**.
 
 Normal flow:
 
-1. user-visible change lands with a changeset file in `.changeset/`
-2. when those changesets reach `main`, GitHub Actions opens or updates a **release PR**
+1. a user-visible change lands with a changeset file in `.changeset/`
+2. when those changesets reach `main`, GitHub Actions opens or updates a release PR
 3. merging that release PR publishes the npm package and writes the version/changelog commit
 
-This means:
+This keeps releases explicit.
 
-- not every push to `main` becomes a release
-- releases happen when changesets say they should
-- version bumps and changelog updates stay explicit
+## What counts as user-visible
+
+For Waypoint, user-visible changes include more than CLI behavior.
+
+They also include:
+
+- changes to the default scaffold
+- changes to the always-on prompt contract
+- changes to shipped skills
+- changes to reviewer-agent behavior
+- changes to how the product positions itself in the docs
+
+If a release changes how Waypoint feels to use, treat that as a real product change.
 
 ## Local author workflow
 
@@ -32,56 +42,28 @@ For a user-visible change:
 npm run changeset
 ```
 
-That creates a markdown file describing:
+Commit the changeset file with the code and doc changes.
 
-- patch / minor / major
-- release notes
+## Release checklist
 
-Commit that file with the change.
+Before releasing:
 
-## One-time setup for automation
-
-GitHub repo secrets/settings needed:
-
-- `NPM_TOKEN` — npm automation token with publish rights
-
-The workflow uses:
-
-- `GITHUB_TOKEN` for the release PR
-- `NPM_TOKEN` for npm publish
-
-## Manual release checklist
-
-If you ever need to release manually:
-
-1. Run:
-
-1. Update `CHANGELOG.md`
-2. Run:
+1. make sure the docs still match the actual scaffold
+2. make sure the scaffold still matches the intended product philosophy
+3. run:
 
 ```bash
 npm run check
 ```
 
-3. Dry-run the package:
+4. dry-run the package:
 
 ```bash
 npm pack --dry-run
-```
-
-2. Dry-run the package:
-
-```bash
-npm pack --dry-run
-```
-
-3. Publish:
-
-```bash
-npm publish --access public
 ```
 
 ## Notes
 
 - `prepack` already runs `npm run check`
 - the package should ship only `dist`, `templates`, `README.md`, and `LICENSE`
+- if a release changes the default behavior, call that out clearly in the changeset and changelog instead of burying it as implementation detail

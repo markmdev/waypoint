@@ -336,6 +336,7 @@ export function initRepository(
     path.join(projectRoot, ".waypoint/agent-operating-manual.md"),
     readTemplate(".waypoint/agent-operating-manual.md"),
   );
+  writeIfMissing(path.join(projectRoot, "MEMORY.md"), readTemplate("MEMORY.md"));
   scaffoldWaypointOptionalTemplates(projectRoot);
 
   writeText(
@@ -361,7 +362,7 @@ export function initRepository(
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created .waypoint/WORKSPACE.md, .waypoint/docs/, and .waypoint/track/ scaffold",
+    "Created MEMORY.md, .waypoint/WORKSPACE.md, .waypoint/docs/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
     "Installed coding/reviewer agents and project Codex config",
     "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
@@ -479,6 +480,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
   }
 
   for (const requiredFile of [
+    path.join(projectRoot, "MEMORY.md"),
     path.join(projectRoot, ".waypoint", "SOUL.md"),
     path.join(projectRoot, ".waypoint", "agent-operating-manual.md"),
     path.join(projectRoot, ".waypoint", "scripts", "prepare-context.mjs"),

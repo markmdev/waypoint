@@ -1,68 +1,87 @@
 # Waypoint
 
-Waypoint is a docs-first repository operating system for Codex.
+Waypoint is a collaborator-first repository operating system for Codex.
 
-It helps the next agent understand your repo by making the important context live in the repo itself instead of disappearing into chat history.
+It exists to solve two problems at the same time:
 
-## Why people use it
+- the next agent should be able to pick up the repo with real context
+- the current agent should still feel smart, direct, and useful
 
-Most agent workflows break down the same way:
+## What Waypoint is for
 
-- the next session starts half-blind
-- important project docs exist, but the agent does not know which ones matter
-- workspace notes turn into noisy append-only logs
-- repo conventions live in people's heads instead of files
-- review and cleanup happen inconsistently
+Most agent setups break down in one of two ways:
 
-Waypoint gives you a lightweight repo contract that fixes those problems with explicit files, generated context, and a strong default skill set.
+- the repo has no memory, so the next session starts half-blind
+- the repo has too much process in the always-on prompt, so the agent starts sounding like a compliance layer
+
+Waypoint is meant to sit in the middle:
+
+- explicit repo-local memory
+- strong default collaboration
+- optional structured workflows when the task actually needs them
+
+The default mode centers a simple loop:
+
+- investigate the issue
+- explain what is happening
+- fix what you can
+- verify it
+- leave the repo clearer than you found it
+
+## Core idea
+
+Waypoint keeps the good parts of a repo operating system:
+
+- durable context in files
+- explicit startup and routing
+- repo-local skills
+- reusable reviewer agents
+- generated context for continuity
+
+Those systems work best when they stay explicit and well-scoped.
+
+Structured workflows belong in tools:
+
+- review loops
+- ship-readiness passes
+- trackers
+- retrospectives
+- pre-PR hygiene
+
+That keeps the default conversation focused on diagnosis, progress, and verification.
 
 ## What Waypoint sets up
 
-Waypoint scaffolds a Codex-friendly repo structure built around a few core pieces:
+Waypoint scaffolds a Codex-friendly repo around a few core pieces:
 
 - `AGENTS.md` for the startup contract
+- `MEMORY.md` for durable user/team preferences and collaboration context
 - `.waypoint/WORKSPACE.md` for live operational state
-- `.waypoint/track/` for active long-running execution trackers
 - `.waypoint/docs/` for durable project memory
 - `.waypoint/DOCS_INDEX.md` for docs routing
-- `.waypoint/TRACKS_INDEX.md` for tracker routing
 - `.waypoint/context/` for generated startup context
-- `.agents/skills/` for repo-local workflows like planning, tracking, audits, and QA
-- `.codex/` for the default reviewer-agent pack
+- `.waypoint/track/` for long-running work that truly needs durable progress tracking
+- `.agents/skills/` for optional structured workflows
+- `.codex/` for optional reviewer and helper agents
 
 The philosophy is simple:
 
 - less hidden runtime magic
-- more repo-local state
-- more markdown
-- better continuity for the next agent
-
-By default, Waypoint keeps its `.gitignore` rules inside a comment-delimited `# Waypoint state` section. That section ignores the exact Waypoint-created skill directories and reviewer-agent config files, plus everything under `.waypoint/` except `.waypoint/docs/`, while still ignoring the scaffolded `.waypoint/docs/README.md` and `.waypoint/docs/code-guide.md` assets. User-authored durable docs stay trackable; workspace, context, indexes, and other operational state remain local.
+- more explicit repo-local state
+- stronger default collaboration
+- investigation before status narration
+- procedures as tools, not identity
 
 ## Best fit
 
 Waypoint is most useful when you want:
 
 - multi-session continuity in a real repo
-- a durable docs and workspace structure for agents
-- stronger planning, tracking, review, QA, and closeout defaults
-- repo-local scaffolding instead of a bunch of global mystery behavior
+- a durable memory structure for agents
+- a cleaner default collaboration style
+- optional planning, review, QA, and release workflows that travel with the project
 
 If you only use Codex for tiny one-off edits, Waypoint is probably unnecessary.
-
-## Install
-
-Waypoint requires Node 20+.
-
-```bash
-npm install -g waypoint-codex
-```
-
-Or run it without a global install:
-
-```bash
-npx waypoint-codex@latest --help
-```
 
 ## Quick start
 
@@ -78,6 +97,7 @@ That gives you a repo that looks roughly like this:
 ```text
 repo/
 ├── AGENTS.md
+├── MEMORY.md
 ├── .codex/
 │   ├── agents/
 │   └── config.toml
@@ -95,38 +115,6 @@ repo/
 ```
 
 From there, start your Codex session in the repo and follow the generated bootstrap in `AGENTS.md`.
-
-## Common init modes
-
-### Minimal setup
-
-```bash
-waypoint init
-```
-
-By default, `waypoint init` updates the global CLI to the latest published `waypoint-codex` first, then scaffolds with that fresh version. It also installs the reviewer-agent pack by default. If you want to scaffold with the currently installed binary instead, use:
-
-```bash
-waypoint init --skip-cli-update
-```
-
-### App-friendly profile
-
-```bash
-waypoint init --app-friendly
-```
-
-Flags you can combine:
-
-- `--app-friendly`
-- `--skip-cli-update`
-
-## Main commands
-
-- `waypoint init` — update the CLI to latest by default, then scaffold or refresh the repo
-- `waypoint doctor` — validate health and report drift
-- `waypoint sync` — rebuild the docs and tracker indexes
-- `waypoint upgrade` — update the CLI and refresh the current repo using its saved config
 
 ## Built-in skills
 
@@ -146,9 +134,13 @@ Waypoint ships a strong default skill pack for real coding work:
 - `pr-review`
 
 These are repo-local, so the workflow travels with the project.
-`conversation-retrospective`, `break-it-qa`, `frontend-ship-audit`, and `backend-ship-audit` are on-demand skills, not default autonomous agent steps.
 
-In practice, Waypoint now expects `conversation-retrospective` to run automatically after major completed work pieces so durable learnings, user feedback, errors, and skill improvements do not stay trapped in chat.
+The important design choice is that they are tools, not default ceremony. Use them when the task calls for them:
+
+- `planning` when the shape of the work needs real clarification
+- `adversarial-review` when you want a deliberate ship-readiness or risky-change second pass
+- `work-tracker` when the work will span sessions
+- `conversation-retrospective` when there is durable learning worth preserving
 
 ## Reviewer agents
 
@@ -158,43 +150,45 @@ Waypoint scaffolds these reviewer agents by default:
 - `code-reviewer`
 - `plan-reviewer`
 
-The intended workflow is closeout-based: run `adversarial-review` before considering any non-trivial implementation slice complete. That skill scopes the current slice, runs `code-reviewer`, runs `code-health-reviewer` when the change is medium or large or otherwise structurally risky, runs `code-guide-audit`, waits as long as needed, fixes meaningful findings, and reruns fresh reviewer rounds until no meaningful findings remain. A recent self-authored commit is the preferred scope anchor when one cleanly represents the slice, but it is not the only valid trigger. Reviewer agents are one-shot workers: once a reviewer returns findings, close it, and if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread.
+They are available for deliberate second passes.
 
-The shipped reviewer configs now default to `gpt-5.4` with `high` reasoning, and the main-agent guidance explicitly tells Codex to pass `fork_context: false` plus the same `model` and `reasoning_effort` values whenever it spawns reviewer agents or other subagents. The reviewer prompts also treat the diff as a starting pointer rather than the review itself: they must read each changed file in full, expand into related files, and only then conclude.
+Use them when:
 
-For planning work, run `plan-reviewer` before presenting a non-trivial implementation plan to the user and iterate until it has no meaningful review findings left. Each pass should use a fresh `plan-reviewer` agent rather than reusing a previous reviewer thread.
+- the change is risky
+- you want extra confidence
+- the user explicitly asks for review or ship-readiness
+- a PR workflow needs an explicit review pass
 
-When the user approves a reviewed plan or explicitly says to proceed, the intended Waypoint behavior is autonomous execution: keep going through implementation, verification, review, and repo-memory updates unless a real blocker or materially risky unresolved decision requires a pause. If reviewers, subagents, CI, or other external work are still running, Waypoint should wait as long as necessary rather than interrupting them for speed. For PR work, placeholder automated-review states like CodeRabbit's "review in progress" do not count as a completed review.
+## What makes Waypoint different
 
-When browser-based reproduction or verification is part of the work, Waypoint should also send screenshots of the relevant UI states so the user can see the evidence directly.
-
-## What makes it different
-
-Waypoint is not trying to hide everything behind hooks and background machinery.
-
-It is opinionated, but explicit:
+Waypoint is opinionated, but explicit:
 
 - state lives in files you can inspect
 - docs routing is generated, not guessed from memory
-- repo conventions are encoded in markdown
-- startup context is rebuilt on purpose
-- the repo remains the source of truth
+- the default contract tells the agent to investigate first
+- durable memory is separated into user/team memory, live workspace state, and project docs
+- heavy procedure lives in optional skills instead of the always-on voice
 
-## Upgrading
+## Install
 
-Recommended path:
-
-```bash
-waypoint upgrade
-```
-
-That updates the global CLI and refreshes the current repo using its existing Waypoint config.
-
-If you only want to update the CLI:
+Waypoint requires Node 20+.
 
 ```bash
-waypoint upgrade --skip-repo-refresh
+npm install -g waypoint-codex
 ```
+
+Or run it without a global install:
+
+```bash
+npx waypoint-codex@latest --help
+```
+
+## Main commands
+
+- `waypoint init` — scaffold or refresh the repo and, by default, update the global CLI first
+- `waypoint doctor` — validate health and report drift
+- `waypoint sync` — rebuild the docs and tracker indexes
+- `waypoint upgrade` — update the CLI and refresh the current repo using its saved config
 
 ## Learn more
 

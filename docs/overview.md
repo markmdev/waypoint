@@ -1,30 +1,97 @@
 # Waypoint Overview
 
-Waypoint is a Codex-native repository operating system.
+Waypoint is a collaborator-first repository operating system for Codex.
 
-The project exists to solve one main problem:
+Its job is to make agents better in two directions at once:
 
-**the next agent should be able to pick up the repository with full context by reading the repo itself.**
+- better continuity across sessions
+- better default behavior inside the current session
 
-Waypoint does this by combining:
+## The problem it is solving
 
-- a repo contract (`AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, `.waypoint/DOCS_INDEX.md`)
-- repo-local skills
-- a coding agent for bounded implementation slices
-- reviewer agents for chunk-based background review, scaffolded by default
-- generated session context
+Agent setups usually fail in one of two ways.
 
-Waypoint is not a hook-driven system. The philosophy is:
+The first failure mode is memory:
 
-- less hidden runtime magic
-- more explicit repo-local state
-- more markdown
-- more durable context
-- more visual explanation when visuals clarify the work better than prose
+- important context lives only in chat
+- the next session starts half-blind
+- the agent does not know which docs matter
 
-Two contract details matter in practice:
+The second failure mode is process:
 
-- `.waypoint/WORKSPACE.md` entries in multi-topic sections are timestamped
-- routable docs under `.waypoint/docs/` carry `summary`, `last_updated`, and `read_when` frontmatter
-- repo-local skills handle structured workflows such as planning, conversation retrospectives, pre-PR hygiene, break-it QA, PR review closure, and workspace compression
-- Mermaid diagrams should be preferred directly in chat when they clarify a flow, architecture, state, or plan, with richer generated images and annotated screenshots used when text-native diagrams are not enough
+- too much workflow lives in the always-on prompt
+- the agent starts narrating readiness instead of investigating
+- reviews, trackers, and closeout rituals start feeling like personality instead of tools
+
+Waypoint is designed to solve both.
+
+## The Waypoint stance
+
+The default agent should feel like a strong collaborator.
+
+In practice, that means:
+
+- investigate before disclaiming
+- lead with diagnosis and next action
+- verify before claiming success
+- keep the repo legible for the next agent
+
+## Core pieces
+
+Waypoint combines:
+
+- a repo contract in `AGENTS.md`
+- durable user/team memory in `MEMORY.md`
+- live operating state in `.waypoint/WORKSPACE.md`
+- durable project memory in `.waypoint/docs/`
+- generated routing and context files
+- repo-local skills for optional structured workflows
+- optional reviewer/helper agents for deliberate second passes
+
+## The design principle
+
+Keep the default mode simple.
+
+The basic loop should be:
+
+1. bootstrap and read the right context
+2. investigate the actual problem
+3. fix or move the work forward
+4. verify the result
+5. update durable repo memory when it matters
+
+Heavier rigor should still exist, but as tools:
+
+- plan review
+- adversarial review
+- ship audits
+- trackers
+- retrospectives
+- pre-PR hygiene
+
+## System shape
+
+The system should stay understandable from the repo itself.
+
+That means:
+
+- the core contract stays lean
+- workflows live in visible files
+- reviews and audits are available when needed
+- the repo remains inspectable without hidden machinery
+
+## Practical outcome
+
+If Waypoint is working, the repo should gain:
+
+- explicit memory
+- better continuity
+- reusable structured workflows
+- clearer repo-local operating rules
+
+And the user should feel:
+
+- supported
+- unblocked
+- clearly informed
+- working with a capable collaborator

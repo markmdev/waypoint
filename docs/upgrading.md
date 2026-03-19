@@ -1,6 +1,6 @@
 # Upgrading Waypoint
 
-## Recommended update path
+## Recommended path
 
 If Waypoint is installed globally from npm, use:
 
@@ -11,11 +11,9 @@ waypoint upgrade
 That does two things:
 
 1. updates the globally installed `waypoint-codex` package
-2. reruns `waypoint init` and `waypoint doctor` in the current repo using the repo's existing Waypoint config
+2. refreshes the current repo scaffold using the repo's existing Waypoint config
 
-## CLI-only update
-
-If you only want to update the CLI and skip repo refresh:
+If you only want to update the CLI and skip the repo refresh:
 
 ```bash
 waypoint upgrade --skip-repo-refresh
@@ -27,24 +25,48 @@ If you use `npx`, no global update step is required:
 npx waypoint-codex@latest --help
 ```
 
-## Repo update
+## Manual refresh
 
-If you updated the CLI outside `waypoint upgrade`, refresh the repo scaffold manually:
+If you updated the CLI some other way, refresh the repo scaffold manually:
 
 ```bash
 waypoint init
 waypoint doctor
 ```
 
-`init` is designed to refresh Waypoint-managed files and preserve the repo's user-owned files.
+`waypoint init` is designed to refresh Waypoint-managed files while preserving user-owned repo content outside the managed scaffold.
 
-## What to check after upgrading
+## What to verify after upgrading
+
+Focus on the files that define the default behavior:
 
 - `AGENTS.md`
-- `.waypoint/WORKSPACE.md`
-- `.waypoint/DOCS_INDEX.md`
+- `MEMORY.md`
 - `.waypoint/SOUL.md`
 - `.waypoint/agent-operating-manual.md`
-- `.waypoint/scripts/prepare-context.mjs`
+- `.waypoint/WORKSPACE.md`
+- `.waypoint/DOCS_INDEX.md`
+- `.waypoint/context/`
 - `.agents/skills/`
 - `.codex/agents/`
+
+## What to look for
+
+After an upgrade, sanity-check three things:
+
+1. The default voice still matches the product.
+The core contract should read like a strong collaborator with clear judgment and useful next actions.
+
+2. Heavy workflows still live in tools.
+Review loops, ship audits, trackers, and retrospectives should stay available without taking over the always-on layer.
+
+3. Repo memory still has clear boundaries.
+`MEMORY.md`, `WORKSPACE.md`, and `.waypoint/docs/` should still have distinct jobs.
+
+## If you customized a repo
+
+Repo-specific guidance should live outside the managed Waypoint block in `AGENTS.md`.
+
+That means upgrades should be able to refresh Waypoint-owned content without clobbering your custom repo guidance.
+
+If the upgrade changes the product philosophy in a meaningful way, review the repo's custom guidance and make sure it still complements the scaffold instead of fighting it.
