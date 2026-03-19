@@ -153,6 +153,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
   assert.ok(gitignore.includes(".waypoint/config.toml"));
+  assert.ok(gitignore.includes(".waypoint/MEMORY.md"));
   assert.ok(gitignore.includes(".waypoint/README.md"));
   assert.ok(gitignore.includes(".waypoint/SOUL.md"));
   assert.ok(gitignore.includes(".waypoint/WORKSPACE.md"));
@@ -162,7 +163,6 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".waypoint/context/"));
   assert.ok(gitignore.includes(".waypoint/scripts/"));
   assert.ok(gitignore.includes(".waypoint/track/"));
-  assert.equal(gitignore.includes(".waypoint/MEMORY.md"), false);
   assert.ok(gitignore.includes(".waypoint/docs/README.md"));
   assert.ok(gitignore.includes(".waypoint/docs/code-guide.md"));
   assert.ok(gitignore.includes("# End Waypoint state"));
@@ -507,6 +507,7 @@ test("init adds missing gitignore lines without duplicating the full waypoint bl
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
       ".waypoint/config.toml",
+      ".waypoint/MEMORY.md",
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
@@ -563,6 +564,7 @@ test("init restores the waypoint gitignore block in snippet order", () => {
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
       ".waypoint/config.toml",
+      ".waypoint/MEMORY.md",
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
@@ -591,7 +593,8 @@ test("init restores the waypoint gitignore block in snippet order", () => {
   const memoryIndex = gitignore.indexOf(".waypoint/MEMORY.md");
   assert.notEqual(workspaceIndex, -1);
   assert.notEqual(docsIndex, -1);
-  assert.equal(memoryIndex, -1);
+  assert.notEqual(memoryIndex, -1);
+  assert.ok(memoryIndex < docsIndex);
   assert.ok(workspaceIndex < docsIndex);
 });
 
@@ -625,6 +628,7 @@ test("init preserves user gitignore rules that follow the waypoint block", () =>
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
       ".waypoint/config.toml",
+      ".waypoint/MEMORY.md",
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
@@ -763,6 +767,7 @@ test("init collapses an already-duplicated waypoint gitignore section back to on
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
       ".waypoint/config.toml",
+      ".waypoint/MEMORY.md",
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
