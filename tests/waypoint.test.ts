@@ -50,7 +50,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Read `MEMORY.md` if it exists"
+      "Read `.waypoint/MEMORY.md` if it exists"
     )
   );
   assert.ok(
@@ -153,6 +153,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
   assert.ok(gitignore.includes(".waypoint/*"));
+  assert.ok(gitignore.includes("!.waypoint/MEMORY.md"));
   assert.ok(gitignore.includes("!.waypoint/docs/"));
   assert.ok(gitignore.includes("!.waypoint/docs/**"));
   assert.ok(gitignore.includes(".waypoint/docs/README.md"));
@@ -166,7 +167,8 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
-  assert.ok(readFileSync(path.join(root, "MEMORY.md"), "utf8").includes("# Memory"));
+  assert.equal(existsSync(path.join(root, "MEMORY.md")), false);
+  assert.ok(readFileSync(path.join(root, ".waypoint/MEMORY.md"), "utf8").includes("# Memory"));
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
@@ -188,7 +190,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Read `MEMORY.md` if it exists"
+      "Read `.waypoint/MEMORY.md` if it exists"
     )
   );
   assert.ok(
@@ -401,6 +403,18 @@ test("doctor is clean after init", () => {
 
   const findings = doctorRepository(root);
   assert.equal(findings.length, 0);
+});
+
+test("init migrates legacy root MEMORY.md into .waypoint", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-memory-migrate-"));
+  writeFileSync(path.join(root, "MEMORY.md"), "# Legacy Memory\n", "utf8");
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  assert.equal(existsSync(path.join(root, "MEMORY.md")), false);
+  assert.equal(readFileSync(path.join(root, ".waypoint/MEMORY.md"), "utf8"), "# Legacy Memory\n");
 });
 
 test("doctor flags missing adversarial-review skill", () => {
@@ -945,7 +959,7 @@ test("init scaffolds codex agent pack by default", () => {
     readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/docs/code-guide.md")
   );
   assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes("MEMORY.md if it exists")
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/MEMORY.md if it exists")
   );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(

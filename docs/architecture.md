@@ -7,7 +7,7 @@
 The always-on layer should stay lean and load-bearing:
 
 - `AGENTS.md`
-- `MEMORY.md`
+- `.waypoint/MEMORY.md`
 - `.waypoint/WORKSPACE.md`
 - `.waypoint/DOCS_INDEX.md`
 - generated startup context in `.waypoint/context/`
@@ -25,7 +25,7 @@ More specialized workflows live in skills and reviewer agents, where they can be
 
 Waypoint separates repo memory into three different jobs:
 
-- `MEMORY.md` for durable user/team preferences, collaboration context, and stable defaults
+- `.waypoint/MEMORY.md` for durable user/team preferences, collaboration context, and stable defaults
 - `.waypoint/WORKSPACE.md` for live operational state
 - `.waypoint/docs/` for durable project behavior, architecture, decisions, and debugging knowledge
 
@@ -114,7 +114,7 @@ Waypoint's session bootstrap is explicit and event-based:
 
 1. run `.waypoint/scripts/prepare-context.mjs`
 2. read `.waypoint/SOUL.md`
-3. read `MEMORY.md` if present
+3. read `.waypoint/MEMORY.md` if present
 4. read `.waypoint/agent-operating-manual.md`
 5. read `.waypoint/WORKSPACE.md`
 6. read `.waypoint/context/MANIFEST.md`

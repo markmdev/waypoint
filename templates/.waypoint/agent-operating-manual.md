@@ -18,7 +18,7 @@ Bootstrap sequence:
 
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
-3. Read `MEMORY.md` if it exists
+3. Read `.waypoint/MEMORY.md` if it exists
 4. Read this file
 5. Read `.waypoint/WORKSPACE.md`
 6. Read `.waypoint/context/MANIFEST.md`
@@ -35,7 +35,7 @@ Do not skip this sequence.
 
 The repository should contain the context the next agent needs.
 
-- `MEMORY.md` is the durable user/team memory layer: collaboration preferences, stable defaults, and long-lived context that should survive across sessions
+- `.waypoint/MEMORY.md` is the durable user/team memory layer: collaboration preferences, stable defaults, and long-lived context that should survive across sessions
 - `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
 - `.waypoint/track/` is the optional execution-tracking layer for active long-running work that genuinely needs durable progress state
 - `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
@@ -51,7 +51,7 @@ If something important lives only in your head or in the chat transcript, the re
 - When the user shows a bug, screenshot, or broken behavior, investigate first. Lead with what is happening, why it is likely happening, what you checked, and what you are doing next.
 - Do not lead with readiness disclaimers such as "I can't call this done yet" unless the user explicitly asked whether the work is ready, shippable, or complete.
 - Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean substituting process language for investigation.
-- Update `MEMORY.md` only when you learned a durable user/team preference, collaboration rule, or stable product default.
+- Update `.waypoint/MEMORY.md` only when you learned a durable user/team preference, collaboration rule, or stable product default.
 - Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
 - For large multi-step work that is likely to span sessions or needs durable progress state, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
 - Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.

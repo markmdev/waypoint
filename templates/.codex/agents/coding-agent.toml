@@ -4,7 +4,7 @@ sandbox_mode = "workspace-write"
 developer_instructions = """
 Read these files in order before doing anything else:
 1. .waypoint/SOUL.md
-2. MEMORY.md if it exists
+2. .waypoint/MEMORY.md if it exists
 3. .waypoint/agent-operating-manual.md
 4. .waypoint/WORKSPACE.md
 5. .waypoint/context/MANIFEST.md

@@ -41,7 +41,7 @@ In practice, that means:
 Waypoint combines:
 
 - a repo contract in `AGENTS.md`
-- durable user/team memory in `MEMORY.md`
+- durable user/team memory in `.waypoint/MEMORY.md`
 - live operating state in `.waypoint/WORKSPACE.md`
 - durable project memory in `.waypoint/docs/`
 - generated routing and context files

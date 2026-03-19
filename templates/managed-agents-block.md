@@ -17,7 +17,7 @@ Run the Waypoint bootstrap only in these cases:
 Bootstrap sequence:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
-3. Read `MEMORY.md` if it exists
+3. Read `.waypoint/MEMORY.md` if it exists
 4. Read `.waypoint/agent-operating-manual.md`
 5. Read `.waypoint/WORKSPACE.md`
 6. Read `.waypoint/context/MANIFEST.md`
@@ -91,7 +91,7 @@ Delivery expectations:
 
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
-- Keep `MEMORY.md` for durable user/team preferences, collaboration context, and stable product defaults; keep task status and active execution state out of it
+- Keep `.waypoint/MEMORY.md` for durable user/team preferences, collaboration context, and stable product defaults; keep task status and active execution state out of it
 - Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, reviewer agents, or `coding-agent` when they create clear leverage, not as default ceremony.
 - Use `work-tracker` when work is likely to span sessions or needs durable progress tracking.

@@ -55,7 +55,7 @@ That keeps the default conversation focused on diagnosis, progress, and verifica
 Waypoint scaffolds a Codex-friendly repo around a few core pieces:
 
 - `AGENTS.md` for the startup contract
-- `MEMORY.md` for durable user/team preferences and collaboration context
+- `.waypoint/MEMORY.md` for durable user/team preferences and collaboration context
 - `.waypoint/WORKSPACE.md` for live operational state
 - `.waypoint/docs/` for durable project memory
 - `.waypoint/DOCS_INDEX.md` for docs routing
@@ -97,7 +97,6 @@ That gives you a repo that looks roughly like this:
 ```text
 repo/
 ├── AGENTS.md
-├── MEMORY.md
 ├── .codex/
 │   ├── agents/
 │   └── config.toml
@@ -105,6 +104,7 @@ repo/
 │   └── skills/
 └── .waypoint/
     ├── DOCS_INDEX.md
+    ├── MEMORY.md
     ├── TRACKS_INDEX.md
     ├── WORKSPACE.md
     ├── docs/
