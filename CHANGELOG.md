@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.1
+
+### Patch Changes
+
+- cdc748b: Stop mentioning Waypoint memory in the generated gitignore block.
+
+  The default ignore rules now list the actual local-only Waypoint files explicitly, so `.waypoint/MEMORY.md` stays trackable without relying on a special exception line.
+
 ## 0.12.0
 
 ### Minor Changes
