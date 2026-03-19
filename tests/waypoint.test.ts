@@ -152,10 +152,17 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/visual-explanations/"));
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
-  assert.ok(gitignore.includes(".waypoint/*"));
-  assert.ok(gitignore.includes("!.waypoint/MEMORY.md"));
-  assert.ok(gitignore.includes("!.waypoint/docs/"));
-  assert.ok(gitignore.includes("!.waypoint/docs/**"));
+  assert.ok(gitignore.includes(".waypoint/config.toml"));
+  assert.ok(gitignore.includes(".waypoint/README.md"));
+  assert.ok(gitignore.includes(".waypoint/SOUL.md"));
+  assert.ok(gitignore.includes(".waypoint/WORKSPACE.md"));
+  assert.ok(gitignore.includes(".waypoint/agent-operating-manual.md"));
+  assert.ok(gitignore.includes(".waypoint/DOCS_INDEX.md"));
+  assert.ok(gitignore.includes(".waypoint/TRACKS_INDEX.md"));
+  assert.ok(gitignore.includes(".waypoint/context/"));
+  assert.ok(gitignore.includes(".waypoint/scripts/"));
+  assert.ok(gitignore.includes(".waypoint/track/"));
+  assert.equal(gitignore.includes(".waypoint/MEMORY.md"), false);
   assert.ok(gitignore.includes(".waypoint/docs/README.md"));
   assert.ok(gitignore.includes(".waypoint/docs/code-guide.md"));
   assert.ok(gitignore.includes("# End Waypoint state"));
@@ -494,16 +501,24 @@ test("init adds missing gitignore lines without duplicating the full waypoint bl
     ".agents/skills/frontend-context-interview/",
     ".agents/skills/backend-context-interview/",
     ".agents/skills/frontend-ship-audit/",
-    ".agents/skills/backend-ship-audit/",
-    ".agents/skills/conversation-retrospective/",
-    ".agents/skills/workspace-compress/",
-    ".agents/skills/pre-pr-hygiene/",
-    ".agents/skills/pr-review/",
-    ".waypoint/*",
-    "!.waypoint/docs/",
-    "!.waypoint/docs/**",
-    ".waypoint/docs/README.md",
-    ".waypoint/docs/code-guide.md",
+      ".agents/skills/backend-ship-audit/",
+      ".agents/skills/conversation-retrospective/",
+      ".agents/skills/workspace-compress/",
+      ".agents/skills/pre-pr-hygiene/",
+      ".agents/skills/pr-review/",
+      ".waypoint/config.toml",
+      ".waypoint/README.md",
+      ".waypoint/SOUL.md",
+      ".waypoint/WORKSPACE.md",
+      ".waypoint/agent-operating-manual.md",
+      ".waypoint/DOCS_INDEX.md",
+      ".waypoint/TRACKS_INDEX.md",
+      ".waypoint/context/",
+      ".waypoint/scripts/",
+      ".waypoint/state/",
+      ".waypoint/track/",
+      ".waypoint/docs/README.md",
+      ".waypoint/docs/code-guide.md",
   ].join("\r\n");
   writeFileSync(gitignorePath, oldSnippet, "utf8");
 
@@ -547,8 +562,17 @@ test("init restores the waypoint gitignore block in snippet order", () => {
       ".agents/skills/workspace-compress/",
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
-      "!.waypoint/docs/",
-      "!.waypoint/docs/**",
+      ".waypoint/config.toml",
+      ".waypoint/README.md",
+      ".waypoint/SOUL.md",
+      ".waypoint/WORKSPACE.md",
+      ".waypoint/agent-operating-manual.md",
+      ".waypoint/DOCS_INDEX.md",
+      ".waypoint/TRACKS_INDEX.md",
+      ".waypoint/context/",
+      ".waypoint/scripts/",
+      ".waypoint/state/",
+      ".waypoint/track/",
       ".waypoint/docs/README.md",
       ".waypoint/docs/code-guide.md",
       "# End Waypoint state",
@@ -562,15 +586,13 @@ test("init restores the waypoint gitignore block in snippet order", () => {
   });
 
   const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
-  const ignoreIndex = gitignore.indexOf(".waypoint/*");
-  const docsIndex = gitignore.indexOf("!.waypoint/docs/");
-  const docsRecursiveIndex = gitignore.indexOf("!.waypoint/docs/**");
-  assert.notEqual(ignoreIndex, -1);
+  const workspaceIndex = gitignore.indexOf(".waypoint/WORKSPACE.md");
+  const docsIndex = gitignore.indexOf(".waypoint/docs/README.md");
+  const memoryIndex = gitignore.indexOf(".waypoint/MEMORY.md");
+  assert.notEqual(workspaceIndex, -1);
   assert.notEqual(docsIndex, -1);
-  assert.notEqual(docsRecursiveIndex, -1);
-  assert.ok(ignoreIndex < docsIndex);
-  assert.ok(docsIndex < docsRecursiveIndex);
-  assert.equal(gitignore.match(/^\.waypoint\/docs\/\*\*$/gm)?.length ?? 0, 0);
+  assert.equal(memoryIndex, -1);
+  assert.ok(workspaceIndex < docsIndex);
 });
 
 test("init preserves user gitignore rules that follow the waypoint block", () => {
@@ -602,9 +624,17 @@ test("init preserves user gitignore rules that follow the waypoint block", () =>
       ".agents/skills/workspace-compress/",
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
-      ".waypoint/*",
-      "!.waypoint/docs/",
-      "!.waypoint/docs/**",
+      ".waypoint/config.toml",
+      ".waypoint/README.md",
+      ".waypoint/SOUL.md",
+      ".waypoint/WORKSPACE.md",
+      ".waypoint/agent-operating-manual.md",
+      ".waypoint/DOCS_INDEX.md",
+      ".waypoint/TRACKS_INDEX.md",
+      ".waypoint/context/",
+      ".waypoint/scripts/",
+      ".waypoint/state/",
+      ".waypoint/track/",
       ".waypoint/docs/README.md",
       ".waypoint/docs/code-guide.md",
       "dist/",
@@ -732,9 +762,17 @@ test("init collapses an already-duplicated waypoint gitignore section back to on
       ".agents/skills/workspace-compress/",
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
-      ".waypoint/*",
-      "!.waypoint/docs/",
-      "!.waypoint/docs/**",
+      ".waypoint/config.toml",
+      ".waypoint/README.md",
+      ".waypoint/SOUL.md",
+      ".waypoint/WORKSPACE.md",
+      ".waypoint/agent-operating-manual.md",
+      ".waypoint/DOCS_INDEX.md",
+      ".waypoint/TRACKS_INDEX.md",
+      ".waypoint/context/",
+      ".waypoint/scripts/",
+      ".waypoint/state/",
+      ".waypoint/track/",
       ".waypoint/docs/README.md",
       ".waypoint/docs/code-guide.md",
       "# End Waypoint state",
