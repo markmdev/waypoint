@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.2
+
+### Patch Changes
+
+- 977e8fd: Ignore `.waypoint/MEMORY.md` in the default Waypoint gitignore block.
+
+  This restores the intended scaffold behavior so both `.waypoint/MEMORY.md` and other local-only Waypoint operating files are ignored in new repos.
+
 ## 0.12.1
 
 ### Patch Changes
