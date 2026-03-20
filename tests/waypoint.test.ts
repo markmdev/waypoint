@@ -162,6 +162,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".waypoint/context/"));
   assert.ok(gitignore.includes(".waypoint/scripts/"));
   assert.ok(gitignore.includes(".waypoint/track/"));
+  assert.ok(gitignore.includes(".waypoint/plans/"));
   assert.ok(gitignore.includes(".waypoint/docs/README.md"));
   assert.ok(gitignore.includes(".waypoint/docs/code-guide.md"));
   assert.ok(gitignore.includes("# End Waypoint state"));

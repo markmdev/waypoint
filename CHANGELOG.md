@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.3
+
+### Patch Changes
+
+- Ignore `.waypoint/plans/` in the default Waypoint scaffold.
+
+  New repos and refreshed repos now treat the plans directory as part of Waypoint's local operating layer, so durable plan docs stay available to the agent without showing up as normal product-source changes.
+
 ## 0.13.2
 
 ### Patch Changes

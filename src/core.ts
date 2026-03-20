@@ -64,6 +64,7 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".waypoint/context/",
   ".waypoint/scripts/",
   ".waypoint/track/",
+  ".waypoint/plans/",
   ".waypoint/*",
   "!.waypoint/docs/",
   "!.waypoint/docs/**",
