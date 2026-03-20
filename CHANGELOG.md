@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.2
+
+### Patch Changes
+
+- Update the CI and release workflows to `actions/checkout@v5` and `actions/setup-node@v5`.
+
+  Waypoint's GitHub Actions runs now use the Node 24 action runtime line directly, which removes the GitHub deprecation warning that was still showing up on releases.
+
 ## 0.13.1
 
 ### Patch Changes
