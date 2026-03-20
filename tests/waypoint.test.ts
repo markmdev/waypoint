@@ -55,12 +55,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "When using a browser to reproduce a bug, verify behavior, or confirm that a fix works, send the user screenshots"
+      "When you use a browser, app, or other interactive UI to inspect, reproduce, or verify something, send the user screenshots"
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "When an explanation would be clearer as a visual than as prose, bias toward visual artifacts."
+      "When an explanation is clearer visually, use Mermaid diagrams directly in chat"
     )
   );
   assert.ok(
@@ -120,12 +120,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Use `plan-reviewer` or other reviewer agents when an independent challenge would materially improve the result"
+      "Let repo-local skills describe their own triggers."
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "review and ship-readiness skills such as `adversarial-review`, `pre-pr-hygiene`, `pr-review`"
+      "Use reviewer agents when an independent second pass would materially improve the result"
     )
   );
   assert.ok(
@@ -149,7 +149,6 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/frontend-context-interview/"));
   assert.ok(gitignore.includes(".agents/skills/backend-ship-audit/"));
   assert.ok(gitignore.includes(".agents/skills/frontend-ship-audit/"));
-  assert.ok(gitignore.includes(".agents/skills/visual-explanations/"));
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
   assert.ok(gitignore.includes(".waypoint/config.toml"));
@@ -167,9 +166,11 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".waypoint/docs/code-guide.md"));
   assert.ok(gitignore.includes("# End Waypoint state"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/plans/"));
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("rules"), false);
+  assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('plans_dir = ".waypoint/plans"'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."coding-agent"]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
@@ -177,6 +178,7 @@ test("init scaffolds core files", () => {
   assert.equal(existsSync(path.join(root, "MEMORY.md")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/MEMORY.md"), "utf8").includes("# Memory"));
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/plans/README.md"), "utf8").includes("This directory is for durable plan documents."));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
   );
@@ -202,7 +204,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Use `plan-reviewer` when a plan includes meaningful design choices"
+      "Let skills carry their own invocation guidance."
     )
   );
   assert.ok(
@@ -217,12 +219,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "when the user asks to save what was learned"
+      "Use the repo-local skills and reviewer agents deliberately, not reflexively."
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "When browser work is part of reproduction or verification, send screenshots of the relevant UI states to the user"
+      "When browser work, app inspection, or other interactive UI work is part of reproduction, inspection, or verification, send screenshots"
     )
   );
   assert.ok(
@@ -232,17 +234,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "It is a tool, not the default voice of the system."
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Did I solve the user's actual problem or clearly explain what remains and why?"
     )
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Use `adversarial-review` when you deliberately want a closeout loop for ship-readiness"
+      "Deliberate closeout review is available when you want a second pass for ship-readiness"
     )
   );
   assert.ok(
@@ -282,16 +279,6 @@ test("init scaffolds core files", () => {
     )
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/docs-sync/SKILL.md"), "utf8").includes("# Docs Sync"));
-  assert.ok(
-    readFileSync(path.join(root, ".agents/skills/visual-explanations/SKILL.md"), "utf8").includes(
-      "# Visual Explanations"
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".agents/skills/visual-explanations/agents/openai.yaml"), "utf8").includes(
-      'display_name: "Visual Explanations"'
-    )
-  );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/backend-ship-audit/SKILL.md"), "utf8").includes(
       "# Backend ship audit"
@@ -400,6 +387,11 @@ test("init scaffolds core files", () => {
       "Compatibility is opt-in, not ambient"
     )
   );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "Write or update a durable plan doc under `.waypoint/plans/`."
+    )
+  );
 });
 
 test("doctor is clean after init", () => {
@@ -462,6 +454,22 @@ test("doctor flags missing adversarial-review skill metadata", () => {
   );
 });
 
+test("doctor flags missing plans directory", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-missing-plans-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  rmSync(path.join(root, ".waypoint/plans"), { recursive: true, force: true });
+
+  const findings = doctorRepository(root);
+  assert.ok(
+    findings.some(
+      (finding) => finding.category === "docs" && finding.message.includes(".waypoint/plans/ directory is missing.")
+    )
+  );
+});
+
 test("doctor flags missing built-in ship-audit skill", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-missing-ship-audit-skill-"));
   initRepository(root, {
@@ -496,7 +504,6 @@ test("init adds missing gitignore lines without duplicating the full waypoint bl
     ".agents/skills/work-tracker/",
     ".agents/skills/docs-sync/",
     ".agents/skills/code-guide-audit/",
-    ".agents/skills/visual-explanations/",
     ".agents/skills/break-it-qa/",
     ".agents/skills/frontend-context-interview/",
     ".agents/skills/backend-context-interview/",
@@ -553,7 +560,6 @@ test("init restores the waypoint gitignore block in snippet order", () => {
       ".agents/skills/docs-sync/",
       ".agents/skills/code-guide-audit/",
       ".agents/skills/adversarial-review/",
-      ".agents/skills/visual-explanations/",
       ".agents/skills/break-it-qa/",
       ".agents/skills/frontend-context-interview/",
       ".agents/skills/backend-context-interview/",
@@ -617,7 +623,6 @@ test("init preserves user gitignore rules that follow the waypoint block", () =>
       ".agents/skills/work-tracker/",
       ".agents/skills/docs-sync/",
       ".agents/skills/code-guide-audit/",
-      ".agents/skills/visual-explanations/",
       ".agents/skills/break-it-qa/",
       ".agents/skills/frontend-context-interview/",
       ".agents/skills/backend-context-interview/",
@@ -756,7 +761,6 @@ test("init collapses an already-duplicated waypoint gitignore section back to on
       ".agents/skills/docs-sync/",
       ".agents/skills/code-guide-audit/",
       ".agents/skills/adversarial-review/",
-      ".agents/skills/visual-explanations/",
       ".agents/skills/break-it-qa/",
       ".agents/skills/frontend-context-interview/",
       ".agents/skills/backend-context-interview/",
@@ -968,6 +972,7 @@ test("sync rebuilds docs and tracks indexes only", () => {
   const result = syncRepository(root);
   assert.deepEqual(result, ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"]);
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/plans/"));
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(existsSync(path.join(root, ".waypoint/automations")), false);
   assert.equal(existsSync(path.join(root, ".waypoint/rules")), false);

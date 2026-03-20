@@ -69,8 +69,8 @@ Prefer existing persisted context over re-interviewing the user.
 
 If the user approves a plan or explicitly tells you to proceed, treat that as authorization to execute the work end to end. Do not stop mid-implementation for incremental permission unless a real blocker, hidden-risk decision, or explicit user redirect requires a pause.
 When work is in flight elsewhere — reviewer agents, subagents, CI, automated review, external jobs, or other waiting periods — wait as long as required. There is no fixed waiting limit, and slowness alone is not a reason to interrupt or abandon the work.
-When using a browser to reproduce a bug, verify behavior, or confirm that a fix works, send the user screenshots of the relevant UI states so they can see the evidence directly. If screenshots are not possible in the current environment, say so explicitly.
-When an explanation would be clearer as a visual than as prose, bias toward visual artifacts. Prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans; use `visual-explanations` for richer generated images and for annotated screenshots that call out concrete UI states.
+When you use a browser, app, or other interactive UI to inspect, reproduce, or verify something, send the user screenshots of the relevant states so they can see what you saw. If screenshots are not possible in the current environment, say so explicitly.
+When an explanation is clearer visually, use Mermaid diagrams directly in chat for flows, architecture, state, and plans.
 
 Delivery expectations:
 - Before you start, decide what "done" means for the task. Set your own finish line and use it as your checklist while you work.
@@ -92,16 +92,12 @@ Delivery expectations:
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
 - Keep `.waypoint/MEMORY.md` for durable user/team preferences, collaboration context, and stable product defaults; keep task status and active execution state out of it
-- Update `.waypoint/docs/` when behavior or durable project knowledge changes, and refresh `last_updated` on touched routable docs
+- Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, reviewer agents, or `coding-agent` when they create clear leverage, not as default ceremony.
-- Use `work-tracker` when work is likely to span sessions or needs durable progress tracking.
-- Use review and ship-readiness skills such as `adversarial-review`, `pre-pr-hygiene`, `pr-review`, `frontend-ship-audit`, and `backend-ship-audit` when the user asks for them, when you are about to ship or open a PR, or when the risk clearly warrants a deliberate second pass.
-- Use `plan-reviewer` or other reviewer agents when an independent challenge would materially improve the result, not before every plan or fix by default.
-- Use `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams can be written directly in chat without invoking a skill.
+- Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.
+- Use reviewer agents when an independent second pass would materially improve the result, not before every plan or fix by default.
 - Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
-- Before pushing or opening/updating a PR for substantial work, use `pre-pr-hygiene`
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch
-- Use `pr-review` once a PR has active review comments or automated review in progress
 - Treat the generated context bundle as required session bootstrap, not optional reference material
 - After plan approval, own the execution through implementation, verification, and necessary repo-memory updates before surfacing a final completion report
 <!-- waypoint:end -->

@@ -39,7 +39,7 @@ function printHelp(): void {
 Commands:
   init                Initialize a repository with Waypoint scaffolding (auto-updates CLI unless skipped)
   doctor              Validate repository health and report drift
-  sync                Rebuild docs and tracker indexes
+  sync                Rebuild docs/plans and tracker indexes
   upgrade             Update the global Waypoint CLI and refresh this repo using existing config
 `);
 }

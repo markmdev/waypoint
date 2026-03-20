@@ -9,12 +9,11 @@ It exists to solve two problems at the same time:
 
 ## What Waypoint is for
 
-Most agent setups break down in one of two ways:
+Waypoint is built for repos where continuity and collaboration both matter.
 
-- the repo has no memory, so the next session starts half-blind
-- the repo has too much process in the always-on prompt, so the agent starts sounding like a compliance layer
+It gives the next session real context and keeps the current session clear and useful.
 
-Waypoint is meant to sit in the middle:
+Waypoint adds:
 
 - explicit repo-local memory
 - strong default collaboration
@@ -57,8 +56,9 @@ Waypoint scaffolds a Codex-friendly repo around a few core pieces:
 - `AGENTS.md` for the startup contract
 - `.waypoint/MEMORY.md` for durable user/team preferences and collaboration context
 - `.waypoint/WORKSPACE.md` for live operational state
-- `.waypoint/docs/` for durable project memory
-- `.waypoint/DOCS_INDEX.md` for docs routing
+- `.waypoint/docs/` for long-lived project docs
+- `.waypoint/plans/` for durable plan documents
+- `.waypoint/DOCS_INDEX.md` for docs and plans routing
 - `.waypoint/context/` for generated startup context
 - `.waypoint/track/` for long-running work that truly needs durable progress tracking
 - `.agents/skills/` for optional structured workflows
@@ -70,7 +70,7 @@ The philosophy is simple:
 - more explicit repo-local state
 - stronger default collaboration
 - investigation before status narration
-- procedures as tools, not identity
+- structured workflows that stay in their own tools
 
 ## Best fit
 
@@ -108,6 +108,7 @@ repo/
     ├── TRACKS_INDEX.md
     ├── WORKSPACE.md
     ├── docs/
+    ├── plans/
     ├── track/
     ├── context/
     ├── scripts/
@@ -135,12 +136,8 @@ Waypoint ships a strong default skill pack for real coding work:
 
 These are repo-local, so the workflow travels with the project.
 
-The important design choice is that they are tools, not default ceremony. Use them when the task calls for them:
-
-- `planning` when the shape of the work needs real clarification
-- `adversarial-review` when you want a deliberate ship-readiness or risky-change second pass
-- `work-tracker` when the work will span sessions
-- `conversation-retrospective` when there is durable learning worth preserving
+The important design choice is that they stay out of the always-on voice.
+Each skill explains what it is for and when it should be invoked.
 
 ## Reviewer agents
 
@@ -152,13 +149,6 @@ Waypoint scaffolds these reviewer agents by default:
 
 They are available for deliberate second passes.
 
-Use them when:
-
-- the change is risky
-- you want extra confidence
-- the user explicitly asks for review or ship-readiness
-- a PR workflow needs an explicit review pass
-
 ## What makes Waypoint different
 
 Waypoint is opinionated, but explicit:
@@ -166,8 +156,9 @@ Waypoint is opinionated, but explicit:
 - state lives in files you can inspect
 - docs routing is generated, not guessed from memory
 - the default contract tells the agent to investigate first
-- durable memory is separated into user/team memory, live workspace state, and project docs
-- heavy procedure lives in optional skills instead of the always-on voice
+- durable memory is separated into user/team memory, live workspace state, project docs, and plan docs
+- visual explanation stays lightweight: Mermaid in chat and screenshots from real UI inspection
+- heavier workflows stay in optional skills
 
 ## Install
 
@@ -187,7 +178,7 @@ npx waypoint-codex@latest --help
 
 - `waypoint init` — scaffold or refresh the repo and, by default, update the global CLI first
 - `waypoint doctor` — validate health and report drift
-- `waypoint sync` — rebuild the docs and tracker indexes
+- `waypoint sync` — rebuild the docs/plans and tracker indexes
 - `waypoint upgrade` — update the CLI and refresh the current repo using its saved config
 
 ## Learn more

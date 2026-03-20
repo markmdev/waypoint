@@ -38,7 +38,8 @@ The repository should contain the context the next agent needs.
 - `.waypoint/MEMORY.md` is the durable user/team memory layer: collaboration preferences, stable defaults, and long-lived context that should survive across sessions
 - `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
 - `.waypoint/track/` is the optional execution-tracking layer for active long-running work that genuinely needs durable progress state
-- `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, debugging knowledge, and durable plans
+- `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, and debugging knowledge
+- `.waypoint/plans/` is the durable planning layer: implementation plans, rollout plans, migration plans, and other task-shaped plans worth keeping
 - `.waypoint/context/` is the generated session context bundle: current git/PR/doc/track index state
 
 If something important lives only in your head or in the chat transcript, the repo is under-documented.
@@ -54,10 +55,11 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/MEMORY.md` only when you learned a durable user/team preference, collaboration rule, or stable product default.
 - Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
 - For large multi-step work that is likely to span sessions or needs durable progress state, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
-- Update `.waypoint/docs/` when durable knowledge changes, and refresh each changed routable doc's `last_updated` field.
+- Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when durable plans change, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
 - Keep most work in the main agent. Use skills, trackers, `coding-agent`, or reviewer agents when they clearly add leverage, not as default ceremony.
+- Let skills carry their own invocation guidance. The always-on contract should only keep the high-level rule: use repo-local skills deliberately when they help the current task.
 - When spawning `coding-agent`, default to `fork_context: false` and choose the model/reasoning pair that fits the slice. Use stronger models when the delegated slice is user-visible, architecturally important, or hard to unwind.
 - When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
 - Use the repo-local skills and reviewer agents deliberately, not reflexively.
@@ -67,11 +69,10 @@ If something important lives only in your head or in the chat transcript, the re
 - When waiting on reviewers, subagents, CI, automated review, or external jobs that you deliberately chose to start, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
 - Never interrupt in-flight work just to force a partial result, salvage something quickly, or avoid making the user wait longer.
 - Only stop waiting when the work has actually finished, clearly failed, or the user explicitly redirects the work.
-- When browser work is part of reproduction or verification, send screenshots of the relevant UI states to the user so they can visually confirm what you observed.
+- When browser work, app inspection, or other interactive UI work is part of reproduction, inspection, or verification, send screenshots of the relevant UI states to the user so they can visually confirm what you observed.
 - Capture the states that matter, such as the broken state, the fixed state, or an important intermediate state that explains the issue.
 - If the current environment cannot provide screenshots, state that explicitly instead of silently omitting visual evidence.
 - When an explanation would be clearer visually, prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans instead of over-explaining in prose.
-- Use `visual-explanations` when the explanation needs a richer generated image or an annotated screenshot rather than only text or Mermaid.
 
 ## Execution autonomy
 
@@ -100,24 +101,9 @@ Document the things the next agent cannot safely infer from raw code alone:
 - integration behavior
 - invariants and constraints
 - debugging and operational knowledge
-- active plans and next steps
+- durable plans when they are useful beyond the current chat
 
 Do not document every trivial implementation detail. Document the non-obvious, durable, or operationally important parts.
-
-## When to use Waypoint skills
-
-- `planning` when a non-trivial change needs deliberate scoping, clarified behavior, or a durable implementation plan
-- `work-tracker` when large multi-step work is likely to span sessions or needs durable progress tracking in `.waypoint/track/`
-- `docs-sync` when routed docs may be stale, missing, or inconsistent with the codebase
-- `code-guide-audit` when a specific feature or file set needs a targeted coding-guide compliance check
-- `adversarial-review` when the user asks for a final review pass, asks whether something is ready to ship, or when the risk warrants a deliberate second-pass review loop
-- `visual-explanations` when a generated image or annotated screenshot would explain the work more clearly than prose alone; Mermaid diagrams do not need a skill
-- `conversation-retrospective` when the user asks to save what was learned, when a major work piece produced durable learnings worth preserving, or when a skill clearly needs improvement based on what happened
-- `break-it-qa` when a browser-facing feature should be attacked with invalid inputs, refreshes, repeated clicks, wrong action order, or other adversarial manual QA
-- `frontend-ship-audit` and `backend-ship-audit` when the user explicitly requests a ship-readiness audit
-- `workspace-compress` after meaningful chunks or before pausing when the live handoff needs cleanup
-- `pre-pr-hygiene` before pushing or opening/updating a PR for substantial work when you want an explicit hygiene pass
-- `pr-review` once a PR has active review comments or automated review in progress
 
 ## When to use the agent pack
 
@@ -130,7 +116,7 @@ Waypoint scaffolds these focused specialists by default:
 
 ## Plan Review
 
-Use `plan-reviewer` when a plan includes meaningful design choices, multiple work phases, migrations, or non-obvious tradeoffs and you want an independent challenge before committing.
+Plan review is available when an independent challenge would materially improve a non-trivial plan.
 
 - Skip it for tiny obvious plans or when no plan will be presented.
 - Use a fresh `plan-reviewer` agent for each pass. After you read its findings, close it instead of reusing the old reviewer thread.
@@ -138,7 +124,7 @@ Use `plan-reviewer` when a plan includes meaningful design choices, multiple wor
 
 ## Review Loop
 
-Use `adversarial-review` when you deliberately want a closeout loop for ship-readiness, a final review request, or a risky change. It is a tool, not the default voice of the system.
+Deliberate closeout review is available when you want a second pass for ship-readiness, a final review request, or a risky change. It is a tool, not the default voice of the system.
 
 - If you use it, follow the skill's loop fully: define the reviewable slice, run the needed reviewers, wait for the outputs, fix meaningful findings, and rerun fresh passes when warranted.
 - Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.

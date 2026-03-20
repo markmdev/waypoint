@@ -6,7 +6,7 @@ description: >
   implementation work. Ask multiple rounds of clarifying questions about product behavior,
   user expectations, edge cases, and architecture; explore the repo deeply before deciding;
   do not waste questions on implementation details that can be learned directly from the
-  code or routed docs; and write the final plan into `.waypoint/docs/` so it persists in the repo.
+  code or routed docs; and write the final plan into `.waypoint/plans/` so it persists in the repo.
 ---
 
 # Planning
@@ -36,7 +36,7 @@ Before planning:
 
 The plan belongs in the repo, not only in chat.
 
-- Write or update a durable plan doc under `.waypoint/docs/`.
+- Write or update a durable plan doc under `.waypoint/plans/`.
 - Choose the smallest routed location that matches the work, such as a project plan, implementation plan, or focused design note.
 - If a relevant plan doc already exists, update it instead of creating a competing one.
 - Make sure the doc remains discoverable through the routed docs layer.
@@ -127,7 +127,7 @@ Before presenting the plan, verify against real code:
 - No pretending you verified something you didn't
 
 If the change touches durable project behavior, include docs/workspace updates in the plan.
-Write or update the durable plan doc under `.waypoint/docs/` as part of the skill, not as an optional follow-up.
+Write or update the durable plan doc under `.waypoint/plans/` as part of the skill, not as an optional follow-up.
 
 ## External APIs
 

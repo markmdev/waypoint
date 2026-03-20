@@ -7,23 +7,12 @@ Its job is to make agents better in two directions at once:
 - better continuity across sessions
 - better default behavior inside the current session
 
-## The problem it is solving
+## What Waypoint improves
 
-Agent setups usually fail in one of two ways.
+Waypoint helps a repo in two directions at once:
 
-The first failure mode is memory:
-
-- important context lives only in chat
-- the next session starts half-blind
-- the agent does not know which docs matter
-
-The second failure mode is process:
-
-- too much workflow lives in the always-on prompt
-- the agent starts narrating readiness instead of investigating
-- reviews, trackers, and closeout rituals start feeling like personality instead of tools
-
-Waypoint is designed to solve both.
+- it gives the next session real context through visible memory files
+- it gives the current session a clear working style focused on diagnosis, progress, and verification
 
 ## The Waypoint stance
 
@@ -35,6 +24,8 @@ In practice, that means:
 - lead with diagnosis and next action
 - verify before claiming success
 - keep the repo legible for the next agent
+- show screenshots when browser or app work is part of what the agent inspected or verified
+- use Mermaid in chat when a diagram explains the point more clearly
 
 ## Core pieces
 
@@ -43,7 +34,8 @@ Waypoint combines:
 - a repo contract in `AGENTS.md`
 - durable user/team memory in `.waypoint/MEMORY.md`
 - live operating state in `.waypoint/WORKSPACE.md`
-- durable project memory in `.waypoint/docs/`
+- long-lived project memory in `.waypoint/docs/`
+- durable planning docs in `.waypoint/plans/`
 - generated routing and context files
 - repo-local skills for optional structured workflows
 - optional reviewer/helper agents for deliberate second passes

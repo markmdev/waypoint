@@ -28,6 +28,7 @@ Waypoint separates repo memory into three different jobs:
 - `.waypoint/MEMORY.md` for durable user/team preferences, collaboration context, and stable defaults
 - `.waypoint/WORKSPACE.md` for live operational state
 - `.waypoint/docs/` for durable project behavior, architecture, decisions, and debugging knowledge
+- `.waypoint/plans/` for durable implementation, rollout, migration, and investigation plans
 
 This separation matters because many bad agent experiences come from mixing personal preferences, active task state, and project knowledge into one noisy blob.
 
@@ -95,9 +96,7 @@ Waypoint adds rigor through explicit escalation paths:
 
 ## Review model
 
-Review still matters.
-
-Waypoint just treats it as a tool rather than the default voice of the system.
+Waypoint offers deliberate second-pass review for moments that benefit from extra scrutiny.
 
 Use second-pass review when:
 
@@ -106,7 +105,7 @@ Use second-pass review when:
 - you are preparing to ship
 - a PR workflow calls for it
 
-`adversarial-review` is the main explicit closeout workflow for those cases.
+`adversarial-review` is the main repo-local workflow for that pass.
 
 ## Bootstrap flow
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.13.0
+
+### Minor Changes
+
+- Separate durable plan docs from long-lived project docs in the Waypoint scaffold.
+
+  New repos now get a dedicated `.waypoint/plans/` directory, the docs index routes both docs and plans, and the built-in guidance now points planning workflows at the new plans layer instead of mixing plans into `.waypoint/docs/`.
+
+- Remove the `visual-explanations` skill and simplify Waypoint's visual guidance.
+
+  Visual explanation now stays in the core contract: use Mermaid directly in chat for diagrams, and show screenshots whenever browser or app inspection is part of reproduction or verification work. The public docs were also tightened so they describe Waypoint more directly and leave per-skill trigger logic inside the skills themselves.
+
 ## 0.12.2
 
 ### Patch Changes

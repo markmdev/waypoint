@@ -20,6 +20,7 @@ const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
 const DEFAULT_DOCS_DIR = ".waypoint/docs";
 const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_MEMORY = ".waypoint/MEMORY.md";
+const DEFAULT_PLANS_DIR = ".waypoint/plans";
 const DEFAULT_TRACK_DIR = ".waypoint/track";
 const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
@@ -40,7 +41,6 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".agents/skills/docs-sync/",
   ".agents/skills/code-guide-audit/",
   ".agents/skills/adversarial-review/",
-  ".agents/skills/visual-explanations/",
   ".agents/skills/break-it-qa/",
   ".agents/skills/frontend-context-interview/",
   ".agents/skills/backend-context-interview/",
@@ -75,7 +75,6 @@ const SHIPPED_SKILL_NAMES = [
   "docs-sync",
   "code-guide-audit",
   "adversarial-review",
-  "visual-explanations",
   "break-it-qa",
   "conversation-retrospective",
   "workspace-compress",
@@ -95,6 +94,19 @@ const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
   "## Done Recently",
 ]);
 const TIMESTAMPED_ENTRY_PATTERN = /^(?:[-*]|\d+\.)\s+\[\d{4}-\d{2}-\d{2} \d{2}:\d{2} [A-Z]{2,5}\]/;
+
+function docsIndexSections(projectRoot: string, config?: WaypointConfig): { heading: string; dir: string }[] {
+  return [
+    {
+      heading: ".waypoint/docs/",
+      dir: path.join(projectRoot, config?.docs_dir ?? DEFAULT_DOCS_DIR),
+    },
+    {
+      heading: ".waypoint/plans/",
+      dir: path.join(projectRoot, config?.plans_dir ?? DEFAULT_PLANS_DIR),
+    },
+  ];
+}
 
 function ensureDir(dirPath: string): void {
   mkdirSync(dirPath, { recursive: true });
@@ -363,14 +375,16 @@ export function initRepository(
   );
   writeIfMissing(path.join(projectRoot, DEFAULT_WORKSPACE), readTemplate("WORKSPACE.md"));
   ensureDir(path.join(projectRoot, DEFAULT_DOCS_DIR));
+  ensureDir(path.join(projectRoot, DEFAULT_PLANS_DIR));
   ensureDir(path.join(projectRoot, DEFAULT_TRACK_DIR));
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/README.md"), readTemplate(".waypoint/docs/README.md"));
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/code-guide.md"), readTemplate(".waypoint/docs/code-guide.md"));
+  writeIfMissing(path.join(projectRoot, ".waypoint/plans/README.md"), readTemplate(".waypoint/plans/README.md"));
   upsertManagedBlock(path.join(projectRoot, "AGENTS.md"), readTemplate("managed-agents-block.md"));
   scaffoldSkills(projectRoot);
   scaffoldOptionalCodex(projectRoot);
   appendGitignoreSnippet(projectRoot);
-  const docsIndex = renderDocsIndex(projectRoot, path.join(projectRoot, DEFAULT_DOCS_DIR));
+  const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot));
   const tracksIndex = renderTracksIndex(projectRoot, path.join(projectRoot, DEFAULT_TRACK_DIR));
   writeText(path.join(projectRoot, DEFAULT_DOCS_INDEX), `${docsIndex.content}\n`);
   writeText(path.join(projectRoot, DEFAULT_TRACKS_INDEX), `${tracksIndex.content}\n`);
@@ -378,7 +392,7 @@ export function initRepository(
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created .waypoint/MEMORY.md, .waypoint/WORKSPACE.md, .waypoint/docs/, and .waypoint/track/ scaffold",
+    "Created .waypoint/MEMORY.md, .waypoint/WORKSPACE.md, .waypoint/docs/, .waypoint/plans/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
     "Installed coding/reviewer agents and project Codex config",
     "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
@@ -514,9 +528,10 @@ export function doctorRepository(projectRoot: string): Finding[] {
     }
   }
 
-  const docsDir = path.join(projectRoot, config.docs_dir ?? DEFAULT_DOCS_DIR);
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
-  const docsIndex = renderDocsIndex(projectRoot, docsDir);
+  const docsDir = path.join(projectRoot, config.docs_dir ?? DEFAULT_DOCS_DIR);
+  const plansDir = path.join(projectRoot, config.plans_dir ?? DEFAULT_PLANS_DIR);
+  const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
   const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
   const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
   const tracksIndex = renderTracksIndex(projectRoot, trackDir);
@@ -527,6 +542,15 @@ export function doctorRepository(projectRoot: string): Finding[] {
       message: ".waypoint/docs/ directory is missing.",
       remediation: "Run `waypoint init` to scaffold docs.",
       paths: [docsDir],
+    });
+  }
+  if (!existsSync(plansDir)) {
+    findings.push({
+      severity: "error",
+      category: "docs",
+      message: ".waypoint/plans/ directory is missing.",
+      remediation: "Run `waypoint init` to scaffold plans.",
+      paths: [plansDir],
     });
   }
   for (const relPath of docsIndex.invalidDocs) {
@@ -543,7 +567,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
       severity: "warn",
       category: "docs",
       message: ".waypoint/DOCS_INDEX.md is missing.",
-      remediation: "Run `waypoint sync` to generate the docs index.",
+      remediation: "Run `waypoint sync` to generate the docs/plans index.",
       paths: [docsIndexPath],
     });
   } else if (readFileSync(docsIndexPath, "utf8").trimEnd() !== docsIndex.content.trimEnd()) {
@@ -551,7 +575,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
       severity: "warn",
       category: "docs",
       message: ".waypoint/DOCS_INDEX.md is stale.",
-      remediation: "Run `waypoint sync` to rebuild the docs index.",
+      remediation: "Run `waypoint sync` to rebuild the docs/plans index.",
       paths: [docsIndexPath],
     });
   }
@@ -644,9 +668,8 @@ export function doctorRepository(projectRoot: string): Finding[] {
 
 export function syncRepository(projectRoot: string): string[] {
   const config = loadWaypointConfig(projectRoot);
-  const docsDir = path.join(projectRoot, config.docs_dir ?? DEFAULT_DOCS_DIR);
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
-  const docsIndex = renderDocsIndex(projectRoot, docsDir);
+  const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
   const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
   const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
   const tracksIndex = renderTracksIndex(projectRoot, trackDir);

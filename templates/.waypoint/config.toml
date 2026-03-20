@@ -2,6 +2,7 @@ version = 1
 profile = "__PROFILE__"
 workspace_file = ".waypoint/WORKSPACE.md"
 docs_dir = ".waypoint/docs"
+plans_dir = ".waypoint/plans"
 docs_index_file = ".waypoint/DOCS_INDEX.md"
 
 [features]

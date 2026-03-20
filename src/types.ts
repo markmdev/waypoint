@@ -20,6 +20,7 @@ export interface WaypointConfig {
   profile?: "universal" | "app-friendly";
   workspace_file?: string;
   docs_dir?: string;
+  plans_dir?: string;
   docs_index_file?: string;
   features?: {
     repo_skills?: boolean;

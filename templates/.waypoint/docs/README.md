@@ -9,9 +9,10 @@ Put the durable context here that the next agent will need to continue the work:
 - integration notes
 - invariants and constraints
 - debugging knowledge
-- active plans that should survive beyond one session
 
 These are **project docs**, not Waypoint internals.
+
+Put durable implementation and rollout plans in `.waypoint/plans/`.
 
 Do not use `.waypoint/docs/` as the execution tracker layer for active long-running work. That belongs under `.waypoint/track/`.
 
@@ -26,4 +27,4 @@ read_when:
 ---
 ```
 
-Refresh `last_updated` whenever you materially change a doc. `DOCS_INDEX.md` is generated from the docs here.
+Refresh `last_updated` whenever you materially change a doc. `DOCS_INDEX.md` is generated from both `.waypoint/docs/` and `.waypoint/plans/`.

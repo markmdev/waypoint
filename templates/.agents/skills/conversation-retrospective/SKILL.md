@@ -43,7 +43,8 @@ Treat explicit user feedback as a high-priority signal. If the user corrected th
 
 Write durable knowledge to the smallest truthful home the repo already uses:
 
-- the main docs or knowledge layer for architecture, behavior, decisions, debugging knowledge, durable plans, and reusable operating guidance
+- the main docs or knowledge layer for architecture, behavior, decisions, debugging knowledge, and reusable operating guidance
+- the repo's plans layer for durable implementation, rollout, migration, or investigation plans
 - the repo's standing guidance file for durable project context or long-lived working rules
 - the repo's live handoff or workspace file for current state, blockers, and immediate next steps
 - the repo's tracker or execution-log layer when the conversation created or materially changed a long-running workstream
