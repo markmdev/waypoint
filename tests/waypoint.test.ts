@@ -837,6 +837,77 @@ test("init does not delete user rules inserted inside an old waypoint gitignore 
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
 });
 
+test("init removes retired visual-explanations gitignore and skill on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-visual-explanations-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  mkdirSync(path.join(root, ".agents/skills/visual-explanations/agents"), { recursive: true });
+  writeFileSync(
+    path.join(root, ".agents/skills/visual-explanations/SKILL.md"),
+    "# Visual Explanations\n",
+    "utf8"
+  );
+  writeFileSync(
+    path.join(root, ".agents/skills/visual-explanations/agents/openai.yaml"),
+    "display_name: \"Visual Explanations\"\n",
+    "utf8"
+  );
+
+  const gitignorePath = path.join(root, ".gitignore");
+  writeFileSync(
+    gitignorePath,
+    [
+      "# Waypoint state",
+      ".codex/config.toml",
+      ".codex/agents/code-reviewer.toml",
+      ".codex/agents/code-health-reviewer.toml",
+      ".codex/agents/plan-reviewer.toml",
+      ".agents/skills/planning/",
+      ".agents/skills/work-tracker/",
+      ".agents/skills/docs-sync/",
+      ".agents/skills/code-guide-audit/",
+      ".agents/skills/adversarial-review/",
+      ".agents/skills/visual-explanations/",
+      ".agents/skills/break-it-qa/",
+      ".agents/skills/frontend-context-interview/",
+      ".agents/skills/backend-context-interview/",
+      ".agents/skills/frontend-ship-audit/",
+      ".agents/skills/backend-ship-audit/",
+      ".agents/skills/conversation-retrospective/",
+      ".agents/skills/workspace-compress/",
+      ".agents/skills/pre-pr-hygiene/",
+      ".agents/skills/pr-review/",
+      ".waypoint/config.toml",
+      ".waypoint/MEMORY.md",
+      ".waypoint/README.md",
+      ".waypoint/SOUL.md",
+      ".waypoint/WORKSPACE.md",
+      ".waypoint/agent-operating-manual.md",
+      ".waypoint/DOCS_INDEX.md",
+      ".waypoint/TRACKS_INDEX.md",
+      ".waypoint/context/",
+      ".waypoint/scripts/",
+      ".waypoint/state/",
+      ".waypoint/track/",
+      ".waypoint/docs/README.md",
+      ".waypoint/docs/code-guide.md",
+      "# End Waypoint state",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
+  assert.equal(gitignore.match(/^\.agents\/skills\/visual-explanations\/$/gm)?.length ?? 0, 0);
+  assert.equal(existsSync(path.join(root, ".agents/skills/visual-explanations")), false);
+});
+
 test("init removes retired audit skill directories on refresh", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-audit-skills-"));
   initRepository(root, {

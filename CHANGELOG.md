@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.1
+
+### Patch Changes
+
+- Fix Waypoint's gitignore refresh so retired `visual-explanations` lines are removed cleanly during upgrades.
+
+  Older repos could keep a stale `.agents/skills/visual-explanations/` ignore line outside the managed Waypoint block after refresh. Waypoint now recognizes that line as retired scaffold state, removes the old skill directory on refresh, and keeps the managed ignore block clean.
+
 ## 0.13.0
 
 ### Minor Changes
