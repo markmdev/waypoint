@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0
+
+### Minor Changes
+
+- 1389209: Support multiple configured docs and plans roots in the docs index while preserving the default `.waypoint/docs` and `.waypoint/plans` routing. Refreshes now keep custom index roots in config, and docs scanning skips symlinked directories to avoid recursive loops.
+
 ## 0.13.3
 
 ### Patch Changes
