@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -171,7 +171,8 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("rules"), false);
-  assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('plans_dir = ".waypoint/plans"'));
+  assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('docs_dirs = [ ".waypoint/docs" ]'));
+  assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('plans_dirs = [ ".waypoint/plans" ]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."coding-agent"]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
@@ -1050,6 +1051,195 @@ test("sync rebuilds docs and tracks indexes only", () => {
   assert.equal(existsSync(path.join(root, ".waypoint/rules")), false);
 });
 
+test("sync indexes additional configured docs and plans roots once each", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-multi-root-sync-"));
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeFileSync(
+    path.join(root, ".waypoint/config.toml"),
+    [
+      "version = 1",
+      'profile = "universal"',
+      'workspace_file = ".waypoint/WORKSPACE.md"',
+      'docs_dirs = [ ".waypoint/docs", "services/app/docs", "./services/app/docs" ]',
+      'plans_dirs = [ ".waypoint/plans", "services/app/plans", "services/app/plans/" ]',
+      'docs_index_file = ".waypoint/DOCS_INDEX.md"',
+      "",
+      "[features]",
+      "repo_skills = true",
+      "docs_index = true",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  writeRoutableDoc(path.join(root, "services/app/docs/runtime.md"), {
+    title: "Runtime Guide",
+    summary: "Explain the app runtime.",
+  });
+  writeRoutableDoc(path.join(root, "services/app/plans/launch.md"), {
+    title: "Launch Plan",
+    summary: "Track the app launch plan.",
+  });
+
+  syncRepository(root);
+
+  const docsIndex = readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8");
+  assert.equal(docsIndex.match(/^## services\/app\/docs\/$/gm)?.length ?? 0, 1);
+  assert.equal(docsIndex.match(/^## services\/app\/plans\/$/gm)?.length ?? 0, 1);
+  assert.ok(docsIndex.includes("services/app/docs/runtime.md"));
+  assert.ok(docsIndex.includes("services/app/plans/launch.md"));
+});
+
+test("sync still honors legacy singular docs and plans roots", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-roots-"));
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeFileSync(
+    path.join(root, ".waypoint/config.toml"),
+    [
+      "version = 1",
+      'profile = "universal"',
+      'workspace_file = ".waypoint/WORKSPACE.md"',
+      'docs_dir = "services/api/docs"',
+      'plans_dir = "services/api/plans"',
+      'docs_index_file = ".waypoint/DOCS_INDEX.md"',
+      "",
+      "[features]",
+      "repo_skills = true",
+      "docs_index = true",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  writeRoutableDoc(path.join(root, "services/api/docs/contracts.md"), {
+    title: "Contracts",
+    summary: "Explain the API contracts.",
+  });
+  writeRoutableDoc(path.join(root, "services/api/plans/migration.md"), {
+    title: "Migration Plan",
+    summary: "Track the API migration plan.",
+  });
+
+  syncRepository(root);
+
+  const docsIndex = readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8");
+  assert.ok(docsIndex.includes("## services/api/docs/"));
+  assert.ok(docsIndex.includes("## services/api/plans/"));
+  assert.ok(docsIndex.includes("services/api/docs/contracts.md"));
+  assert.ok(docsIndex.includes("services/api/plans/migration.md"));
+});
+
+test("doctor flags missing configured docs and plans roots", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-multi-root-"));
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeFileSync(
+    path.join(root, ".waypoint/config.toml"),
+    [
+      "version = 1",
+      'profile = "universal"',
+      'workspace_file = ".waypoint/WORKSPACE.md"',
+      'docs_dirs = [ ".waypoint/docs", "services/app/docs" ]',
+      'plans_dirs = [ ".waypoint/plans", "services/app/plans" ]',
+      'docs_index_file = ".waypoint/DOCS_INDEX.md"',
+      "",
+      "[features]",
+      "repo_skills = true",
+      "docs_index = true",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  const findings = doctorRepository(root);
+  assert.ok(findings.some((finding) => finding.message.includes("services/app/docs/ directory is missing.")));
+  assert.ok(findings.some((finding) => finding.message.includes("services/app/plans/ directory is missing.")));
+});
+
+test("init preserves custom docs roots and docs index path on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-config-refresh-"));
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  mkdirp(path.join(root, "services/app/docs"));
+  mkdirp(path.join(root, "services/app/plans"));
+  writeFileSync(
+    path.join(root, ".waypoint/config.toml"),
+    [
+      "version = 1",
+      'profile = "universal"',
+      'workspace_file = ".waypoint/WORKSPACE.md"',
+      'docs_dirs = [ ".waypoint/docs", "services/app/docs" ]',
+      'plans_dirs = [ ".waypoint/plans", "services/app/plans" ]',
+      'docs_index_file = ".waypoint/CUSTOM_DOCS_INDEX.md"',
+      "",
+      "[features]",
+      "repo_skills = true",
+      "docs_index = false",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+
+  writeRoutableDoc(path.join(root, "services/app/docs/runtime.md"), {
+    title: "Runtime Guide",
+    summary: "Explain the refreshed runtime docs.",
+  });
+  writeRoutableDoc(path.join(root, "services/app/plans/launch.md"), {
+    title: "Launch Plan",
+    summary: "Explain the refreshed launch plan.",
+  });
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const config = readFileSync(path.join(root, ".waypoint/config.toml"), "utf8");
+  assert.ok(config.includes('docs_dirs = [ ".waypoint/docs", "services/app/docs" ]'));
+  assert.ok(config.includes('plans_dirs = [ ".waypoint/plans", "services/app/plans" ]'));
+  assert.ok(config.includes('docs_index_file = ".waypoint/CUSTOM_DOCS_INDEX.md"'));
+  assert.ok(config.includes("docs_index = false"));
+
+  const docsIndex = readFileSync(path.join(root, ".waypoint/CUSTOM_DOCS_INDEX.md"), "utf8");
+  assert.ok(docsIndex.includes("## services/app/docs/"));
+  assert.ok(docsIndex.includes("## services/app/plans/"));
+});
+
+test("sync skips symlinked directories while walking docs roots", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-symlink-docs-"));
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeRoutableDoc(path.join(root, ".waypoint/docs/reference.md"), {
+    title: "Reference",
+    summary: "Explain the stable reference doc.",
+  });
+
+  if (process.platform !== "win32") {
+    symlinkSync(path.join(root, ".waypoint/docs"), path.join(root, ".waypoint/docs/loop"));
+  }
+
+  syncRepository(root);
+
+  const docsIndex = readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8");
+  assert.equal(docsIndex.match(/\.waypoint\/docs\/reference\.md/g)?.length ?? 0, 1);
+});
+
 test("init scaffolds codex agent pack by default", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-roles-"));
   initRepository(root, {
@@ -1660,6 +1850,33 @@ test("built cli can read package version", () => {
 
   assert.equal(actualVersion, expectedVersion);
 });
+
+function writeRoutableDoc(
+  filePath: string,
+  options: {
+    title: string;
+    summary: string;
+  },
+): void {
+  mkdirp(path.dirname(filePath));
+  writeFileSync(
+    filePath,
+    [
+      "---",
+      `summary: "${options.summary}"`,
+      'last_updated: "2026-03-23 10:00 PDT"',
+      "read_when:",
+      "  - you need the routed doc",
+      "---",
+      "",
+      `# ${options.title}`,
+      "",
+      "Useful details live here.",
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+}
 
 function mkdirp(dirPath: string): void {
   mkdirSync(dirPath, { recursive: true });

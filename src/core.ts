@@ -4,6 +4,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -13,7 +14,14 @@ import * as TOML from "@iarna/toml";
 
 import { renderDocsIndex } from "./docs-index.js";
 import { renderTracksIndex } from "./track-index.js";
-import { readTemplate, renderWaypointConfig, MANAGED_BLOCK_END, MANAGED_BLOCK_START, templatePath } from "./templates.js";
+import {
+  defaultWaypointConfig,
+  readTemplate,
+  renderWaypointConfig,
+  MANAGED_BLOCK_END,
+  MANAGED_BLOCK_START,
+  templatePath,
+} from "./templates.js";
 import type { Finding, WaypointConfig } from "./types.js";
 
 const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
@@ -97,17 +105,99 @@ const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
 ]);
 const TIMESTAMPED_ENTRY_PATTERN = /^(?:[-*]|\d+\.)\s+\[\d{4}-\d{2}-\d{2} \d{2}:\d{2} [A-Z]{2,5}\]/;
 
+function configuredRootDirs(
+  projectRoot: string,
+  roots: string[] | undefined,
+  legacyRoot: string | undefined,
+  fallbackRoot: string,
+): string[] {
+  const configuredRoots = roots && roots.length > 0
+    ? roots
+    : legacyRoot
+      ? [legacyRoot]
+      : [fallbackRoot];
+  const normalizedRoots: string[] = [];
+  const seen = new Set<string>();
+
+  for (const root of configuredRoots) {
+    const trimmedRoot = root.trim();
+    if (trimmedRoot.length === 0) {
+      continue;
+    }
+
+    const resolvedRoot = path.resolve(projectRoot, trimmedRoot);
+    let dedupeKey = path.normalize(resolvedRoot);
+    if (existsSync(resolvedRoot)) {
+      try {
+        dedupeKey = realpathSync(resolvedRoot);
+      } catch {
+        dedupeKey = path.normalize(resolvedRoot);
+      }
+    }
+
+    if (seen.has(dedupeKey)) {
+      continue;
+    }
+
+    seen.add(dedupeKey);
+    normalizedRoots.push(resolvedRoot);
+  }
+
+  return normalizedRoots.length > 0 ? normalizedRoots : [path.resolve(projectRoot, fallbackRoot)];
+}
+
+function docsRootDirs(projectRoot: string, config?: WaypointConfig): string[] {
+  return configuredRootDirs(projectRoot, config?.docs_dirs, config?.docs_dir, DEFAULT_DOCS_DIR);
+}
+
+function plansRootDirs(projectRoot: string, config?: WaypointConfig): string[] {
+  return configuredRootDirs(projectRoot, config?.plans_dirs, config?.plans_dir, DEFAULT_PLANS_DIR);
+}
+
+function docsSectionHeading(projectRoot: string, dir: string): string {
+  const relativePath = path.relative(projectRoot, dir).split(path.sep).join("/");
+  const normalizedPath = relativePath.length === 0 ? "." : relativePath;
+  return normalizedPath.endsWith("/") ? normalizedPath : `${normalizedPath}/`;
+}
+
 function docsIndexSections(projectRoot: string, config?: WaypointConfig): { heading: string; dir: string }[] {
   return [
-    {
-      heading: ".waypoint/docs/",
-      dir: path.join(projectRoot, config?.docs_dir ?? DEFAULT_DOCS_DIR),
-    },
-    {
-      heading: ".waypoint/plans/",
-      dir: path.join(projectRoot, config?.plans_dir ?? DEFAULT_PLANS_DIR),
-    },
+    ...docsRootDirs(projectRoot, config).map((dir) => ({
+      heading: docsSectionHeading(projectRoot, dir),
+      dir,
+    })),
+    ...plansRootDirs(projectRoot, config).map((dir) => ({
+      heading: docsSectionHeading(projectRoot, dir),
+      dir,
+    })),
   ];
+}
+
+function buildWaypointConfig(
+  projectRoot: string,
+  existingConfig: WaypointConfig | undefined,
+  options: {
+    profile: "universal" | "app-friendly";
+  },
+): WaypointConfig {
+  const defaults = defaultWaypointConfig({ profile: options.profile });
+
+  return {
+    version: existingConfig?.version ?? defaults.version,
+    profile: options.profile,
+    workspace_file: existingConfig?.workspace_file ?? defaults.workspace_file,
+    docs_dirs: configuredRootDirs(projectRoot, existingConfig?.docs_dirs, existingConfig?.docs_dir, DEFAULT_DOCS_DIR).map((dir) =>
+      path.relative(projectRoot, dir).split(path.sep).join("/")
+    ),
+    plans_dirs: configuredRootDirs(projectRoot, existingConfig?.plans_dirs, existingConfig?.plans_dir, DEFAULT_PLANS_DIR).map((dir) =>
+      path.relative(projectRoot, dir).split(path.sep).join("/")
+    ),
+    docs_index_file: existingConfig?.docs_index_file ?? defaults.docs_index_file,
+    features: {
+      repo_skills: existingConfig?.features?.repo_skills ?? defaults.features?.repo_skills,
+      docs_index: existingConfig?.features?.docs_index ?? defaults.features?.docs_index,
+    },
+  };
 }
 
 function ensureDir(dirPath: string): void {
@@ -328,6 +418,7 @@ export function initRepository(
 ): string[] {
   ensureDir(projectRoot);
   migrateLegacyRootFiles(projectRoot);
+  const config = buildWaypointConfig(projectRoot, loadWaypointConfig(projectRoot), options);
   // Any Waypoint-owned path removed from the scaffold should be added here
   // so `waypoint init` / `waypoint upgrade` can actively prune stale copies.
   for (const deprecatedPath of [
@@ -372,9 +463,7 @@ export function initRepository(
 
   writeText(
     path.join(projectRoot, DEFAULT_CONFIG_PATH),
-    renderWaypointConfig({
-      profile: options.profile,
-    }),
+    renderWaypointConfig(config),
   );
   writeIfMissing(path.join(projectRoot, DEFAULT_WORKSPACE), readTemplate("WORKSPACE.md"));
   ensureDir(path.join(projectRoot, DEFAULT_DOCS_DIR));
@@ -387,9 +476,10 @@ export function initRepository(
   scaffoldSkills(projectRoot);
   scaffoldOptionalCodex(projectRoot);
   appendGitignoreSnippet(projectRoot);
-  const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot));
+  const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
+  const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
   const tracksIndex = renderTracksIndex(projectRoot, path.join(projectRoot, DEFAULT_TRACK_DIR));
-  writeText(path.join(projectRoot, DEFAULT_DOCS_INDEX), `${docsIndex.content}\n`);
+  writeText(docsIndexPath, `${docsIndex.content}\n`);
   writeText(path.join(projectRoot, DEFAULT_TRACKS_INDEX), `${tracksIndex.content}\n`);
 
   return [
@@ -532,27 +622,35 @@ export function doctorRepository(projectRoot: string): Finding[] {
   }
 
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
-  const docsDir = path.join(projectRoot, config.docs_dir ?? DEFAULT_DOCS_DIR);
-  const plansDir = path.join(projectRoot, config.plans_dir ?? DEFAULT_PLANS_DIR);
+  const configuredDocsDirs = docsRootDirs(projectRoot, config);
+  const configuredPlansDirs = plansRootDirs(projectRoot, config);
   const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
   const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
   const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
   const tracksIndex = renderTracksIndex(projectRoot, trackDir);
-  if (!existsSync(docsDir)) {
+  for (const docsDir of configuredDocsDirs) {
+    if (existsSync(docsDir)) {
+      continue;
+    }
+
     findings.push({
       severity: "error",
       category: "docs",
-      message: ".waypoint/docs/ directory is missing.",
-      remediation: "Run `waypoint init` to scaffold docs.",
+      message: `${docsSectionHeading(projectRoot, docsDir)} directory is missing.`,
+      remediation: "Create the configured docs directory or update `.waypoint/config.toml`.",
       paths: [docsDir],
     });
   }
-  if (!existsSync(plansDir)) {
+  for (const plansDir of configuredPlansDirs) {
+    if (existsSync(plansDir)) {
+      continue;
+    }
+
     findings.push({
       severity: "error",
       category: "docs",
-      message: ".waypoint/plans/ directory is missing.",
-      remediation: "Run `waypoint init` to scaffold plans.",
+      message: `${docsSectionHeading(projectRoot, plansDir)} directory is missing.`,
+      remediation: "Create the configured plans directory or update `.waypoint/config.toml`.",
       paths: [plansDir],
     });
   }

@@ -30,6 +30,9 @@ Waypoint separates repo memory into three different jobs:
 - `.waypoint/docs/` for durable project behavior, architecture, decisions, and debugging knowledge
 - `.waypoint/plans/` for durable implementation, rollout, migration, and investigation plans
 
+Waypoint uses those as the default routed roots, but the docs index can also include additional explicit docs and plans roots from `.waypoint/config.toml`.
+Each configured root is scanned recursively, and only Markdown files with valid Waypoint frontmatter are routed into `.waypoint/DOCS_INDEX.md`.
+
 This separation matters because many bad agent experiences come from mixing personal preferences, active task state, and project knowledge into one noisy blob.
 
 ### 3. Skill layer

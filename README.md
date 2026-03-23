@@ -72,6 +72,10 @@ The philosophy is simple:
 - investigation before status narration
 - structured workflows that stay in their own tools
 
+By default, Waypoint routes docs from `.waypoint/docs/` and plans from `.waypoint/plans/`.
+If your repo keeps routable docs elsewhere, you can add more explicit roots in `.waypoint/config.toml` with `docs_dirs` and `plans_dirs`.
+Waypoint scans each configured root recursively and only includes Markdown files with valid Waypoint frontmatter.
+
 ## Best fit
 
 Waypoint is most useful when you want:
@@ -116,6 +120,20 @@ repo/
 ```
 
 From there, start your Codex session in the repo and follow the generated bootstrap in `AGENTS.md`.
+
+If you want to add more routable roots, extend `.waypoint/config.toml` like this:
+
+```toml
+docs_dirs = [
+  ".waypoint/docs",
+  "services/app/docs",
+]
+
+plans_dirs = [
+  ".waypoint/plans",
+  "services/app/plans",
+]
+```
 
 ## Built-in skills
 

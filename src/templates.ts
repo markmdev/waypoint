@@ -1,7 +1,10 @@
+import * as TOML from "@iarna/toml";
 import { readFileSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+
+import type { WaypointConfig } from "./types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,9 +37,36 @@ export function readTemplate(relativePath: string): string {
   return readFileSync(templatePath(relativePath), "utf8");
 }
 
-export function renderWaypointConfig(options: {
+export function defaultWaypointConfig(options: {
   profile: "universal" | "app-friendly";
-}): string {
-  return readTemplate(".waypoint/config.toml")
-    .replace("__PROFILE__", options.profile);
+}): WaypointConfig {
+  return {
+    version: 1,
+    profile: options.profile,
+    workspace_file: ".waypoint/WORKSPACE.md",
+    docs_dirs: [".waypoint/docs"],
+    plans_dirs: [".waypoint/plans"],
+    docs_index_file: ".waypoint/DOCS_INDEX.md",
+    features: {
+      repo_skills: true,
+      docs_index: true,
+    },
+  };
+}
+
+export function renderWaypointConfig(config: WaypointConfig): string {
+  const renderedConfig: WaypointConfig = {
+    version: config.version,
+    profile: config.profile,
+    workspace_file: config.workspace_file,
+    docs_dirs: config.docs_dirs,
+    plans_dirs: config.plans_dirs,
+    docs_index_file: config.docs_index_file,
+    features: config.features ? {
+      repo_skills: config.features.repo_skills,
+      docs_index: config.features.docs_index,
+    } : undefined,
+  };
+
+  return TOML.stringify(renderedConfig as unknown as TOML.JsonMap);
 }

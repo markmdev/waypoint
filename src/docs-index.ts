@@ -1,4 +1,4 @@
-import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { Dirent, existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import path from "node:path";
 
 interface DocEntry {
@@ -69,19 +69,34 @@ function parseFrontmatter(filePath: string): { summary: string; lastUpdated: str
   return { summary, lastUpdated, readWhen };
 }
 
-function walkDocs(projectRoot: string, currentDir: string, output: DocEntry[], invalid: string[]): void {
-  for (const entry of readdirSync(currentDir)) {
-    const fullPath = path.join(currentDir, entry);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      if (SKIP_DIRS.has(entry)) {
-        continue;
-      }
-      walkDocs(projectRoot, fullPath, output, invalid);
+function walkDocs(
+  projectRoot: string,
+  currentDir: string,
+  output: DocEntry[],
+  invalid: string[],
+  visitedDirs: Set<string>,
+): void {
+  const resolvedCurrentDir = realpathSync(currentDir);
+  if (visitedDirs.has(resolvedCurrentDir)) {
+    return;
+  }
+  visitedDirs.add(resolvedCurrentDir);
+
+  for (const entry of readdirSync(currentDir, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) {
       continue;
     }
 
-    if (!entry.endsWith(".md") || SKIP_NAMES.has(entry)) {
+    const fullPath = path.join(currentDir, entry.name);
+    if (entry.isDirectory()) {
+      if (SKIP_DIRS.has(entry.name)) {
+        continue;
+      }
+      walkDocs(projectRoot, fullPath, output, invalid, visitedDirs);
+      continue;
+    }
+
+    if (!isMarkdownDoc(entry)) {
       continue;
     }
 
@@ -100,10 +115,14 @@ function collectDocEntries(projectRoot: string, docsDir: string): { entries: Doc
   const invalidDocs: string[] = [];
 
   if (existsSync(docsDir)) {
-    walkDocs(projectRoot, docsDir, entries, invalidDocs);
+    walkDocs(projectRoot, docsDir, entries, invalidDocs, new Set<string>());
   }
 
   return { entries, invalidDocs };
+}
+
+function isMarkdownDoc(entry: Dirent): boolean {
+  return entry.isFile() && entry.name.endsWith(".md") && !SKIP_NAMES.has(entry.name);
 }
 
 export function renderDocsIndex(projectRoot: string, sections: DocSection[]): { content: string; invalidDocs: string[] } {
