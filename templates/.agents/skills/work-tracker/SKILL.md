@@ -1,11 +1,11 @@
 ---
 name: work-tracker
-description: Create or maintain a durable tracker under `.waypoint/track/` for large multi-step work. Use when implementation will span multiple sessions, when an audit or review produces many fix items, when verification has a long checklist, or whenever `WORKSPACE.md` would become too detailed if it tried to hold the whole execution log.
+description: Create or maintain a durable tracker under `.waypoint/track/` for any non-trivial workstream that needs ongoing execution state. Use when work has multiple steps, meaningful verification, review follow-ups, milestone checkpoints, or any real chance that `WORKSPACE.md` alone will stop being enough as the work evolves.
 ---
 
 # Work Tracker
 
-Use this skill when the work is too large, too long-running, or too itemized to live safely in `WORKSPACE.md`.
+Use this skill when the work has enough moving parts that the next state should not live only in chat or in a few workspace bullets.
 
 This skill owns the execution tracker layer:
 
@@ -34,12 +34,15 @@ Before tracking:
 
 Create or update a tracker when any of these are true:
 
+- the work is non-trivial and will unfold across multiple meaningful steps
 - the work will likely span multiple sessions
 - there are many actionable items to implement
 - an audit, QA pass, or review produced a remediation campaign
 - verification requires a substantial checklist
+- the work has milestone checkpoints, PR stages, or repeated fix-and-verify loops
 - `WORKSPACE.md` would become noisy if it carried all the detail
 
+When in doubt, prefer creating or updating the tracker for non-trivial work instead of hoping the workspace alone will stay enough.
 Small, single-shot work does not need a tracker.
 
 ## Step 1: Choose The Tracker File
@@ -99,6 +102,7 @@ The tracker should answer "what exactly is happening across the whole workstream
 - Update `last_updated` whenever you materially change the tracker.
 - Mark completed items done instead of deleting the record.
 - Add blockers, new tasks, and verification status as the work evolves.
+- Update the tracker during the work, not only at the end. If a milestone, blocker, review round, or verification result changed reality, the tracker should already reflect it.
 - When the workstream finishes, set `status: done` or `status: archived`.
 
 Do not let the tracker become fiction. It must match reality.
@@ -118,6 +122,7 @@ When you create or update a tracker, report:
 ## Gotchas
 
 - Do not create a new tracker if a relevant active tracker already exists for the same workstream.
+- Do not wait until final handoff to start the tracker if the work has already become multi-step, review-heavy, or hard to summarize from memory.
 - Do not let the tracker become fiction. Completed items, blockers, and verification state should match reality.
 - Do not stuff durable architecture or debugging knowledge into the tracker if it belongs in `.waypoint/docs/`.
 - Do not leave `WORKSPACE.md` carrying the full execution log after a tracker exists.

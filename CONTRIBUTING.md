@@ -4,14 +4,17 @@ Thanks for contributing to Waypoint.
 
 ## What Waypoint Optimizes For
 
-Waypoint is a collaborator-first repository operating system for Codex.
+Waypoint makes Codex better by default for real software work.
 
 Good contributions improve one or more of these:
 
+- Codex's default behavior in real projects
 - repo legibility for the next agent
+- planning quality before implementation starts
 - quality of the generated scaffold
 - quality of the shipped skills
 - quality of the default collaboration experience
+- quality of the self-improvement loop after user correction
 - reliability of the CLI and context-generation flows
 
 ## Product guardrails

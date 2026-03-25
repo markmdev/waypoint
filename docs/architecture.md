@@ -1,5 +1,9 @@
 # Waypoint Architecture
 
+Waypoint's architecture exists to make Codex better by default without forcing
+the user to manually re-teach planning habits, coding standards, review loops,
+and improvement rules on every task.
+
 ## Core layers
 
 ### 1. Repo contract
@@ -76,6 +80,18 @@ Waypoint rebuilds explicit startup context on purpose:
 
 This gives the agent continuity without requiring hidden prompt magic.
 
+### 6. Improvement layer
+
+Waypoint also needs a way to learn from real usage.
+
+That means user corrections should not disappear into chat history.
+They should flow into the right durable surfaces such as:
+
+- user-scoped guidance
+- project-scoped guidance
+- repo-local skills
+- retrospectives that capture repeated friction
+
 ## Execution model
 
 Waypoint's default execution model is:
@@ -83,6 +99,7 @@ Waypoint's default execution model is:
 - collaborator-first
 - investigation-first
 - ownership-based after approval
+- self-improving after correction
 
 That means the agent should usually:
 

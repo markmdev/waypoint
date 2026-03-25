@@ -36,6 +36,11 @@ When the product surface makes it practical, extend done to include:
 
 Do not stop at "the code compiles" or "the first push is up."
 
+During the loop, keep live execution state current:
+
+- update `WORKSPACE.md` as milestones, blockers, verification state, and next steps change
+- if a tracker exists or the work has become tracker-worthy, update the tracker during the work instead of reconstructing it later
+
 ## Step 1: Reconfirm The Scope And Ownership Mode
 
 - Make sure the plan is already approved or the user explicitly said to proceed.
@@ -64,7 +69,7 @@ For bugs, prefer reproducing the problem first, then fixing it, then proving the
 
 Use the repo's existing skills and reviewer agents instead of inventing a parallel process.
 
-- Use `work-tracker` when the work or verification checklist is too large for `WORKSPACE.md`.
+- Use `work-tracker` early when the work becomes non-trivial, multi-step, review-heavy, or checklist-driven enough that `WORKSPACE.md` alone will stop being a good live record.
 - Use `docs-sync` when shipped behavior, routes, contracts, or commands changed materially.
 - Use `pre-pr-hygiene` before pushing or opening/updating a PR when the change surface is substantial.
 - Use `pr-review` once active PR review or automated review has started.
@@ -75,8 +80,10 @@ If the repo ships reviewer agents under `.codex/agents/`, use them in the closeo
 - run `code-reviewer` for every non-trivial implementation slice before declaring the work clear
 - run `code-health-reviewer` when the change is medium or large, especially when it adds structure, duplicates logic, or introduces new abstractions
 - launch them in parallel when both apply
+- use them at meaningful milestones, not only at the very end: after substantial implementation chunks, before opening or materially updating a PR, after fixing substantial findings, and before final closeout
 - treat them as fresh closeout passes, not as optional decoration
-- if meaningful fixes follow from their findings, rerun the most relevant verification and, when warranted, rerun fresh reviewer passes instead of trusting stale results
+- if either reviewer finds anything more serious than obvious optional polish, fix those findings, rerun the most relevant verification, and run fresh reviewer passes instead of trusting stale results
+- keep iterating until the remaining reviewer feedback is only nitpicks or none
 
 If those reviewer agents are not present in the repo, do the equivalent closeout thinking locally and continue instead of blocking on missing helpers.
 
@@ -96,6 +103,7 @@ If an existing repo-local skill clearly matches the verification surface, use it
 - Run builds, lint, migrations, or focused smoke tests when they are part of the real risk surface.
 - Fix failing checks before pushing unless the user explicitly accepts an exception.
 - For user-facing flows, do at least one realistic manual or UI-driven pass beyond pure unit coverage.
+- Update `WORKSPACE.md` and any active tracker with the current verification state before moving on.
 
 Do not push a branch that still obviously fails its own touched-surface checks.
 
@@ -109,6 +117,8 @@ When the repo uses PRs:
 - request preview or staging environments when they are part of validation
 
 If the repo does not use PRs, keep moving through the equivalent review and handoff workflow instead of forcing PR-shaped steps.
+
+Before opening or materially updating the PR on non-trivial work, strongly prefer a fresh reviewer-agent pass when those agents are available.
 
 ## Step 8: Babysit The PR Instead Of Dropping It
 
@@ -130,6 +140,7 @@ Once review starts:
 - fix valid findings
 - reply inline where the workflow supports inline reply
 - rerun the relevant verification after review-driven fixes
+- if the fixes were meaningful, run fresh reviewer-agent passes before you call the work clear when those agents are available
 
 Do not leave comments unanswered just because the code changed.
 
@@ -161,12 +172,13 @@ Keep the handoff plain and direct. The point of this skill is to reduce the user
 ## Gotchas
 
 - Do not mistake planning approval for permission to stop at implementation; this skill owns the full closeout.
+- Do not let `WORKSPACE.md` or an active tracker fall behind reality while the work is in flight.
 - Do not rely only on automated tests when the risky surface is interactive.
 - Do not let stale previews, staging selectors, old PR branches, or half-deployed environments quietly poison verification.
 - Do not treat CI failures, review comments, or rollout gates as outside the task once the user asked for full ownership.
 - Do not declare success while known meaningful review findings or failing checks still exist.
 - Do not confuse a reusable test harness or scripted UI test with the final walkthrough artifact; the artifact should show the real verified surface when practical.
-- Do not forget the reviewer-agent loop when `code-reviewer` and `code-health-reviewer` are available. They are part of the closeout signal, not an afterthought.
+- Do not forget the reviewer-agent loop when `code-reviewer` and `code-health-reviewer` are available. They are part of the closeout signal, not an afterthought, and serious findings should reopen the fix-and-review cycle.
 
 ## Keep This Skill Sharp
 

@@ -130,12 +130,32 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Use reviewer agents when an independent second pass would materially improve the result"
+      "Use reviewer agents proactively at meaningful milestones"
     )
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
       "If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Treat `.waypoint/WORKSPACE.md` as a mandatory live execution log"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "update the tracker during the work as well"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "Use reviewer agents proactively at meaningful milestones"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "fix those findings, rerun the relevant verification, and run fresh review passes"
     )
   );
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
@@ -216,6 +236,16 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Treat `.waypoint/WORKSPACE.md` as mandatory live execution state"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "For any non-trivial multi-step work"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Let skills carry their own invocation guidance."
     )
   );
@@ -231,7 +261,17 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Use the repo-local skills and reviewer agents deliberately, not reflexively."
+      "Use the repo-local skills and reviewer agents deliberately, but do not underuse them on work that is expensive to get wrong."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "For non-trivial work, strongly prefer reviewer-agent passes between major implementation milestones"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "If `code-reviewer` or `code-health-reviewer` surface anything more serious than optional polish"
     )
   );
   assert.ok(
@@ -286,6 +326,16 @@ test("init scaffolds core files", () => {
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes("# Work Tracker"));
   assert.ok(
+    readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes(
+      "Use this skill when the work has enough moving parts"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes(
+      "When in doubt, prefer creating or updating the tracker for non-trivial work"
+    )
+  );
+  assert.ok(
     readFileSync(path.join(root, ".agents/skills/work-tracker/agents/openai.yaml"), "utf8").includes(
       "display_name: \"Work Tracker\""
     )
@@ -338,6 +388,21 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/adversarial-review/agents/openai.yaml"), "utf8").includes(
       'display_name: "Adversarial Review"'
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/merge-ready-owner/SKILL.md"), "utf8").includes(
+      "update `WORKSPACE.md` as milestones, blockers, verification state, and next steps change"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/merge-ready-owner/SKILL.md"), "utf8").includes(
+      "use them at meaningful milestones, not only at the very end"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/merge-ready-owner/SKILL.md"), "utf8").includes(
+      "keep iterating until the remaining reviewer feedback is only nitpicks or none"
     )
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/break-it-qa/SKILL.md"), "utf8").includes("# Break-It QA"));

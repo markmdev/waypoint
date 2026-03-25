@@ -57,8 +57,11 @@ If something important lives only in your head or in the chat transcript, the re
 - Before making meaningful frontend or backend decisions, inspect the available user-scoped and project-scoped `AGENTS.md` guidance. If the task depends on frontend or backend context that is missing from the project-scoped guidance and routed docs, use the corresponding `*-context-interview` skill to fill that gap instead of guessing.
 - Update the user-scoped `AGENTS.md` when you learn a durable preference, workflow rule, or default that should apply across projects and your environment allows you to edit it.
 - Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules.
-- Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
-- For large multi-step work that is likely to span sessions or needs durable progress state, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
+- Treat `.waypoint/WORKSPACE.md` as mandatory live execution state, not end-of-task paperwork.
+- Update `.waypoint/WORKSPACE.md` during the work whenever the active goal, phase, next step, blocker, verification state, or review state materially changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
+- Do not wait until final handoff to update workspace state. If the work took enough effort that the next agent would benefit from a current snapshot, the workspace should already say so.
+- For any non-trivial multi-step work, any work likely to span sessions, any work with a meaningful checklist, or any workstream that has already accumulated review/QA follow-ups, create or update a tracker in `.waypoint/track/`, keep detailed execution state there during the work, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
+- If a tracker exists for the workstream, maintain it as the work evolves instead of updating it only at the end.
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when durable plans change, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
@@ -66,9 +69,11 @@ If something important lives only in your head or in the chat transcript, the re
 - Let skills carry their own invocation guidance. The always-on contract should only keep the high-level rule: use repo-local skills deliberately when they help the current task.
 - When spawning `coding-agent`, default to `fork_context: false` and choose the model/reasoning pair that fits the slice. Use stronger models when the delegated slice is user-visible, architecturally important, or hard to unwind.
 - When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
-- Use the repo-local skills and reviewer agents deliberately, not reflexively.
+- Use the repo-local skills and reviewer agents deliberately, but do not underuse them on work that is expensive to get wrong.
+- For non-trivial work, strongly prefer reviewer-agent passes between major implementation milestones, before opening or updating a PR, after fixing substantial findings, and before final closeout when the environment allows those agents to run.
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
+- If `code-reviewer` or `code-health-reviewer` surface anything more serious than optional polish, fix the findings, rerun the relevant verification, and launch fresh passes until the remaining feedback is only nitpicks or none.
 - Do not kill long-running subagents or reviewer agents just because they are slow.
 - When waiting on reviewers, subagents, CI, automated review, or external jobs that you deliberately chose to start, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
 - Never interrupt in-flight work just to force a partial result, salvage something quickly, or avoid making the user wait longer.
@@ -133,6 +138,7 @@ Deliberate closeout review is available when you want a second pass for ship-rea
 - If you use it, follow the skill's loop fully: define the reviewable slice, run the needed reviewers, wait for the outputs, fix meaningful findings, and rerun fresh passes when warranted.
 - Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
 - Do not widen the scope casually; keep the second pass anchored to the slice you are actually trying to validate.
+- For non-trivial work, the healthy default is to use reviewer passes at meaningful milestones instead of saving all second-pass scrutiny for the very end.
 
 ## Quality bar
 

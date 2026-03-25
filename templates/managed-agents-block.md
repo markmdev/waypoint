@@ -94,13 +94,18 @@ Delivery expectations:
 - Only come back before that if you hit a genuine blocker you cannot clear with the codebase, tools, or available context. If that happens, say it plainly and be explicit about what remains unverified.
 
 Working rules:
-- Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
+- Treat `.waypoint/WORKSPACE.md` as a mandatory live execution log, not a closeout chore.
+- Update `.waypoint/WORKSPACE.md` during the work whenever the active goal, current phase, next step, blocker, verification state, or handoff context materially changes.
+- For multi-step work, keep the workspace moving as you move: do not wait until the end of the task to reconstruct what happened.
+- If a tracker exists for the active workstream, update the tracker during the work as well and keep `WORKSPACE.md` pointing at the current tracker state.
 - Update user-scoped `AGENTS.md` when you learn a durable preference, standing rule, or default that should apply across projects and your environment allows you to edit that file
 - Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, reviewer agents, or `coding-agent` when they create clear leverage, not as default ceremony.
 - Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.
-- Use reviewer agents when an independent second pass would materially improve the result, not before every plan or fix by default.
+- Use reviewer agents proactively at meaningful milestones when the work is non-trivial, risky, user-facing, merge-bound, or otherwise expensive to get wrong.
+- Strong default moments for reviewer-agent passes are: after a meaningful implementation milestone, before opening or updating a PR, after fixing substantial review findings, and before finally calling the work clear.
+- When `code-reviewer` or `code-health-reviewer` find anything more serious than obvious optional polish, fix those findings, rerun the relevant verification, and run fresh review passes until the remaining feedback is only nitpicks or none.
 - Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch
 - Treat the generated context bundle as required session bootstrap, not optional reference material
