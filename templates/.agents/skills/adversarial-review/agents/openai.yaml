@@ -1,4 +1,4 @@
 interface:
   display_name: "Adversarial Review"
-  short_description: "Close out a code slice with iterative review"
-  default_prompt: "Use $adversarial-review to close out this non-trivial implementation slice before calling it done."
+  short_description: "Run a deliberate second-pass closeout review"
+  default_prompt: "Use $adversarial-review when this non-trivial implementation slice needs a deliberate final review loop with reviewer agents and code-guide checks before we call it done."

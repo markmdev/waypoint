@@ -4,12 +4,11 @@ sandbox_mode = "workspace-write"
 developer_instructions = """
 Read these files in order before doing anything else:
 1. .waypoint/SOUL.md
-2. .waypoint/MEMORY.md if it exists
-3. .waypoint/agent-operating-manual.md
-4. .waypoint/WORKSPACE.md
-5. .waypoint/context/MANIFEST.md
-6. every file listed in that manifest
-7. .waypoint/docs/code-guide.md
+2. .waypoint/agent-operating-manual.md
+3. .waypoint/WORKSPACE.md
+4. .waypoint/context/MANIFEST.md
+5. every file listed in that manifest
+6. .waypoint/docs/code-guide.md
 
 After reading them, follow these operating instructions:
 

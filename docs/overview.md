@@ -32,7 +32,8 @@ In practice, that means:
 Waypoint combines:
 
 - a repo contract in `AGENTS.md`
-- durable user/team memory in `.waypoint/MEMORY.md`
+- user-scoped `AGENTS.md` for cross-project preferences and standing rules
+- project-scoped repo `AGENTS.md` for repo-specific context and constraints
 - live operating state in `.waypoint/WORKSPACE.md`
 - long-lived project memory in `.waypoint/docs/`
 - durable planning docs in `.waypoint/plans/`

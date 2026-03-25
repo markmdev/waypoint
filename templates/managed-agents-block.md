@@ -17,11 +17,10 @@ Run the Waypoint bootstrap only in these cases:
 Bootstrap sequence:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
-3. Read `.waypoint/MEMORY.md` if it exists
-4. Read `.waypoint/agent-operating-manual.md`
-5. Read `.waypoint/WORKSPACE.md`
-6. Read `.waypoint/context/MANIFEST.md`
-7. Read every file listed in the manifest
+3. Read `.waypoint/agent-operating-manual.md`
+4. Read `.waypoint/WORKSPACE.md`
+5. Read `.waypoint/context/MANIFEST.md`
+6. Read every file listed in the manifest
 
 This is mandatory, not optional.
 
@@ -34,7 +33,10 @@ This is mandatory, not optional.
 Before making meaningful implementation, review, architectural, or tradeoff decisions, inspect the project root guidance files for persisted project context.
 
 Project guidance rules:
+- Distinguish user-scoped guidance from project-scoped guidance.
+- User-scoped `AGENTS.md` applies across projects and holds durable personal preferences, workflow rules, and collaboration defaults for this user.
 - Prefer `AGENTS.md` in the project root if present.
+- The project root `AGENTS.md` is project-scoped and should hold repo-specific context, constraints, standards, and durable project truth.
 - Look for context sections relevant to the task, including `## Project Context`, `## Frontend Context`, and `## Backend Context`.
 - Treat relevant context sections as active inputs to decision-making, not passive documentation.
 - Apply that context to scope, architecture, implementation depth, review standards, risk tolerance, testing strategy, compatibility expectations, rollout caution, and UX/product quality bar.
@@ -53,8 +55,8 @@ Examples of durable context that can materially change the correct approach:
 
 If relevant context is missing, empty, stale, or insufficient and that gap would materially change the correct approach:
 - do not guess silently
-- use `frontend-context-interview` when project-level frontend context is missing
-- use `backend-context-interview` when project-level backend context is missing
+- if the task touches frontend and the needed frontend project context is not present in `AGENTS.md` or routed docs, use `frontend-context-interview`
+- if the task touches backend and the needed backend project context is not present in `AGENTS.md` or routed docs, use `backend-context-interview`
 - ask only the missing high-leverage questions
 - ask about the project, deployment reality, and operating constraints rather than the concrete feature
 - persist only durable context back into the project guidance file
@@ -79,6 +81,8 @@ Delivery expectations:
 - This communication rule applies to how you explain the work, not to how you do it. Your actual reasoning, coding, debugging, and verification should stay technical, precise, and rigorous.
 - When the user shows a bug, broken behavior, or a screenshot of something wrong, investigate before discussing readiness.
 - Lead with the useful truth: what is happening, the likely cause, what you checked, and what you are doing next.
+- Fix the underlying problem, not only the visible symptom. If the real fix requires removing a bad old decision, paying down local technical debt, or simplifying shaky architecture, do that instead of hot-patching around it.
+- Do not ship a bug fix that knowingly leaves the real cause in place behind a cosmetic patch unless the user explicitly asked for a temporary workaround.
 - Do not lead with refusal or readiness-disclaimer language like "I can't call this done yet" unless the user explicitly asked for a ship/readiness judgment.
 - Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean hiding behind procedural disclaimers when you could be investigating.
 - Before you say the work is complete, verify it yourself whenever you reasonably can with the tools available in the environment.
@@ -91,7 +95,8 @@ Delivery expectations:
 
 Working rules:
 - Keep `.waypoint/WORKSPACE.md` current as the live execution state, with timestamped new or materially revised entries in multi-topic sections
-- Keep `.waypoint/MEMORY.md` for durable user/team preferences, collaboration context, and stable product defaults; keep task status and active execution state out of it
+- Update user-scoped `AGENTS.md` when you learn a durable preference, standing rule, or default that should apply across projects and your environment allows you to edit that file
+- Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, reviewer agents, or `coding-agent` when they create clear leverage, not as default ceremony.
 - Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.

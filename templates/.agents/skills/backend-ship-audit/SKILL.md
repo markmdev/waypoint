@@ -1,6 +1,6 @@
 ---
 name: backend-ship-audit
-description: Audit a backend scope for practical ship readiness with evidence-based findings focused on real release risk rather than style. Use when the user asks whether a backend service, API, worker, scheduler, endpoint group, pull request, or backend directory is ready to ship; when Codex needs to perform a release-risk review before launch; when the audit scope must be resolved from repository structure; when complete-file reading is required to understand behavior and dependencies; when only high-leverage deployment-context questions should be asked after repository exploration; or when a timestamped backend audit should be written under `.waypoint/audit/`. Do not use this for frontend ship review, generic style review, PR comment triage, or a one-off coding-guide check.
+description: Audit a backend scope for ship-readiness with evidence-based findings focused on real release risk. Use when a backend service, API, worker, scheduler, PR, or backend area needs a launch-readiness review rather than style feedback or PR comment triage.
 ---
 
 # Backend ship audit

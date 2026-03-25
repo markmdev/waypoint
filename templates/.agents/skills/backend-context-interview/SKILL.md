@@ -1,6 +1,6 @@
 ---
 name: backend-context-interview
-description: Gather and persist durable backend project context when it is missing, stale, contradictory, or too weak to support implementation, architecture, migration, or ship-readiness decisions. Use when a task needs project-level backend facts such as deployment reality, user exposure, scale, criticality, tenant model, compatibility expectations, security posture, observability expectations, or compliance constraints, and those facts are not already clear in `AGENTS.md` or the repo docs. This is not a feature-discovery skill and should not trigger for endpoint details, acceptance criteria, or other task-specific product questions.
+description: Fill missing backend project context that materially changes engineering decisions. Use when durable backend facts like exposure, scale, criticality, compatibility, tenant model, security, observability, or compliance are not already clear in `AGENTS.md` or routed docs.
 ---
 
 # Backend Context Interview

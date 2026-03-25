@@ -1,6 +1,6 @@
 ---
 name: code-guide-audit
-description: Audit a specific feature, file set, or implementation slice against the coding guide and report only coding-guide-related violations or risks in that scope. Use when the user asks for a code-guide audit, coding-guide compliance check, guide-specific review, or wants to know whether a change follows rules like no silent fallbacks, strong boundary validation, frontend reuse, explicit state handling, and behavior-focused verification. Do not use this for broad ship-readiness review, generic bug hunting, PR comment triage, or repo-wide cleanup.
+description: Audit a scoped implementation slice against the code guide and report only guide-related violations or risks. Use for coding-guide compliance checks on explicit behavior, root-cause fixes, boundary validation, security, concurrency, accessibility, performance, and future legibility.
 ---
 
 # Code Guide Audit

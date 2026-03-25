@@ -53,8 +53,7 @@ That keeps the default conversation focused on diagnosis, progress, and verifica
 
 Waypoint scaffolds a Codex-friendly repo around a few core pieces:
 
-- `AGENTS.md` for the startup contract
-- `.waypoint/MEMORY.md` for durable user/team preferences and collaboration context
+- `AGENTS.md` for the project-scoped startup contract and durable repo guidance
 - `.waypoint/WORKSPACE.md` for live operational state
 - `.waypoint/docs/` for long-lived project docs
 - `.waypoint/plans/` for durable plan documents
@@ -81,7 +80,7 @@ Waypoint scans each configured root recursively and only includes Markdown files
 Waypoint is most useful when you want:
 
 - multi-session continuity in a real repo
-- a durable memory structure for agents
+- clear separation between cross-project user guidance and repo-specific guidance
 - a cleaner default collaboration style
 - optional planning, review, QA, and release workflows that travel with the project
 
@@ -108,7 +107,6 @@ repo/
 │   └── skills/
 └── .waypoint/
     ├── DOCS_INDEX.md
-    ├── MEMORY.md
     ├── TRACKS_INDEX.md
     ├── WORKSPACE.md
     ├── docs/
@@ -148,6 +146,7 @@ Waypoint ships a strong default skill pack for real coding work:
 - `conversation-retrospective`
 - `frontend-ship-audit`
 - `backend-ship-audit`
+- `merge-ready-owner`
 - `workspace-compress`
 - `pre-pr-hygiene`
 - `pr-review`
@@ -165,7 +164,7 @@ Waypoint scaffolds these reviewer agents by default:
 - `code-reviewer`
 - `plan-reviewer`
 
-They are available for deliberate second passes.
+They are available for deliberate second passes and for ownership workflows like `merge-ready-owner`.
 
 ## What makes Waypoint different
 
@@ -174,7 +173,7 @@ Waypoint is opinionated, but explicit:
 - state lives in files you can inspect
 - docs routing is generated, not guessed from memory
 - the default contract tells the agent to investigate first
-- durable memory is separated into user/team memory, live workspace state, project docs, and plan docs
+- durable guidance is separated into user-scoped AGENTS, project-scoped AGENTS, live workspace state, project docs, and plan docs
 - visual explanation stays lightweight: Mermaid in chat and screenshots from real UI inspection
 - heavier workflows stay in optional skills
 

@@ -27,7 +27,6 @@ import type { Finding, WaypointConfig } from "./types.js";
 const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
 const DEFAULT_DOCS_DIR = ".waypoint/docs";
 const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
-const DEFAULT_MEMORY = ".waypoint/MEMORY.md";
 const DEFAULT_PLANS_DIR = ".waypoint/plans";
 const DEFAULT_TRACK_DIR = ".waypoint/track";
 const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
@@ -56,11 +55,11 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".agents/skills/frontend-ship-audit/",
   ".agents/skills/backend-ship-audit/",
   ".agents/skills/conversation-retrospective/",
+  ".agents/skills/merge-ready-owner/",
   ".agents/skills/workspace-compress/",
   ".agents/skills/pre-pr-hygiene/",
   ".agents/skills/pr-review/",
   ".waypoint/config.toml",
-  ".waypoint/MEMORY.md",
   ".waypoint/README.md",
   ".waypoint/SOUL.md",
   ".waypoint/WORKSPACE.md",
@@ -87,6 +86,7 @@ const SHIPPED_SKILL_NAMES = [
   "adversarial-review",
   "break-it-qa",
   "conversation-retrospective",
+  "merge-ready-owner",
   "workspace-compress",
   "pre-pr-hygiene",
   "pr-review",
@@ -228,13 +228,8 @@ function migrateLegacyRootFiles(projectRoot: string): void {
   if (existsSync(legacyWorkspace) && !existsSync(newWorkspace)) {
     writeText(newWorkspace, readFileSync(legacyWorkspace, "utf8"));
   }
-  const legacyMemory = path.join(projectRoot, "MEMORY.md");
-  const newMemory = path.join(projectRoot, DEFAULT_MEMORY);
-  if (existsSync(legacyMemory) && !existsSync(newMemory)) {
-    writeText(newMemory, readFileSync(legacyMemory, "utf8"));
-  }
   removePathIfExists(legacyWorkspace);
-  removePathIfExists(legacyMemory);
+  removePathIfExists(path.join(projectRoot, "MEMORY.md"));
   removePathIfExists(path.join(projectRoot, "DOCS_INDEX.md"));
 }
 
@@ -446,6 +441,7 @@ export function initRepository(
     ".codex/agents/implementer.toml",
     ".waypoint/agents",
     ".waypoint/automations",
+    ".waypoint/MEMORY.md",
     ".waypoint/rules",
     ".waypoint/state",
   ]) {
@@ -458,7 +454,6 @@ export function initRepository(
     path.join(projectRoot, ".waypoint/agent-operating-manual.md"),
     readTemplate(".waypoint/agent-operating-manual.md"),
   );
-  writeIfMissing(path.join(projectRoot, DEFAULT_MEMORY), readTemplate(".waypoint/MEMORY.md"));
   scaffoldWaypointOptionalTemplates(projectRoot);
 
   writeText(
@@ -485,7 +480,7 @@ export function initRepository(
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created .waypoint/MEMORY.md, .waypoint/WORKSPACE.md, .waypoint/docs/, .waypoint/plans/, and .waypoint/track/ scaffold",
+    "Created .waypoint/WORKSPACE.md, .waypoint/docs/, .waypoint/plans/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
     "Installed coding/reviewer agents and project Codex config",
     "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
@@ -603,7 +598,6 @@ export function doctorRepository(projectRoot: string): Finding[] {
   }
 
   for (const requiredFile of [
-    path.join(projectRoot, DEFAULT_MEMORY),
     path.join(projectRoot, ".waypoint", "SOUL.md"),
     path.join(projectRoot, ".waypoint", "agent-operating-manual.md"),
     path.join(projectRoot, ".waypoint", "scripts", "prepare-context.mjs"),

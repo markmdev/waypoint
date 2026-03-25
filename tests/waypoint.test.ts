@@ -50,7 +50,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Read `.waypoint/MEMORY.md` if it exists"
+      "User-scoped `AGENTS.md` applies across projects"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "The project root `AGENTS.md` is project-scoped"
     )
   );
   assert.ok(
@@ -151,8 +156,8 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".agents/skills/frontend-ship-audit/"));
   assert.ok(gitignore.includes(".agents/skills/conversation-retrospective/"));
   assert.ok(gitignore.includes(".agents/skills/adversarial-review/"));
+  assert.ok(gitignore.includes(".agents/skills/merge-ready-owner/"));
   assert.ok(gitignore.includes(".waypoint/config.toml"));
-  assert.ok(gitignore.includes(".waypoint/MEMORY.md"));
   assert.ok(gitignore.includes(".waypoint/README.md"));
   assert.ok(gitignore.includes(".waypoint/SOUL.md"));
   assert.ok(gitignore.includes(".waypoint/WORKSPACE.md"));
@@ -178,7 +183,7 @@ test("init scaffolds core files", () => {
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
   assert.equal(existsSync(path.join(root, "MEMORY.md")), false);
-  assert.ok(readFileSync(path.join(root, ".waypoint/MEMORY.md"), "utf8").includes("# Memory"));
+  assert.equal(existsSync(path.join(root, ".waypoint/MEMORY.md")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(readFileSync(path.join(root, ".waypoint/plans/README.md"), "utf8").includes("This directory is for durable plan documents."));
   assert.ok(
@@ -201,7 +206,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Read `.waypoint/MEMORY.md` if it exists"
+      "user-scoped `AGENTS.md` is the durable cross-project guidance layer"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Update the project-scoped repo `AGENTS.md`"
     )
   );
   assert.ok(
@@ -406,7 +416,7 @@ test("doctor is clean after init", () => {
   assert.equal(findings.length, 0);
 });
 
-test("init migrates legacy root MEMORY.md into .waypoint", () => {
+test("init removes legacy root MEMORY.md", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-memory-migrate-"));
   writeFileSync(path.join(root, "MEMORY.md"), "# Legacy Memory\n", "utf8");
 
@@ -415,7 +425,7 @@ test("init migrates legacy root MEMORY.md into .waypoint", () => {
   });
 
   assert.equal(existsSync(path.join(root, "MEMORY.md")), false);
-  assert.equal(readFileSync(path.join(root, ".waypoint/MEMORY.md"), "utf8"), "# Legacy Memory\n");
+  assert.equal(existsSync(path.join(root, ".waypoint/MEMORY.md")), false);
 });
 
 test("doctor flags missing adversarial-review skill", () => {
@@ -510,25 +520,25 @@ test("init adds missing gitignore lines without duplicating the full waypoint bl
     ".agents/skills/frontend-context-interview/",
     ".agents/skills/backend-context-interview/",
     ".agents/skills/frontend-ship-audit/",
-      ".agents/skills/backend-ship-audit/",
-      ".agents/skills/conversation-retrospective/",
-      ".agents/skills/workspace-compress/",
-      ".agents/skills/pre-pr-hygiene/",
-      ".agents/skills/pr-review/",
-      ".waypoint/config.toml",
-      ".waypoint/MEMORY.md",
-      ".waypoint/README.md",
-      ".waypoint/SOUL.md",
-      ".waypoint/WORKSPACE.md",
-      ".waypoint/agent-operating-manual.md",
-      ".waypoint/DOCS_INDEX.md",
-      ".waypoint/TRACKS_INDEX.md",
-      ".waypoint/context/",
-      ".waypoint/scripts/",
-      ".waypoint/state/",
-      ".waypoint/track/",
-      ".waypoint/docs/README.md",
-      ".waypoint/docs/code-guide.md",
+    ".agents/skills/backend-ship-audit/",
+    ".agents/skills/conversation-retrospective/",
+    ".agents/skills/merge-ready-owner/",
+    ".agents/skills/workspace-compress/",
+    ".agents/skills/pre-pr-hygiene/",
+    ".agents/skills/pr-review/",
+    ".waypoint/config.toml",
+    ".waypoint/README.md",
+    ".waypoint/SOUL.md",
+    ".waypoint/WORKSPACE.md",
+    ".waypoint/agent-operating-manual.md",
+    ".waypoint/DOCS_INDEX.md",
+    ".waypoint/TRACKS_INDEX.md",
+    ".waypoint/context/",
+    ".waypoint/scripts/",
+    ".waypoint/state/",
+    ".waypoint/track/",
+    ".waypoint/docs/README.md",
+    ".waypoint/docs/code-guide.md",
   ].join("\r\n");
   writeFileSync(gitignorePath, oldSnippet, "utf8");
 
@@ -568,11 +578,11 @@ test("init restores the waypoint gitignore block in snippet order", () => {
       ".agents/skills/frontend-ship-audit/",
       ".agents/skills/backend-ship-audit/",
       ".agents/skills/conversation-retrospective/",
+      ".agents/skills/merge-ready-owner/",
       ".agents/skills/workspace-compress/",
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
       ".waypoint/config.toml",
-      ".waypoint/MEMORY.md",
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
@@ -598,11 +608,8 @@ test("init restores the waypoint gitignore block in snippet order", () => {
   const gitignore = readFileSync(gitignorePath, "utf8").replace(/\r\n/g, "\n");
   const workspaceIndex = gitignore.indexOf(".waypoint/WORKSPACE.md");
   const docsIndex = gitignore.indexOf(".waypoint/docs/README.md");
-  const memoryIndex = gitignore.indexOf(".waypoint/MEMORY.md");
   assert.notEqual(workspaceIndex, -1);
   assert.notEqual(docsIndex, -1);
-  assert.notEqual(memoryIndex, -1);
-  assert.ok(memoryIndex < docsIndex);
   assert.ok(workspaceIndex < docsIndex);
 });
 
@@ -631,11 +638,11 @@ test("init preserves user gitignore rules that follow the waypoint block", () =>
       ".agents/skills/frontend-ship-audit/",
       ".agents/skills/backend-ship-audit/",
       ".agents/skills/conversation-retrospective/",
+      ".agents/skills/merge-ready-owner/",
       ".agents/skills/workspace-compress/",
       ".agents/skills/pre-pr-hygiene/",
       ".agents/skills/pr-review/",
       ".waypoint/config.toml",
-      ".waypoint/MEMORY.md",
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
@@ -1269,7 +1276,7 @@ test("init scaffolds codex agent pack by default", () => {
     readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/docs/code-guide.md")
   );
   assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/MEMORY.md if it exists")
+    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/agent-operating-manual.md")
   );
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(

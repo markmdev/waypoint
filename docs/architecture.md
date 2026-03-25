@@ -7,7 +7,6 @@
 The always-on layer should stay lean and load-bearing:
 
 - `AGENTS.md`
-- `.waypoint/MEMORY.md`
 - `.waypoint/WORKSPACE.md`
 - `.waypoint/DOCS_INDEX.md`
 - generated startup context in `.waypoint/context/`
@@ -25,7 +24,8 @@ More specialized workflows live in skills and reviewer agents, where they can be
 
 Waypoint separates repo memory into three different jobs:
 
-- `.waypoint/MEMORY.md` for durable user/team preferences, collaboration context, and stable defaults
+- user-scoped `AGENTS.md` for cross-project preferences, standing rules, and stable defaults
+- the repo root `AGENTS.md` for project-specific context, constraints, and durable collaboration rules
 - `.waypoint/WORKSPACE.md` for live operational state
 - `.waypoint/docs/` for durable project behavior, architecture, decisions, and debugging knowledge
 - `.waypoint/plans/` for durable implementation, rollout, migration, and investigation plans
@@ -41,6 +41,7 @@ Repo-local skills under `.agents/skills/` handle structured workflows such as:
 
 - planning
 - work tracking
+- merge-ready ownership
 - code-guide audits
 - adversarial review
 - PR review
@@ -116,11 +117,10 @@ Waypoint's session bootstrap is explicit and event-based:
 
 1. run `.waypoint/scripts/prepare-context.mjs`
 2. read `.waypoint/SOUL.md`
-3. read `.waypoint/MEMORY.md` if present
-4. read `.waypoint/agent-operating-manual.md`
-5. read `.waypoint/WORKSPACE.md`
-6. read `.waypoint/context/MANIFEST.md`
-7. read everything listed there
+3. read `.waypoint/agent-operating-manual.md`
+4. read `.waypoint/WORKSPACE.md`
+5. read `.waypoint/context/MANIFEST.md`
+6. read everything listed there
 
 This is the replacement for hidden hook-based context injection.
 

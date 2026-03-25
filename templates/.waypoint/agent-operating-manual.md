@@ -18,11 +18,10 @@ Bootstrap sequence:
 
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
-3. Read `.waypoint/MEMORY.md` if it exists
-4. Read this file
-5. Read `.waypoint/WORKSPACE.md`
-6. Read `.waypoint/context/MANIFEST.md`
-7. Read every file listed in that manifest
+3. Read this file
+4. Read `.waypoint/WORKSPACE.md`
+5. Read `.waypoint/context/MANIFEST.md`
+6. Read every file listed in that manifest
 
 Do not skip this sequence.
 
@@ -35,7 +34,8 @@ Do not skip this sequence.
 
 The repository should contain the context the next agent needs.
 
-- `.waypoint/MEMORY.md` is the durable user/team memory layer: collaboration preferences, stable defaults, and long-lived context that should survive across sessions
+- user-scoped `AGENTS.md` is the durable cross-project guidance layer: collaboration preferences, personal workflow rules, and stable defaults that should apply across repos
+- the repo root `AGENTS.md` is the project-scoped guidance layer: repo-specific context, constraints, and durable rules for this project
 - `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
 - `.waypoint/track/` is the optional execution-tracking layer for active long-running work that genuinely needs durable progress state
 - `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, and debugging knowledge
@@ -50,9 +50,13 @@ If something important lives only in your head or in the chat transcript, the re
 - Follow the repo's documented patterns when they are healthy.
 - If the user approves a plan or explicitly tells you to proceed, treat that as authorization to finish the approved work end to end.
 - When the user shows a bug, screenshot, or broken behavior, investigate first. Lead with what is happening, why it is likely happening, what you checked, and what you are doing next.
+- Fix underlying causes instead of papering over symptoms. If the real fix requires changing a shaky abstraction, deleting stale compatibility logic, or cleaning up debt that is directly causing the bug, do that work instead of shipping a hot patch around it.
+- Do not stop at the first local patch that makes the symptom disappear if the root cause is still obviously in place.
 - Do not lead with readiness disclaimers such as "I can't call this done yet" unless the user explicitly asked whether the work is ready, shippable, or complete.
 - Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean substituting process language for investigation.
-- Update `.waypoint/MEMORY.md` only when you learned a durable user/team preference, collaboration rule, or stable product default.
+- Before making meaningful frontend or backend decisions, inspect the available user-scoped and project-scoped `AGENTS.md` guidance. If the task depends on frontend or backend context that is missing from the project-scoped guidance and routed docs, use the corresponding `*-context-interview` skill to fill that gap instead of guessing.
+- Update the user-scoped `AGENTS.md` when you learn a durable preference, workflow rule, or default that should apply across projects and your environment allows you to edit it.
+- Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules.
 - Update `.waypoint/WORKSPACE.md` as live execution state when progress meaningfully changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
 - For large multi-step work that is likely to span sessions or needs durable progress state, create or update a tracker in `.waypoint/track/`, keep detailed execution state there, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when durable plans change, and refresh each changed routable doc's `last_updated` field.

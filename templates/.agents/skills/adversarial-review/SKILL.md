@@ -1,11 +1,11 @@
 ---
 name: adversarial-review
-description: Run a deliberate second-pass review loop for ship-readiness or risky changes. Use when the user asks for a final review pass, asks whether something is ready to ship, asks to "close the loop," or when the implementation risk clearly warrants an explicit closeout workflow. This skill scopes the slice, runs `code-reviewer`, runs `code-health-reviewer` when the change is medium or large or structurally risky, runs `code-guide-audit`, waits for the required outputs, fixes real findings, and repeats with fresh rounds until no meaningful issues remain. Do not use this for tiny obvious edits, normal debugging back-and-forth, pre-implementation plan review, or active PR comment triage.
+description: Second-pass closeout review for a non-trivial implementation slice. Use when risky work needs a deliberate final review before being called done. This skill scopes the slice, runs the right reviewer agents and code-guide checks, fixes meaningful findings, and repeats until only optional polish remains.
 ---
 
 # Adversarial Review
 
-Use this skill when you explicitly want a closeout-grade second pass instead of a normal implementation loop.
+Use this skill when you explicitly want a closeout-grade second pass before calling a non-trivial slice done or ready to ship.
 
 This skill coordinates the specialist reviewers, keeps the scope tight, waits as long as needed, fixes meaningful findings, and reruns fresh review rounds until the remaining feedback is only optional polish or no findings at all.
 

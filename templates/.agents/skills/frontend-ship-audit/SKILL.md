@@ -1,6 +1,6 @@
 ---
 name: frontend-ship-audit
-description: Audit a defined frontend scope for ship-readiness with a strong focus on real product risk, user-facing correctness, and evidence from the repository. Use when Codex needs to review an app, route group, feature, page set, component area, PR, or frontend directory to decide whether it is ready to ship; resolve the actual reviewable frontend scope from the user request and repository structure; read all relevant frontend code and docs completely; ask a concise high-leverage interview only for missing context that materially changes the release bar; persist durable frontend deployment context into the project root AGENTS.md under a Frontend Context section; and write an evidence-based audit with prioritized P0-P4 findings at .waypoint/audit/dd-mm-yyyy-hh-mm-frontend-audit.md.
+description: Audit a frontend scope for ship-readiness with evidence-based findings focused on product risk and user-facing correctness. Use when an app area, route group, feature, PR, or frontend surface needs a launch-readiness review rather than style feedback or PR comment triage.
 ---
 
 Audit ship-readiness like a strong frontend reviewer. Optimize for user impact, release risk, and production correctness. Do not optimize for style policing.

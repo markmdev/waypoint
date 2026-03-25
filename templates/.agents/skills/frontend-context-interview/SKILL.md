@@ -1,6 +1,6 @@
 ---
 name: frontend-context-interview
-description: Gather and persist durable frontend project context when missing or insufficient for implementation or review work. Use this to ask project-level questions about audience, deployment surface, browser/device expectations, accessibility, SEO, localization, analytics obligations, and other durable frontend context that is not clearly documented. This is not a feature-discovery skill.
+description: Fill missing frontend project context that materially changes implementation or review decisions. Use when durable frontend facts like audience, deployment surface, browser and device support, accessibility, SEO, localization, analytics, or design-system constraints are not already clear in `AGENTS.md` or routed docs.
 ---
 
 # Frontend Context Interview

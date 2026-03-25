@@ -41,7 +41,6 @@ waypoint doctor
 Focus on the files that define the default behavior:
 
 - `AGENTS.md`
-- `.waypoint/MEMORY.md`
 - `.waypoint/SOUL.md`
 - `.waypoint/agent-operating-manual.md`
 - `.waypoint/WORKSPACE.md`
@@ -61,7 +60,7 @@ The core contract should read like a strong collaborator with clear judgment and
 Review loops, ship audits, trackers, and retrospectives should stay available without taking over the always-on layer.
 
 3. Repo memory still has clear boundaries.
-`.waypoint/MEMORY.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, and `.waypoint/plans/` should still have distinct jobs.
+User-scoped `AGENTS.md`, project-scoped `AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, and `.waypoint/plans/` should still have distinct jobs.
 
 ## If you customized a repo
 
