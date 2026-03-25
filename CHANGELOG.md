@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0
+
+### Minor Changes
+
+- 86aa1dd: Add a built-in `merge-ready-owner` skill, strengthen Waypoint's root-cause and project-context rules, refresh the code guide with security/concurrency/accessibility/performance guidance, and tighten several shipped skill descriptions and prompts.
+
 ## 0.14.0
 
 ### Minor Changes
