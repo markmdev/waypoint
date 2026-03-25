@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.0
+
+### Minor Changes
+
+- b293139: Strengthen live execution-state guidance so `WORKSPACE.md` is updated during the work, broaden tracker use for non-trivial workstreams, and push merge-ready closeout toward repeated reviewer-agent passes at meaningful milestones until only minor polish remains.
+
 ## 0.15.0
 
 ### Minor Changes
