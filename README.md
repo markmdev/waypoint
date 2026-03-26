@@ -31,10 +31,18 @@ Or try it without a global install:
 npx waypoint-codex@latest --help
 ```
 
+Inside the repo you want to prepare for Codex:
+
+```bash
+waypoint init
+waypoint doctor
+```
+
 Keep an existing repo up to date:
 
 ```bash
 waypoint upgrade
+waypoint doctor
 ```
 
 ## What gets better
