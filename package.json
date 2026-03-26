@@ -1,7 +1,7 @@
 {
   "name": "waypoint-codex",
   "version": "0.16.0",
-  "description": "Codex-native repository operating system: scaffolding, docs routing, repo-local skills, doctor, and sync.",
+  "description": "Make Codex better by default with stronger planning, code quality, reviews, tracking, and repo guidance.",
   "license": "MIT",
   "type": "module",
   "bin": {
