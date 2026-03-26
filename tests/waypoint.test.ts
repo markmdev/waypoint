@@ -165,7 +165,6 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
   assert.ok(gitignore.includes(".codex/config.toml"));
-  assert.ok(gitignore.includes(".codex/agents/coding-agent.toml"));
   assert.ok(gitignore.includes(".codex/agents/code-reviewer.toml"));
   assert.ok(gitignore.includes(".codex/agents/code-health-reviewer.toml"));
   assert.ok(gitignore.includes(".codex/agents/plan-reviewer.toml"));
@@ -198,7 +197,6 @@ test("init scaffolds core files", () => {
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("rules"), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('docs_dirs = [ ".waypoint/docs" ]'));
   assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('plans_dirs = [ ".waypoint/plans" ]'));
-  assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."coding-agent"]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
@@ -333,6 +331,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes(
       "When in doubt, prefer creating or updating the tracker for non-trivial work"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes(
+      "Use `- [ ]` checkboxes when there are many concrete tasks to track. Use status-style entries when the work is better expressed as phase/state updates than as a task list."
     )
   );
   assert.ok(
@@ -1027,6 +1030,26 @@ test("init removes retired .waypoint agent prompt files on refresh", () => {
   assert.equal(existsSync(path.join(root, ".waypoint/agents")), false);
 });
 
+test("init removes retired coding-agent scaffold on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-coding-agent-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeFileSync(
+    path.join(root, ".codex/agents/coding-agent.toml"),
+    "model = \"gpt-5.4-mini\"\n",
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  assert.equal(existsSync(path.join(root, ".codex/agents/coding-agent.toml")), false);
+  assert.equal(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."coding-agent"]'), false);
+});
+
 test("doctor warns when workspace entries are not timestamped", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-workspace-timestamps-"));
   initRepository(root, {
@@ -1322,37 +1345,10 @@ test("init scaffolds codex agent pack by default", () => {
   assert.ok(codexConfig.includes("[features]"));
   assert.ok(codexConfig.includes("multi_agent = true"));
   assert.ok(codexConfig.includes("max_threads = 24"));
-  assert.ok(codexConfig.includes('[agents."coding-agent"]'));
   assert.ok(codexConfig.includes('[agents."code-health-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."plan-reviewer"]'));
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes("You are the coding agent.")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes('model = "gpt-5.4-mini"')
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
-      'sandbox_mode = "workspace-write"'
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/docs/code-guide.md")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(".waypoint/agent-operating-manual.md")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
-      "Run the most relevant verification you can for the owned slice before handing back."
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/coding-agent.toml"), "utf8").includes(
-      "Do not use readiness-disclaimer language as the main point of the handoff."
-    )
-  );
+  assert.equal(existsSync(path.join(root, ".codex/agents/coding-agent.toml")), false);
   assert.ok(
     readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes("You are a code reviewer.")
   );

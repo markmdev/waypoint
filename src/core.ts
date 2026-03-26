@@ -420,6 +420,7 @@ export function initRepository(
     "docs/README.md",
     "docs/code-guide.md",
     "docs/legacy-import",
+    ".codex/agents/coding-agent.toml",
     ".agents/skills/error-audit",
     ".agents/skills/observability-audit",
     ".agents/skills/ux-states-audit",

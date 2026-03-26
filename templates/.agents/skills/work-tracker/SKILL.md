@@ -88,7 +88,7 @@ A good tracker usually includes:
 - `Decisions`
 - `Notes`
 
-Use checklists when there are many concrete items. Use timestamped bullets for materially revised state.
+Use `- [ ]` checkboxes when there are many concrete tasks to track. Use status-style entries when the work is better expressed as phase/state updates than as a task list. Use timestamped bullets for materially revised state.
 
 ## Step 4: Link It From The Workspace
 
@@ -100,7 +100,7 @@ The tracker should answer "what exactly is happening across the whole workstream
 ## Step 5: Maintain It During Execution
 
 - Update `last_updated` whenever you materially change the tracker.
-- Mark completed items done instead of deleting the record.
+- Keep task lists or status entries current instead of deleting history. Mark completed checkbox items as `- [x]`, and update status-style entries when the phase or state changes.
 - Add blockers, new tasks, and verification status as the work evolves.
 - Update the tracker during the work, not only at the end. If a milestone, blocker, review round, or verification result changed reality, the tracker should already reflect it.
 - When the workstream finishes, set `status: done` or `status: archived`.

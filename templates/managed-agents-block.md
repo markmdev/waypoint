@@ -101,7 +101,7 @@ Working rules:
 - Update user-scoped `AGENTS.md` when you learn a durable preference, standing rule, or default that should apply across projects and your environment allows you to edit that file
 - Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, and refresh `last_updated` on touched routable docs
-- Keep most work in the main agent. Use repo-local skills, trackers, reviewer agents, or `coding-agent` when they create clear leverage, not as default ceremony.
+- Keep most work in the main agent. Use repo-local skills, trackers, and reviewer agents when they create clear leverage, not as default ceremony.
 - Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.
 - Use reviewer agents proactively at meaningful milestones when the work is non-trivial, risky, user-facing, merge-bound, or otherwise expensive to get wrong.
 - Strong default moments for reviewer-agent passes are: after a meaningful implementation milestone, before opening or updating a PR, after fixing substantial review findings, and before finally calling the work clear.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0
+
+### Minor Changes
+
+- Refine work-tracker guidance to explicitly allow either checkbox task lists or status-style progress entries, whichever better matches the workstream.
+
+  Remove the default `coding-agent` scaffold from Waypoint's shipped agent pack and refresh guidance so the default multi-agent setup focuses on reviewer agents.
+
 ## 0.16.0
 
 ### Minor Changes

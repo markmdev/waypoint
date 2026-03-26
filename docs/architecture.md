@@ -58,11 +58,10 @@ They exist so the repo can reach for more rigor when needed without forcing that
 
 ### 4. Agent layer
 
-Waypoint can scaffold helper and reviewer agents under `.codex/agents/`.
+Waypoint can scaffold reviewer agents under `.codex/agents/`.
 
 These are for deliberate use:
 
-- `coding-agent` for bounded implementation slices where delegation truly helps
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability review
 - `plan-reviewer` for challenging plans that carry real design risk

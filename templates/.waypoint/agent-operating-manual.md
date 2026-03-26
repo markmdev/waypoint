@@ -65,11 +65,10 @@ If something important lives only in your head or in the chat transcript, the re
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when durable plans change, and refresh each changed routable doc's `last_updated` field.
 - Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
 - Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
-- Keep most work in the main agent. Use skills, trackers, `coding-agent`, or reviewer agents when they clearly add leverage, not as default ceremony.
+- Keep most work in the main agent. Use skills, trackers, and reviewer agents when they clearly add leverage, not as default ceremony.
 - Let skills carry their own invocation guidance. The always-on contract should only keep the high-level rule: use repo-local skills deliberately when they help the current task.
-- When spawning `coding-agent`, default to `fork_context: false` and choose the model/reasoning pair that fits the slice. Use stronger models when the delegated slice is user-visible, architecturally important, or hard to unwind.
-- When spawning reviewer agents or other non-`coding-agent` subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
 - Use the repo-local skills and reviewer agents deliberately, but do not underuse them on work that is expensive to get wrong.
+- When spawning reviewer agents or other subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
 - For non-trivial work, strongly prefer reviewer-agent passes between major implementation milestones, before opening or updating a PR, after fixing substantial findings, and before final closeout when the environment allows those agents to run.
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
@@ -118,7 +117,6 @@ Do not document every trivial implementation detail. Document the non-obvious, d
 
 Waypoint scaffolds these focused specialists by default:
 
-- `coding-agent` for bounded implementation slices the main agent deliberately wants to hand off because parallelism or context preservation will clearly help
 - `code-reviewer` for correctness and regression review
 - `code-health-reviewer` for maintainability drift
 - `plan-reviewer` to challenge non-trivial implementation plans when an independent second pass would materially improve the result
