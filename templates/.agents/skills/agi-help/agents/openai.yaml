@@ -1,0 +1,4 @@
+interface:
+  display_name: "AGI-Help"
+  short_description: "Prepare a full GPT-5.4-Pro handoff package for high-stakes work"
+  default_prompt: "Use $agi-help when this task is unusually high-stakes, ambiguous, or leverage-heavy and the best next move is to prepare a complete GPT-5.4-Pro handoff package with full relevant context, copied source files, and a strong external prompt for Mark to send manually in ChatGPT."

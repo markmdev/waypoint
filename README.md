@@ -269,6 +269,7 @@ Waypoint ships a strong default skill pack for real coding work:
 - `workspace-compress`
 - `pre-pr-hygiene`
 - `pr-review`
+- `agi-help`
 
 These are repo-local, so the workflow travels with the project.
 
