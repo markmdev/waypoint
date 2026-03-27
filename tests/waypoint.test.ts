@@ -83,7 +83,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      'Before you start, decide what "done" means for the task.'
+      "Keep communication concise by default."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "For planned work, define done from the approved scope and acceptance criteria"
     )
   );
   assert.ok(
@@ -124,6 +129,16 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
       "investigate before discussing readiness"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "explain the problem to the user before jumping into implementation"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "do not silently narrow, defer, or drop planned work"
     )
   );
   assert.ok(
@@ -233,6 +248,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Keep communication concise by default."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "user-scoped `AGENTS.md` is the durable cross-project guidance layer"
     )
   );
@@ -259,6 +279,16 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Do not silently narrow, defer, or drop approved work"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "explain the diagnosis before jumping into implementation"
     )
   );
   assert.ok(
@@ -326,6 +356,16 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
       "treat that approval as authorization to execute the plan end to end"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "Scope checklist"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "do not silently defer or drop checklist items later"
     )
   );
   assert.ok(

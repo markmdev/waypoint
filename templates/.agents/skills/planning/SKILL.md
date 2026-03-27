@@ -102,6 +102,7 @@ Plans document your understanding. Include what matters for this task:
 - **Current State**: What exists today — relevant files, data flows, constraints, existing patterns
 - **Changes**: Every file to create/modify/delete, how changes connect
 - **Decisions**: Why this approach, tradeoffs, assumptions
+- **Scope checklist**: Concrete implementation items that can be marked done or not done
 - **Acceptance criteria**: What must be true when each step is "done"
 - **Test cases**: For behavioral changes, include input -> expected output examples
 - **Non-Goals**: Explicitly out of scope to prevent implementation drift
@@ -125,6 +126,8 @@ Before presenting the plan, verify against real code:
 - No "we'll figure it out during implementation"
 - No literal code unless the user explicitly wants it
 - No pretending you verified something you didn't
+- Approved scope must be explicit enough to act as an execution contract after user approval
+- If the user approves the plan, do not silently defer or drop checklist items later; discuss any proposed scope change first
 
 If the change touches durable project behavior, include docs/workspace updates in the plan.
 Write or update the durable plan doc under `.waypoint/plans/` as part of the skill, not as an optional follow-up.
@@ -140,9 +143,10 @@ A good durable plan doc usually includes:
 1. Current state
 2. Proposed changes
 3. Decisions and tradeoffs
-4. Acceptance criteria
-5. Verification
-6. TL;DR
+4. Scope checklist
+5. Acceptance criteria
+6. Verification
+7. TL;DR
 
 ## Final Response
 
@@ -152,6 +156,7 @@ When the plan doc is written:
 - include the doc path
 - call out any unresolved decisions that still need the user's input
 - if there are no unresolved decisions and the user approves the plan, treat that approval as authorization to execute the plan end to end rather than asking again at each obvious next step
+- once approved, use the plan's checklist and acceptance criteria to decide whether the work is actually done; if anything approved is skipped, report that as partial work or ask to change scope instead of calling it complete
 
 ## Quality Bar
 
