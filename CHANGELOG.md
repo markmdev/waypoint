@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.2
+
+### Patch Changes
+
+- 388a234: Tighten Waypoint's collaboration defaults so approved plans are treated as execution contracts, silent scope reduction is disallowed, bug investigations explain the diagnosis before implementation, and user-facing communication stays concise by default.
+
 ## 0.18.1
 
 ### Patch Changes
