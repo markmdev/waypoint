@@ -189,6 +189,15 @@ The continuity story matters:
 - `.waypoint/context/RECENT_THREAD.md` helps the agent retain the important
   parts of the previous conversation
 
+Waypoint defaults to Codex transcript discovery.
+If you use Pi instead, set this in `.waypoint/config.toml`:
+
+```toml
+coding_agent = "pi"
+```
+
+Supported values are `"codex"` and `"pi"`.
+
 ## Best fit
 
 Waypoint is most useful when you want:

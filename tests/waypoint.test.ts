@@ -8,9 +8,11 @@ import assert from "node:assert/strict";
 import { doctorRepository, initRepository, syncRepository } from "../src/core.js";
 
 let originalCodexHome: string | undefined;
+let originalPiAgentHome: string | undefined;
 
 beforeEach(() => {
   originalCodexHome = process.env.CODEX_HOME;
+  originalPiAgentHome = process.env.PI_AGENT_HOME;
 });
 
 afterEach(() => {
@@ -18,6 +20,12 @@ afterEach(() => {
     delete process.env.CODEX_HOME;
   } else {
     process.env.CODEX_HOME = originalCodexHome;
+  }
+
+  if (originalPiAgentHome === undefined) {
+    delete process.env.PI_AGENT_HOME;
+  } else {
+    process.env.PI_AGENT_HOME = originalPiAgentHome;
   }
 });
 
@@ -195,6 +203,7 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("automations"), false);
   assert.equal(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes("rules"), false);
+  assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('coding_agent = "codex"'));
   assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('docs_dirs = [ ".waypoint/docs" ]'));
   assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('plans_dirs = [ ".waypoint/plans" ]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
@@ -1509,6 +1518,95 @@ test("prepare-context writes merged recent thread with redaction", () => {
   assert.ok(!recentThread.includes("npm_ABC123SECRET"));
   assert.ok(manifest.includes(".waypoint/context/RECENT_THREAD.md"));
   assert.ok(manifest.includes("latest meaningful turns"));
+});
+
+test("prepare-context reads recent thread from Pi transcripts when configured", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-pi-context-"));
+  const piAgentHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-pi-agent-home-"));
+  process.env.PI_AGENT_HOME = piAgentHome;
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeFileSync(
+    path.join(root, ".waypoint/config.toml"),
+    readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").replace('coding_agent = "codex"', 'coding_agent = "pi"'),
+    "utf8"
+  );
+
+  const sessionDir = path.join(piAgentHome, "sessions", "--tmp-waypoint-pi-context--");
+  mkdirp(sessionDir);
+  const sessionPath = path.join(sessionDir, "2026-03-06T05-00-00-000Z_pi-session.jsonl");
+  const sessionLines = [
+    {
+      type: "session",
+      version: 3,
+      id: "pi-session-123",
+      timestamp: "2026-03-06T05:00:00.000Z",
+      cwd: root
+    },
+    {
+      type: "message",
+      id: "msg-1",
+      timestamp: "2026-03-06T05:00:01.000Z",
+      message: {
+        role: "user",
+        content: [{ type: "text", text: "# AGENTS.md instructions for /tmp/demo\n" }]
+      }
+    },
+    {
+      type: "message",
+      id: "msg-2",
+      timestamp: "2026-03-06T05:00:02.000Z",
+      message: {
+        role: "user",
+        content: [{ type: "text", text: "Please ship the Pi support.\n" }]
+      }
+    },
+    {
+      type: "message",
+      id: "msg-3",
+      timestamp: "2026-03-06T05:00:03.000Z",
+      message: {
+        role: "assistant",
+        content: [{ type: "text", text: "I’m checking the transcript format first.\n" }]
+      }
+    },
+    {
+      type: "message",
+      id: "msg-4",
+      timestamp: "2026-03-06T05:00:04.000Z",
+      message: {
+        role: "assistant",
+        content: [{ type: "text", text: "Here is a token: npm_ABC123SECRET\n" }]
+      }
+    },
+    {
+      type: "compaction",
+      id: "cmp-1",
+      parentId: "msg-4",
+      timestamp: "2026-03-06T05:00:05.000Z",
+      summary: "Compacted session"
+    }
+  ];
+  writeFileSync(sessionPath, `${sessionLines.map((line) => JSON.stringify(line)).join("\n")}\n`, "utf8");
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, PI_AGENT_HOME: piAgentHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
+
+  assert.ok(recentThread.includes("sessions/--tmp-waypoint-pi-context--/2026-03-06T05-00-00-000Z_pi-session.jsonl"));
+  assert.ok(recentThread.includes("Assistant (merged 2 messages)"));
+  assert.ok(recentThread.includes("I’m checking the transcript format first."));
+  assert.ok(recentThread.includes("[REDACTED]"));
+  assert.ok(!recentThread.includes("npm_ABC123SECRET"));
+  assert.ok(manifest.includes("latest meaningful turns from the local Pi session"));
 });
 
 test("prepare-context includes active trackers in generated context", () => {

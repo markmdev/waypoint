@@ -18,6 +18,7 @@ export interface Finding {
 export interface WaypointConfig {
   version?: number;
   profile?: "universal" | "app-friendly";
+  coding_agent?: "codex" | "pi";
   workspace_file?: string;
   docs_dir?: string;
   docs_dirs?: string[];

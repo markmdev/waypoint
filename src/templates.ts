@@ -43,6 +43,7 @@ export function defaultWaypointConfig(options: {
   return {
     version: 1,
     profile: options.profile,
+    coding_agent: "codex",
     workspace_file: ".waypoint/WORKSPACE.md",
     docs_dirs: [".waypoint/docs"],
     plans_dirs: [".waypoint/plans"],
@@ -58,6 +59,7 @@ export function renderWaypointConfig(config: WaypointConfig): string {
   const renderedConfig: WaypointConfig = {
     version: config.version,
     profile: config.profile,
+    coding_agent: config.coding_agent,
     workspace_file: config.workspace_file,
     docs_dirs: config.docs_dirs,
     plans_dirs: config.plans_dirs,

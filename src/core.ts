@@ -185,6 +185,7 @@ function buildWaypointConfig(
   return {
     version: existingConfig?.version ?? defaults.version,
     profile: options.profile,
+    coding_agent: existingConfig?.coding_agent ?? defaults.coding_agent,
     workspace_file: existingConfig?.workspace_file ?? defaults.workspace_file,
     docs_dirs: configuredRootDirs(projectRoot, existingConfig?.docs_dirs, existingConfig?.docs_dir, DEFAULT_DOCS_DIR).map((dir) =>
       path.relative(projectRoot, dir).split(path.sep).join("/")

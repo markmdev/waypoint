@@ -116,7 +116,7 @@ function renderPullRequestBlock(result, emptyMessage) {
   return result.stdout || emptyMessage;
 }
 
-const SESSION_DIR_NAMES = ["sessions", "archived_sessions"];
+const CODEX_SESSION_DIR_NAMES = ["sessions", "archived_sessions"];
 const SECRET_PATTERNS = [
   /npm_[A-Za-z0-9]+/g,
   /github_pat_[A-Za-z0-9_]+/g,
@@ -130,6 +130,29 @@ const MAX_RECENT_TURNS = 25;
 
 function codexHome() {
   return process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
+}
+
+function piAgentHome() {
+  return process.env.PI_AGENT_HOME || path.join(os.homedir(), ".pi", "agent");
+}
+
+function loadCodingAgent(projectRoot) {
+  const configPath = path.join(projectRoot, ".waypoint", "config.toml");
+  if (!existsSync(configPath)) {
+    return "codex";
+  }
+
+  const configText = readFileSync(configPath, "utf8");
+  const match = configText.match(/^\s*coding_agent\s*=\s*"(codex|pi)"\s*$/m);
+  return match?.[1] || "codex";
+}
+
+function codingAgentLabel(codingAgent) {
+  return codingAgent === "pi" ? "Pi" : "Codex";
+}
+
+function codingAgentHome(codingAgent) {
+  return codingAgent === "pi" ? piAgentHome() : codexHome();
 }
 
 function redactSecrets(text) {
@@ -181,12 +204,23 @@ function collectSessionFiles(rootDir) {
   return files;
 }
 
-function extractMessageText(content) {
+function extractCodexMessageText(content) {
   if (!Array.isArray(content)) {
     return "";
   }
   return content
     .filter((block) => block?.type === "input_text" || block?.type === "output_text")
+    .map((block) => (typeof block?.text === "string" ? block.text : ""))
+    .join("")
+    .trim();
+}
+
+function extractPiMessageText(content) {
+  if (!Array.isArray(content)) {
+    return "";
+  }
+  return content
+    .filter((block) => block?.type === "text")
     .map((block) => (typeof block?.text === "string" ? block.text : ""))
     .join("")
     .trim();
@@ -213,11 +247,33 @@ function mergeConsecutiveTurns(turns) {
   return merged;
 }
 
-function parseSession(sessionFile, projectRoot) {
+function finalizeParsedSession(sessionFile, projectRoot, sessionId, sessionCwd, sessionStartedAt, rawTurns, compactionBoundaries) {
+  if (!sessionCwd || !isWithinPath(sessionCwd, projectRoot)) {
+    return null;
+  }
+
+  const selectedFromPreCompaction = compactionBoundaries.length > 0;
+  const relevantTurns = selectedFromPreCompaction ? rawTurns.slice(0, compactionBoundaries.at(-1)) : rawTurns;
+  const turns = mergeConsecutiveTurns(relevantTurns);
+  if (turns.length === 0) {
+    return null;
+  }
+
+  return {
+    path: sessionFile,
+    sessionId,
+    sessionCwd,
+    turns,
+    compactionCount: compactionBoundaries.length,
+    selectedFromPreCompaction,
+    sessionStartedAt,
+  };
+}
+
+function parseCodexSession(sessionFile, projectRoot) {
   let sessionId = null;
   let sessionCwd = null;
   let sessionStartedAt = null;
-  let compactionCount = 0;
   const rawTurns = [];
   const compactionBoundaries = [];
 
@@ -250,7 +306,6 @@ function parseSession(sessionFile, projectRoot) {
     }
 
     if (parsed.type === "compacted") {
-      compactionCount += 1;
       compactionBoundaries.push(rawTurns.length);
       continue;
     }
@@ -264,7 +319,7 @@ function parseSession(sessionFile, projectRoot) {
       continue;
     }
 
-    const text = redactSecrets(extractMessageText(parsed.payload?.content));
+    const text = redactSecrets(extractCodexMessageText(parsed.payload?.content));
     if (!text || isBootstrapNoise(role, text)) {
       continue;
     }
@@ -277,35 +332,88 @@ function parseSession(sessionFile, projectRoot) {
     });
   }
 
-  if (!sessionCwd || !isWithinPath(sessionCwd, projectRoot)) {
-    return null;
-  }
-
-  const selectedFromPreCompaction = compactionBoundaries.length > 0;
-  const relevantTurns = selectedFromPreCompaction ? rawTurns.slice(0, compactionBoundaries.at(-1)) : rawTurns;
-  const turns = mergeConsecutiveTurns(relevantTurns);
-  if (turns.length === 0) {
-    return null;
-  }
-
-  return {
-    path: sessionFile,
-    sessionId,
-    sessionCwd,
-    turns,
-    compactionCount,
-    selectedFromPreCompaction,
-    sessionStartedAt,
-  };
+  return finalizeParsedSession(sessionFile, projectRoot, sessionId, sessionCwd, sessionStartedAt, rawTurns, compactionBoundaries);
 }
 
-function latestMatchingSession(projectRoot, threadIdOverride = null) {
+function parsePiSession(sessionFile, projectRoot) {
+  let sessionId = null;
+  let sessionCwd = null;
+  let sessionStartedAt = null;
+  const rawTurns = [];
+  const compactionBoundaries = [];
+
+  for (const line of readFileSync(sessionFile, "utf8").split("\n")) {
+    if (!line.trim()) {
+      continue;
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(line);
+    } catch {
+      continue;
+    }
+
+    if (parsed.type === "session") {
+      if (typeof parsed.id === "string") {
+        sessionId = parsed.id;
+      }
+      if (typeof parsed.cwd === "string") {
+        sessionCwd = parsed.cwd;
+      }
+      if (typeof parsed.timestamp === "string") {
+        sessionStartedAt = parsed.timestamp;
+      }
+      continue;
+    }
+
+    if (parsed.type === "compaction") {
+      compactionBoundaries.push(rawTurns.length);
+      continue;
+    }
+
+    if (parsed.type !== "message") {
+      continue;
+    }
+
+    const role = parsed.message?.role;
+    if (role !== "user" && role !== "assistant") {
+      continue;
+    }
+
+    const text = redactSecrets(extractPiMessageText(parsed.message?.content));
+    if (!text || isBootstrapNoise(role, text)) {
+      continue;
+    }
+
+    rawTurns.push({
+      role,
+      text,
+      timestamp: parsed.timestamp || parsed.message?.timestamp || null,
+      messageCount: 1,
+    });
+  }
+
+  return finalizeParsedSession(sessionFile, projectRoot, sessionId, sessionCwd, sessionStartedAt, rawTurns, compactionBoundaries);
+}
+
+function latestMatchingSession(projectRoot, codingAgent, threadIdOverride = null) {
   const matches = [];
-  for (const dirName of SESSION_DIR_NAMES) {
-    for (const sessionFile of collectSessionFiles(path.join(codexHome(), dirName))) {
-      const parsed = parseSession(sessionFile, projectRoot);
+
+  if (codingAgent === "pi") {
+    for (const sessionFile of collectSessionFiles(path.join(piAgentHome(), "sessions"))) {
+      const parsed = parsePiSession(sessionFile, projectRoot);
       if (parsed) {
         matches.push(parsed);
+      }
+    }
+  } else {
+    for (const dirName of CODEX_SESSION_DIR_NAMES) {
+      for (const sessionFile of collectSessionFiles(path.join(codexHome(), dirName))) {
+        const parsed = parseCodexSession(sessionFile, projectRoot);
+        if (parsed) {
+          matches.push(parsed);
+        }
       }
     }
   }
@@ -331,7 +439,10 @@ function latestMatchingSession(projectRoot, threadIdOverride = null) {
 
 function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
   const filePath = path.join(contextDir, "RECENT_THREAD.md");
-  const snapshot = latestMatchingSession(projectRoot, threadIdOverride);
+  const codingAgent = loadCodingAgent(projectRoot);
+  const agentLabel = codingAgentLabel(codingAgent);
+  const agentHome = codingAgentHome(codingAgent);
+  const snapshot = latestMatchingSession(projectRoot, codingAgent, threadIdOverride);
   const generatedAt = new Date().toString();
 
   if (!snapshot) {
@@ -342,7 +453,7 @@ function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
         "",
         `Generated by \`${path.relative(projectRoot, fileURLToPath(import.meta.url))}\` on ${generatedAt}.`,
         "",
-        "No matching local Codex session was found for this repo yet.",
+        `No matching local ${agentLabel} session was found for this repo yet.`,
         "",
       ].join("\n"),
       "utf8"
@@ -358,10 +469,10 @@ function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
         "",
         `Generated by \`${path.relative(projectRoot, fileURLToPath(import.meta.url))}\` on ${generatedAt}.`,
         "",
-        `- Source session: \`${path.relative(codexHome(), snapshot.path)}\``,
+        `- Source session: \`${path.relative(agentHome, snapshot.path)}\``,
         `- Session cwd: \`${snapshot.sessionCwd}\``,
         `- Compactions in source session: ${snapshot.compactionCount}`,
-        "- No compaction was found in the latest matching local Codex session, so there is nothing to restore into startup context yet.",
+        `- No compaction was found in the latest matching local ${agentLabel} session, so there is nothing to restore into startup context yet.`,
         "",
       ].join("\n"),
       "utf8"
@@ -370,7 +481,7 @@ function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
   }
 
   const selectedTurns = snapshot.turns.slice(-MAX_RECENT_TURNS);
-  const relSessionPath = path.relative(codexHome(), snapshot.path);
+  const relSessionPath = path.relative(agentHome, snapshot.path);
   const lines = [
     "# Recent Thread",
     "",
@@ -435,6 +546,8 @@ function main() {
 
   const docsIndexPath = writeDocsIndex(projectRoot);
   const { outputPath: tracksIndexPath, activeTracks } = writeTracksIndex(projectRoot);
+  const codingAgent = loadCodingAgent(projectRoot);
+  const codingAgentLabelText = codingAgentLabel(codingAgent);
 
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const currentLocalDatetime = new Date().toString();
@@ -577,7 +690,7 @@ function main() {
     `- \`${path.relative(projectRoot, uncommittedChangesPath)}\` — uncommitted change summary`,
     `- \`${path.relative(projectRoot, recentCommitsPath)}\` — recent commits`,
     `- \`${path.relative(projectRoot, prsPath)}\` — open and recently merged pull requests`,
-    `- \`${path.relative(projectRoot, recentThreadPath)}\` — latest meaningful turns from the local Codex session for this repo`,
+    `- \`${path.relative(projectRoot, recentThreadPath)}\` — latest meaningful turns from the local ${codingAgentLabelText} session for this repo`,
     `- \`${path.relative(projectRoot, docsIndexPath)}\` — current docs index`,
     `- \`${path.relative(projectRoot, tracksIndexPath)}\` — current tracker index`,
     `- \`${path.relative(projectRoot, activeTrackersPath)}\` — active tracker summary`,
