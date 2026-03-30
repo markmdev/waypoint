@@ -163,6 +163,7 @@ Waypoint scaffolds a Codex-friendly repo around a few core pieces:
 
 - `AGENTS.md` for the project-scoped startup contract and durable repo guidance
 - `.waypoint/WORKSPACE.md` for live operational state
+- `.waypoint/ACTIVE_PLANS.md` for the currently approved plan and active phase checkpoints
 - `.waypoint/docs/` for long-lived project docs
 - `.waypoint/plans/` for durable plan documents
 - `.waypoint/DOCS_INDEX.md` for docs and plans routing, so the agent knows what
@@ -186,6 +187,7 @@ The continuity story matters:
 
 - `.waypoint/DOCS_INDEX.md` helps the agent find the right docs before work
 - `.waypoint/WORKSPACE.md` helps the next session understand what is in flight
+- `.waypoint/ACTIVE_PLANS.md` keeps the currently approved plan visible during execution
 - `.waypoint/context/RECENT_THREAD.md` helps the agent retain the important
   parts of the previous conversation
 
@@ -237,6 +239,7 @@ repo/
     ├── DOCS_INDEX.md
     ├── TRACKS_INDEX.md
     ├── WORKSPACE.md
+    ├── ACTIVE_PLANS.md
     ├── docs/
     ├── plans/
     ├── track/

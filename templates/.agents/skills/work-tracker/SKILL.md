@@ -26,9 +26,10 @@ Before tracking:
 1. Read `.waypoint/SOUL.md`
 2. Read `.waypoint/agent-operating-manual.md`
 3. Read `.waypoint/WORKSPACE.md`
-4. Read `.waypoint/context/MANIFEST.md`
-5. Read every file listed in that manifest
-6. Read `.waypoint/track/README.md`
+4. Read `.waypoint/ACTIVE_PLANS.md`
+5. Read `.waypoint/context/MANIFEST.md`
+6. Read every file listed in that manifest
+7. Read `.waypoint/track/README.md`
 
 ## When A Tracker Is Required
 
@@ -84,6 +85,7 @@ A good tracker usually includes:
 - `Current State`
 - `Next`
 - `Workstreams`
+- `Phase Checkpoints`
 - `Verification`
 - `Decisions`
 - `Notes`
@@ -93,8 +95,10 @@ Use `- [ ]` checkboxes when there are many concrete tasks to track. Use status-s
 ## Step 4: Link It From The Workspace
 
 Add or update a bullet under `## Active Trackers` in `.waypoint/WORKSPACE.md` that points at the tracker path and states the current phase or next step.
+If the work is driven by an approved plan, keep `.waypoint/ACTIVE_PLANS.md` aligned with the same phase naming and checkpoint language.
 
 `WORKSPACE.md` should answer "what matters right now?"
+`.waypoint/ACTIVE_PLANS.md` should answer "what plan and phase must be followed right now?"
 The tracker should answer "what exactly is happening across the whole workstream?"
 
 ## Step 5: Maintain It During Execution

@@ -31,6 +31,7 @@ const DEFAULT_PLANS_DIR = ".waypoint/plans";
 const DEFAULT_TRACK_DIR = ".waypoint/track";
 const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
+const DEFAULT_ACTIVE_PLANS = ".waypoint/ACTIVE_PLANS.md";
 const GITIGNORE_WAYPOINT_START = "# Waypoint state";
 const GITIGNORE_WAYPOINT_END = "# End Waypoint state";
 const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
@@ -63,6 +64,7 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".waypoint/README.md",
   ".waypoint/SOUL.md",
   ".waypoint/WORKSPACE.md",
+  ".waypoint/ACTIVE_PLANS.md",
   ".waypoint/agent-operating-manual.md",
   ".waypoint/",
   ".waypoint/DOCS_INDEX.md",
@@ -96,6 +98,7 @@ const SHIPPED_SKILL_NAMES = [
   "backend-ship-audit",
 ];
 const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
+  "## Active Plans",
   "## Active Trackers",
   "## Current State",
   "## In Progress",
@@ -463,6 +466,7 @@ export function initRepository(
     renderWaypointConfig(config),
   );
   writeIfMissing(path.join(projectRoot, DEFAULT_WORKSPACE), readTemplate("WORKSPACE.md"));
+  writeIfMissing(path.join(projectRoot, DEFAULT_ACTIVE_PLANS), readTemplate(".waypoint/ACTIVE_PLANS.md"));
   ensureDir(path.join(projectRoot, DEFAULT_DOCS_DIR));
   ensureDir(path.join(projectRoot, DEFAULT_PLANS_DIR));
   ensureDir(path.join(projectRoot, DEFAULT_TRACK_DIR));
@@ -482,7 +486,7 @@ export function initRepository(
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created .waypoint/WORKSPACE.md, .waypoint/docs/, .waypoint/plans/, and .waypoint/track/ scaffold",
+    "Created .waypoint/WORKSPACE.md, .waypoint/ACTIVE_PLANS.md, .waypoint/docs/, .waypoint/plans/, and .waypoint/track/ scaffold",
     "Installed repo-local Waypoint skills",
     "Installed coding/reviewer agents and project Codex config",
     "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
@@ -570,6 +574,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
     const workspaceText = readFileSync(workspacePath, "utf8");
     for (const section of [
       "## Active Goal",
+      "## Active Plans",
       "## Active Trackers",
       "## Current State",
       "## In Progress",
@@ -709,6 +714,24 @@ export function doctorRepository(projectRoot: string): Finding[] {
       message: ".waypoint/TRACKS_INDEX.md is stale.",
       remediation: "Run `waypoint sync` to rebuild the tracks index.",
       paths: [tracksIndexPath],
+    });
+  }
+  const activePlansPath = path.join(projectRoot, DEFAULT_ACTIVE_PLANS);
+  if (!existsSync(activePlansPath)) {
+    findings.push({
+      severity: "error",
+      category: "workspace",
+      message: ".waypoint/ACTIVE_PLANS.md is missing.",
+      remediation: "Run `waypoint init` to scaffold the active plans file.",
+      paths: [activePlansPath],
+    });
+  } else if (existsSync(workspacePath) && !readFileSync(workspacePath, "utf8").includes(DEFAULT_ACTIVE_PLANS)) {
+    findings.push({
+      severity: "warn",
+      category: "workspace",
+      message: "Workspace does not reference .waypoint/ACTIVE_PLANS.md under `## Active Plans`.",
+      remediation: "Point `## Active Plans` at `.waypoint/ACTIVE_PLANS.md` and summarize the current active phase.",
+      paths: [workspacePath, activePlansPath],
     });
   }
   if (

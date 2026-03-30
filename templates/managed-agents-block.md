@@ -19,8 +19,9 @@ Bootstrap sequence:
 2. Read `.waypoint/SOUL.md`
 3. Read `.waypoint/agent-operating-manual.md`
 4. Read `.waypoint/WORKSPACE.md`
-5. Read `.waypoint/context/MANIFEST.md`
-6. Read every file listed in the manifest
+5. Read `.waypoint/ACTIVE_PLANS.md`
+6. Read `.waypoint/context/MANIFEST.md`
+7. Read every file listed in the manifest
 
 This is mandatory, not optional.
 
@@ -76,7 +77,8 @@ When an explanation is clearer visually, use Mermaid diagrams directly in chat f
 
 Delivery expectations:
 - Keep communication concise by default. Lead with the answer, diagnosis, decision, or next step, and include only the most important supporting detail unless the user asks for more.
-- For planned work, define done from the approved scope and acceptance criteria, not from your own sense that the system is already good enough.
+- For planned work, treat `.waypoint/ACTIVE_PLANS.md` as the live execution contract and define done from the approved scope, current phase checkpoint, and acceptance criteria, not from your own sense that the system is already good enough.
+- Execute approved plans phase by phase. Finish the current phase, run the relevant checkpoint, resolve findings, and only then move to the next phase.
 - When you report back to the user, explain the result in plain, direct language. Say what you changed, what happened, and anything the user actually needs to know, but do not lean on jargon, low-level implementation detail, or code-heavy narration unless the user asks for it.
 - Write for a smart person who is not looking at the code. The goal is clarity, not technical performance.
 - This communication rule applies to how you explain the work, not to how you do it. Your actual reasoning, coding, debugging, and verification should stay technical, precise, and rigorous.
@@ -98,16 +100,19 @@ Delivery expectations:
 
 Working rules:
 - Treat `.waypoint/WORKSPACE.md` as a mandatory live execution log, not a closeout chore.
+- Treat `.waypoint/ACTIVE_PLANS.md` as the mandatory live execution-contract file for approved plans.
 - Update `.waypoint/WORKSPACE.md` during the work whenever the active goal, current phase, next step, blocker, verification state, or handoff context materially changes.
-- For multi-step work, keep the workspace moving as you move: do not wait until the end of the task to reconstruct what happened.
+- Update `.waypoint/ACTIVE_PLANS.md` whenever the active approved plan, current phase, phase checklist, checkpoint, or approved scope changes.
+- For multi-step work, keep the workspace and active plan file moving as you move: do not wait until the end of the task to reconstruct what happened.
 - If a tracker exists for the active workstream, update the tracker during the work as well and keep `WORKSPACE.md` pointing at the current tracker state.
 - Update user-scoped `AGENTS.md` when you learn a durable preference, standing rule, or default that should apply across projects and your environment allows you to edit that file
 - Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules
-- Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, and refresh `last_updated` on touched routable docs
+- Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, update `.waypoint/ACTIVE_PLANS.md` when the active approved plan or current phase changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, and reviewer agents when they create clear leverage, not as default ceremony.
 - Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.
-- Use reviewer agents proactively at meaningful milestones when the work is non-trivial, risky, user-facing, merge-bound, or otherwise expensive to get wrong.
-- Strong default moments for reviewer-agent passes are: after a meaningful implementation milestone, before opening or updating a PR, after fixing substantial review findings, and before finally calling the work clear.
+- Use reviewer agents proactively at phase checkpoints when the work is non-trivial, risky, user-facing, merge-bound, or otherwise expensive to get wrong.
+- Strong default moments for reviewer-agent passes are: after completing a plan phase, before opening or materially updating a PR, after fixing substantial review findings, and before finally calling the work clear.
+- Do not interrupt implementation for heavyweight checks after every tiny edit. Batch related work into the current plan phase, then run the checkpoint.
 - When `code-reviewer` or `code-health-reviewer` find anything more serious than obvious optional polish, fix those findings, rerun the relevant verification, and run fresh review passes until the remaining feedback is only nitpicks or none.
 - Treat `plan-reviewer`, `code-reviewer`, and `code-health-reviewer` as one-shot agents: once a reviewer returns findings, close it; if another pass is needed later, spawn a fresh reviewer instead of reusing the old thread
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch

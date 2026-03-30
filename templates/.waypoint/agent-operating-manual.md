@@ -20,8 +20,9 @@ Bootstrap sequence:
 2. Read `.waypoint/SOUL.md`
 3. Read this file
 4. Read `.waypoint/WORKSPACE.md`
-5. Read `.waypoint/context/MANIFEST.md`
-6. Read every file listed in that manifest
+5. Read `.waypoint/ACTIVE_PLANS.md`
+6. Read `.waypoint/context/MANIFEST.md`
+7. Read every file listed in that manifest
 
 Do not skip this sequence.
 
@@ -37,6 +38,7 @@ The repository should contain the context the next agent needs.
 - user-scoped `AGENTS.md` is the durable cross-project guidance layer: collaboration preferences, personal workflow rules, and stable defaults that should apply across repos
 - the repo root `AGENTS.md` is the project-scoped guidance layer: repo-specific context, constraints, and durable rules for this project
 - `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
+- `.waypoint/ACTIVE_PLANS.md` is the live execution-contract record: which approved plan is active, which phase is active, and what checkpoint must pass before moving on
 - `.waypoint/track/` is the optional execution-tracking layer for active long-running work that genuinely needs durable progress state
 - `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, and debugging knowledge
 - `.waypoint/plans/` is the durable planning layer: implementation plans, rollout plans, migration plans, and other task-shaped plans worth keeping
@@ -61,8 +63,10 @@ If something important lives only in your head or in the chat transcript, the re
 - Update the user-scoped `AGENTS.md` when you learn a durable preference, workflow rule, or default that should apply across projects and your environment allows you to edit it.
 - Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules.
 - Treat `.waypoint/WORKSPACE.md` as mandatory live execution state, not end-of-task paperwork.
+- Treat `.waypoint/ACTIVE_PLANS.md` as mandatory live plan state for approved work, not a forgotten side file.
 - Update `.waypoint/WORKSPACE.md` during the work whenever the active goal, phase, next step, blocker, verification state, or review state materially changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
-- Do not wait until final handoff to update workspace state. If the work took enough effort that the next agent would benefit from a current snapshot, the workspace should already say so.
+- Update `.waypoint/ACTIVE_PLANS.md` whenever the active approved plan, current phase, phase checklist, checkpoint, or approved scope changes.
+- Do not wait until final handoff to update workspace or active plan state. If the work took enough effort that the next agent would benefit from a current snapshot, those files should already say so.
 - For any non-trivial multi-step work, any work likely to span sessions, any work with a meaningful checklist, or any workstream that has already accumulated review/QA follow-ups, create or update a tracker in `.waypoint/track/`, keep detailed execution state there during the work, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
 - If a tracker exists for the workstream, maintain it as the work evolves instead of updating it only at the end.
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when durable plans change, and refresh each changed routable doc's `last_updated` field.
@@ -72,7 +76,8 @@ If something important lives only in your head or in the chat transcript, the re
 - Let skills carry their own invocation guidance. The always-on contract should only keep the high-level rule: use repo-local skills deliberately when they help the current task.
 - Use the repo-local skills and reviewer agents deliberately, but do not underuse them on work that is expensive to get wrong.
 - When spawning reviewer agents or other subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
-- For non-trivial work, strongly prefer reviewer-agent passes between major implementation milestones, before opening or updating a PR, after fixing substantial findings, and before final closeout when the environment allows those agents to run.
+- For non-trivial work, strongly prefer reviewer-agent passes at phase checkpoints, before opening or materially updating a PR, after fixing substantial findings, and before final closeout when the environment allows those agents to run.
+- Do not run heavyweight reviewer or full-suite loops after every tiny edit. Batch related work into the current approved phase, then run the checkpoint.
 - If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch.
 - Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
 - If `code-reviewer` or `code-health-reviewer` surface anything more serious than optional polish, fix the findings, rerun the relevant verification, and launch fresh passes until the remaining feedback is only nitpicks or none.
@@ -88,6 +93,8 @@ If something important lives only in your head or in the chat transcript, the re
 ## Execution autonomy
 
 Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete.
+
+Execute approved work phase by phase. Complete the current phase, run the relevant checkpoint, fix findings, rerun verification, and only then move to the next phase.
 
 That means:
 

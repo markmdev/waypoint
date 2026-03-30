@@ -58,8 +58,9 @@ If the plan is not actually settled, stop and use `planning` instead of guessing
 
 ## Step 3: Implement In Small Verified Chunks
 
-- Make the change in small logical chunks.
-- Commit in small steps when the repo workflow benefits from granular history.
+- Make the change in small logical chunks inside the current approved plan phase.
+- Batch related edits into a meaningful phase slice before running heavyweight checks, reviewer passes, or a commit.
+- Commit at phase boundaries or other meaningful checkpoints when the repo workflow benefits from granular history.
 - Keep unrelated local changes intact.
 - Do not stop after the first implementation pass if clear follow-up fixes are still needed.
 
@@ -77,10 +78,10 @@ Use the repo's existing skills and reviewer agents instead of inventing a parall
 
 If the repo ships reviewer agents under `.codex/agents/`, use them in the closeout flow when they are available:
 
-- run `code-reviewer` for every non-trivial implementation slice before declaring the work clear
+- run `code-reviewer` for every non-trivial completed phase before declaring the work clear
 - run `code-health-reviewer` when the change is medium or large, especially when it adds structure, duplicates logic, or introduces new abstractions
 - launch them in parallel when both apply
-- use them at meaningful milestones, not only at the very end: after substantial implementation chunks, before opening or materially updating a PR, after fixing substantial findings, and before final closeout
+- use them at phase checkpoints, not only at the very end: after completing a substantial phase, before opening or materially updating a PR, after fixing substantial findings, and before final closeout
 - treat them as fresh closeout passes, not as optional decoration
 - if either reviewer finds anything more serious than obvious optional polish, fix those findings, rerun the most relevant verification, and run fresh reviewer passes instead of trusting stale results
 - keep iterating until the remaining reviewer feedback is only nitpicks or none
@@ -97,13 +98,21 @@ If those reviewer agents are not present in the repo, do the equivalent closeout
 
 If an existing repo-local skill clearly matches the verification surface, use it.
 
-## Step 6: Run The Full Pre-Push Loop
+## Step 6: Run The Phase Checkpoint And Pre-Push Loop
 
-- Run the required tests and typechecks for every touched package or service.
-- Run builds, lint, migrations, or focused smoke tests when they are part of the real risk surface.
-- Fix failing checks before pushing unless the user explicitly accepts an exception.
-- For user-facing flows, do at least one realistic manual or UI-driven pass beyond pure unit coverage.
-- Update `WORKSPACE.md` and any active tracker with the current verification state before moving on.
+At the end of each completed phase:
+
+- run the required tests and typechecks for the touched package or service
+- run builds, lint, migrations, or focused smoke tests when they are part of the real risk surface
+- run the relevant reviewer-agent passes for non-trivial work
+- fix failing checks and reviewer findings before moving to the next phase
+- rerun the checkpoint until the current phase is clean
+- update `WORKSPACE.md`, `.waypoint/ACTIVE_PLANS.md`, and any active tracker with the current verification state before moving on
+
+Before pushing:
+
+- make sure the latest completed phase checkpoint is still green
+- for user-facing flows, do at least one realistic manual or UI-driven pass beyond pure unit coverage
 
 Do not push a branch that still obviously fails its own touched-surface checks.
 

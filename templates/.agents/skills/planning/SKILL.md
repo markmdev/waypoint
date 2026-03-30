@@ -28,9 +28,10 @@ Before planning:
 1. Read `.waypoint/SOUL.md`
 2. Read `.waypoint/agent-operating-manual.md`
 3. Read `.waypoint/WORKSPACE.md`
-4. Read `.waypoint/context/MANIFEST.md`
-5. Read every file listed in the manifest
-6. Read the routed docs relevant to the task
+4. Read `.waypoint/ACTIVE_PLANS.md`
+5. Read `.waypoint/context/MANIFEST.md`
+6. Read every file listed in the manifest
+7. Read the routed docs relevant to the task
 
 ## Output Location
 
@@ -40,6 +41,7 @@ The plan belongs in the repo, not only in chat.
 - Choose the smallest routed location that matches the work, such as a project plan, implementation plan, or focused design note.
 - If a relevant plan doc already exists, update it instead of creating a competing one.
 - Make sure the doc remains discoverable through the routed docs layer.
+- Update `.waypoint/ACTIVE_PLANS.md` when this plan becomes the approved active plan or when its current phase changes.
 - In chat, return only a concise summary plus the path to the plan doc.
 
 If the planned implementation will be large, multi-step, or likely to span multiple sessions, also create or update a tracker under `.waypoint/track/` and link it from `WORKSPACE.md` before implementation begins.
@@ -102,8 +104,10 @@ Plans document your understanding. Include what matters for this task:
 - **Current State**: What exists today — relevant files, data flows, constraints, existing patterns
 - **Changes**: Every file to create/modify/delete, how changes connect
 - **Decisions**: Why this approach, tradeoffs, assumptions
+- **Phase breakdown**: Distinct execution phases in the order they should happen
 - **Scope checklist**: Concrete implementation items that can be marked done or not done
-- **Acceptance criteria**: What must be true when each step is "done"
+- **Acceptance criteria**: What must be true when each phase is "done"
+- **Phase checkpoints**: What verification, reviewer passes, tests, typechecks, builds, or manual QA must pass before moving to the next phase
 - **Test cases**: For behavioral changes, include input -> expected output examples
 - **Non-Goals**: Explicitly out of scope to prevent implementation drift
 
@@ -127,6 +131,7 @@ Before presenting the plan, verify against real code:
 - No literal code unless the user explicitly wants it
 - No pretending you verified something you didn't
 - Approved scope must be explicit enough to act as an execution contract after user approval
+- The plan must be explicit enough to support phase-by-phase execution and checkpoints without rediscovering the intended order in chat
 - If the user approves the plan, do not silently defer or drop checklist items later; discuss any proposed scope change first
 
 If the change touches durable project behavior, include docs/workspace updates in the plan.
@@ -143,10 +148,12 @@ A good durable plan doc usually includes:
 1. Current state
 2. Proposed changes
 3. Decisions and tradeoffs
-4. Scope checklist
-5. Acceptance criteria
-6. Verification
-7. TL;DR
+4. Phase breakdown
+5. Scope checklist
+6. Acceptance criteria
+7. Phase checkpoints
+8. Verification
+9. TL;DR
 
 ## Final Response
 
@@ -156,7 +163,8 @@ When the plan doc is written:
 - include the doc path
 - call out any unresolved decisions that still need the user's input
 - if there are no unresolved decisions and the user approves the plan, treat that approval as authorization to execute the plan end to end rather than asking again at each obvious next step
-- once approved, use the plan's checklist and acceptance criteria to decide whether the work is actually done; if anything approved is skipped, report that as partial work or ask to change scope instead of calling it complete
+- once approved, update `.waypoint/ACTIVE_PLANS.md` so the active plan, current phase, and current checkpoint are visible during execution
+- once approved, use the plan's checklist, phase checkpoints, and acceptance criteria to decide whether the work is actually done; if anything approved is skipped, report that as partial work or ask to change scope instead of calling it complete
 
 ## Quality Bar
 

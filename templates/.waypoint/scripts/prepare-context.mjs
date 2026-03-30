@@ -534,6 +534,22 @@ function writeActiveTrackers(contextDir, projectRoot, activeTracks) {
   );
 }
 
+function writeActivePlans(contextDir, projectRoot) {
+  const activePlansPath = path.join(projectRoot, ".waypoint", "ACTIVE_PLANS.md");
+  return writeContextFile(
+    contextDir,
+    "ACTIVE_PLANS.md",
+    "Active Plans",
+    existsSync(activePlansPath)
+      ? [
+          "Read this file before meaningful implementation when approved plan work is in flight:",
+          "",
+          `- \`${path.relative(projectRoot, activePlansPath)}\``,
+        ].join("\n")
+      : "`.waypoint/ACTIVE_PLANS.md` is missing.",
+  );
+}
+
 function main() {
   const projectRoot = detectProjectRoot();
   const contextDir = path.join(projectRoot, ".waypoint", "context");
@@ -672,6 +688,7 @@ function main() {
     ].join("\n")
   );
   const recentThreadPath = writeRecentThread(contextDir, projectRoot, threadIdOverride);
+  const activePlansPath = writeActivePlans(contextDir, projectRoot);
   const activeTrackersPath = writeActiveTrackers(contextDir, projectRoot, activeTracks);
 
   const manifestPath = path.join(contextDir, "MANIFEST.md");
@@ -691,6 +708,7 @@ function main() {
     `- \`${path.relative(projectRoot, recentCommitsPath)}\` — recent commits`,
     `- \`${path.relative(projectRoot, prsPath)}\` — open and recently merged pull requests`,
     `- \`${path.relative(projectRoot, recentThreadPath)}\` — latest meaningful turns from the local ${codingAgentLabelText} session for this repo`,
+    `- \`${path.relative(projectRoot, activePlansPath)}\` — active plan summary`,
     `- \`${path.relative(projectRoot, docsIndexPath)}\` — current docs index`,
     `- \`${path.relative(projectRoot, tracksIndexPath)}\` — current tracker index`,
     `- \`${path.relative(projectRoot, activeTrackersPath)}\` — active tracker summary`,
@@ -700,6 +718,7 @@ function main() {
     "- `.waypoint/SOUL.md`",
     "- `.waypoint/agent-operating-manual.md`",
     "- `.waypoint/WORKSPACE.md`",
+    "- `.waypoint/ACTIVE_PLANS.md`",
     "",
     "## Active tracker files to read after this manifest",
     "",

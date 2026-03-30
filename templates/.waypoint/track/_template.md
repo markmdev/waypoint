@@ -31,6 +31,10 @@ What outcome this tracker is trying to reach.
 - [ ] First task
 - [ ] Second task
 
+## Phase Checkpoints
+
+- [ ] Checkpoint required before leaving the current phase
+
 ## Verification
 
 - [ ] Verification step

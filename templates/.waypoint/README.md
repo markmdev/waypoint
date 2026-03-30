@@ -4,6 +4,7 @@ Repo-local Waypoint configuration and project memory files.
 
 - `config.toml` — Waypoint feature toggles and file locations
 - `WORKSPACE.md` — live operational state; new or materially revised entries in multi-topic sections are timestamped
+- `ACTIVE_PLANS.md` — live execution-contract view of the approved plan(s) and current phase checkpoints
 - `DOCS_INDEX.md` — generated docs and plans routing map
 - `SOUL.md` — agent identity and working values
 - `agent-operating-manual.md` — required session workflow

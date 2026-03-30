@@ -1,10 +1,14 @@
 # Workspace
 
-Timestamp discipline: Prefix new or materially revised bullets in `Active Trackers`, `Current State`, `In Progress`, `Next`, `Parked`, and `Done Recently` with `[YYYY-MM-DD HH:MM TZ]`.
+Timestamp discipline: Prefix new or materially revised bullets in `Active Plans`, `Active Trackers`, `Current State`, `In Progress`, `Next`, `Parked`, and `Done Recently` with `[YYYY-MM-DD HH:MM TZ]`.
 
 ## Active Goal
 
 Describe the main thing currently being built or changed.
+
+## Active Plans
+
+Point at `.waypoint/ACTIVE_PLANS.md` and note the currently active approved plan and phase.
 
 ## Active Trackers
 

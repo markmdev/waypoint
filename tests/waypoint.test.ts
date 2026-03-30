@@ -88,7 +88,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "For planned work, define done from the approved scope and acceptance criteria"
+      "For planned work, treat `.waypoint/ACTIVE_PLANS.md` as the live execution contract"
     )
   );
   assert.ok(
@@ -153,7 +153,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Use reviewer agents proactively at meaningful milestones"
+      "Use reviewer agents proactively at phase checkpoints"
     )
   );
   assert.ok(
@@ -173,7 +173,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
-      "Use reviewer agents proactively at meaningful milestones"
+      "Use reviewer agents proactively at phase checkpoints"
     )
   );
   assert.ok(
@@ -184,8 +184,10 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("at the start of a new session"));
   assert.ok(readFileSync(path.join(root, "AGENTS.md"), "utf8").includes("Do not rerun it mid-conversation"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Goal"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Plans"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Trackers"));
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("Timestamp discipline:"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/ACTIVE_PLANS.md"), "utf8").includes("# Active Plans"));
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
   assert.ok(gitignore.includes(".codex/config.toml"));
   assert.ok(gitignore.includes(".codex/agents/code-reviewer.toml"));
@@ -203,6 +205,7 @@ test("init scaffolds core files", () => {
   assert.ok(gitignore.includes(".waypoint/README.md"));
   assert.ok(gitignore.includes(".waypoint/SOUL.md"));
   assert.ok(gitignore.includes(".waypoint/WORKSPACE.md"));
+  assert.ok(gitignore.includes(".waypoint/ACTIVE_PLANS.md"));
   assert.ok(gitignore.includes(".waypoint/agent-operating-manual.md"));
   assert.ok(gitignore.includes(".waypoint/DOCS_INDEX.md"));
   assert.ok(gitignore.includes(".waypoint/TRACKS_INDEX.md"));
@@ -223,11 +226,13 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/config.toml"), "utf8").includes('plans_dirs = [ ".waypoint/plans" ]'));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
+  assert.equal(existsSync(path.join(root, "ACTIVE_PLANS.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
   assert.equal(existsSync(path.join(root, "MEMORY.md")), false);
   assert.equal(existsSync(path.join(root, ".waypoint/MEMORY.md")), false);
   assert.ok(readFileSync(path.join(root, ".waypoint/SOUL.md"), "utf8").includes("Waypoint Soul"));
   assert.ok(readFileSync(path.join(root, ".waypoint/plans/README.md"), "utf8").includes("This directory is for durable plan documents."));
+  assert.ok(readFileSync(path.join(root, ".waypoint/README.md"), "utf8").includes("ACTIVE_PLANS.md"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes("Session start")
   );
@@ -268,6 +273,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Treat `.waypoint/ACTIVE_PLANS.md` as mandatory live plan state"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "For any non-trivial multi-step work"
     )
   );
@@ -279,6 +289,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "Execute approved work phase by phase."
     )
   );
   assert.ok(
@@ -303,7 +318,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "For non-trivial work, strongly prefer reviewer-agent passes between major implementation milestones"
+      "For non-trivial work, strongly prefer reviewer-agent passes at phase checkpoints"
     )
   );
   assert.ok(
@@ -352,10 +367,18 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/scripts/build-track-index.mjs"), "utf8").includes("TRACKS_INDEX.md")
   );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("ACTIVE_PLANS.md")
+  );
   assert.ok(readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes("# Planning"));
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
       "treat that approval as authorization to execute the plan end to end"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "Phase breakdown"
     )
   );
   assert.ok(
@@ -369,12 +392,22 @@ test("init scaffolds core files", () => {
     )
   );
   assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "update `.waypoint/ACTIVE_PLANS.md`"
+    )
+  );
+  assert.ok(
     readFileSync(path.join(root, ".agents/skills/planning/agents/openai.yaml"), "utf8").includes("display_name: \"Planning\"")
   );
   assert.ok(readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes("# Work Tracker"));
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes(
       "Use this skill when the work has enough moving parts"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8").includes(
+      "`.waypoint/ACTIVE_PLANS.md` should answer"
     )
   );
   assert.ok(
@@ -449,7 +482,7 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/merge-ready-owner/SKILL.md"), "utf8").includes(
-      "use them at meaningful milestones, not only at the very end"
+      "use them at phase checkpoints, not only at the very end"
     )
   );
   assert.ok(
@@ -511,6 +544,7 @@ test("init scaffolds core files", () => {
   assert.ok(readFileSync(path.join(root, ".waypoint/docs/README.md"), "utf8").includes("Waypoint-managed project memory"));
   assert.ok(readFileSync(path.join(root, ".waypoint/track/README.md"), "utf8").includes("active execution trackers"));
   assert.ok(readFileSync(path.join(root, ".waypoint/track/_template.md"), "utf8").includes("## Workstreams"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/track/_template.md"), "utf8").includes("## Phase Checkpoints"));
   assert.ok(
     readFileSync(path.join(root, ".waypoint/docs/code-guide.md"), "utf8").includes(
       "Compatibility is opt-in, not ambient"
@@ -647,6 +681,7 @@ test("init adds missing gitignore lines without duplicating the full waypoint bl
     ".waypoint/README.md",
     ".waypoint/SOUL.md",
     ".waypoint/WORKSPACE.md",
+    ".waypoint/ACTIVE_PLANS.md",
     ".waypoint/agent-operating-manual.md",
     ".waypoint/DOCS_INDEX.md",
     ".waypoint/TRACKS_INDEX.md",
@@ -703,6 +738,7 @@ test("init restores the waypoint gitignore block in snippet order", () => {
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
+      ".waypoint/ACTIVE_PLANS.md",
       ".waypoint/agent-operating-manual.md",
       ".waypoint/DOCS_INDEX.md",
       ".waypoint/TRACKS_INDEX.md",
@@ -763,6 +799,7 @@ test("init preserves user gitignore rules that follow the waypoint block", () =>
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
+      ".waypoint/ACTIVE_PLANS.md",
       ".waypoint/agent-operating-manual.md",
       ".waypoint/DOCS_INDEX.md",
       ".waypoint/TRACKS_INDEX.md",
@@ -901,6 +938,7 @@ test("init collapses an already-duplicated waypoint gitignore section back to on
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
+      ".waypoint/ACTIVE_PLANS.md",
       ".waypoint/agent-operating-manual.md",
       ".waypoint/DOCS_INDEX.md",
       ".waypoint/TRACKS_INDEX.md",
@@ -1010,6 +1048,7 @@ test("init removes retired visual-explanations gitignore and skill on refresh", 
       ".waypoint/README.md",
       ".waypoint/SOUL.md",
       ".waypoint/WORKSPACE.md",
+      ".waypoint/ACTIVE_PLANS.md",
       ".waypoint/agent-operating-manual.md",
       ".waypoint/DOCS_INDEX.md",
       ".waypoint/TRACKS_INDEX.md",
@@ -1687,10 +1726,13 @@ test("prepare-context includes active trackers in generated context", () => {
 
   const tracksIndex = readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8");
   const activeTrackers = readFileSync(path.join(root, ".waypoint/context/ACTIVE_TRACKERS.md"), "utf8");
+  const activePlans = readFileSync(path.join(root, ".waypoint/context/ACTIVE_PLANS.md"), "utf8");
   const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
 
   assert.ok(tracksIndex.includes(".waypoint/track/backend-hardening.md"));
   assert.ok(activeTrackers.includes(".waypoint/track/backend-hardening.md"));
+  assert.ok(activePlans.includes(".waypoint/ACTIVE_PLANS.md"));
+  assert.ok(manifest.includes(".waypoint/ACTIVE_PLANS.md"));
   assert.ok(manifest.includes(".waypoint/TRACKS_INDEX.md"));
   assert.ok(manifest.includes(".waypoint/context/ACTIVE_TRACKERS.md"));
   assert.ok(manifest.includes(".waypoint/track/backend-hardening.md"));
