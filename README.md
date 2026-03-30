@@ -133,14 +133,14 @@ This helps the agent keep moving until the work is actually ready, not just
 Waypoint treats user corrections as product input, not just conversation noise.
 
 When the user corrects behavior, rules, or workflow, the agent is pushed to
-update the right durable files so the same issue is less likely to happen
+update the right durable layer so the same issue is less likely to happen
 again.
 
 That includes:
 
-- user-scoped guidance
-- project-scoped guidance
-- repo-local skills
+- user-scoped guidance for true cross-project standing rules
+- project-scoped guidance for durable repo-wide context and always-on rules
+- repo-local skills for workflow-specific or method-specific guidance
 - retrospectives that turn friction from the current conversation into lasting
   improvements
 

@@ -263,7 +263,12 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
-      "Update the project-scoped repo `AGENTS.md`"
+      "Persist corrections and newly learned context in the right durable layer"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "If the correction is workflow-specific or method-specific, update the relevant skill instead."
     )
   );
   assert.ok(

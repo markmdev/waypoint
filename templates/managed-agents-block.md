@@ -105,8 +105,10 @@ Working rules:
 - Update `.waypoint/ACTIVE_PLANS.md` whenever the active approved plan, current phase, phase checklist, checkpoint, or approved scope changes.
 - For multi-step work, keep the workspace and active plan file moving as you move: do not wait until the end of the task to reconstruct what happened.
 - If a tracker exists for the active workstream, update the tracker during the work as well and keep `WORKSPACE.md` pointing at the current tracker state.
-- Update user-scoped `AGENTS.md` when you learn a durable preference, standing rule, or default that should apply across projects and your environment allows you to edit that file
-- Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules
+- Persist corrections and newly learned context in the right durable layer instead of defaulting to `AGENTS.md`.
+- Update user-scoped `AGENTS.md` only for true cross-project standing preferences or global operating rules.
+- Update the project-scoped repo `AGENTS.md` only for durable repo context or project-wide rules that should always apply in this repo.
+- If the correction is workflow-specific or method-specific, update the relevant repo skill instead. If no existing skill owns it well, propose creating one instead of stuffing that guidance into `AGENTS.md`.
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, update `.waypoint/ACTIVE_PLANS.md` when the active approved plan or current phase changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, and reviewer agents when they create clear leverage, not as default ceremony.
 - Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.

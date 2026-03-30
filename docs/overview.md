@@ -85,7 +85,8 @@ Heavier rigor should still exist, but as tools:
 
 Waypoint also treats corrections as a lasting improvement loop.
 If the user corrects behavior, rules, or workflow, the system should update the
-right durable guidance instead of losing that lesson in chat history.
+right durable layer instead of losing that lesson in chat history. Core always-on
+rules belong in `AGENTS.md`; workflow-specific guidance belongs in skills.
 
 ## System shape
 

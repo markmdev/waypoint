@@ -60,8 +60,10 @@ If something important lives only in your head or in the chat transcript, the re
 - Keep communication concise by default. Lead with the answer, diagnosis, decision, or next step, and include only the most important supporting detail unless the user asks for more.
 - Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean substituting process language for investigation.
 - Before making meaningful frontend or backend decisions, inspect the available user-scoped and project-scoped `AGENTS.md` guidance. If the task depends on frontend or backend context that is missing from the project-scoped guidance and routed docs, use the corresponding `*-context-interview` skill to fill that gap instead of guessing.
-- Update the user-scoped `AGENTS.md` when you learn a durable preference, workflow rule, or default that should apply across projects and your environment allows you to edit it.
-- Update the project-scoped repo `AGENTS.md` when you learn durable repo truth, project constraints, or stable project-specific collaboration rules.
+- Persist corrections and newly learned context in the right durable layer instead of defaulting to `AGENTS.md`.
+- Update the user-scoped `AGENTS.md` only for true cross-project standing preferences or global operating rules.
+- Update the project-scoped repo `AGENTS.md` only for durable repo truth, project constraints, or stable project-wide rules that should always apply in this repo.
+- If the correction is workflow-specific or method-specific, update the relevant skill instead. If no existing skill owns it well, propose creating one instead of stuffing that guidance into `AGENTS.md`.
 - Treat `.waypoint/WORKSPACE.md` as mandatory live execution state, not end-of-task paperwork.
 - Treat `.waypoint/ACTIVE_PLANS.md` as mandatory live plan state for approved work, not a forgotten side file.
 - Update `.waypoint/WORKSPACE.md` during the work whenever the active goal, phase, next step, blocker, verification state, or review state materially changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
@@ -147,7 +149,7 @@ Deliberate closeout review is available when you want a second pass for ship-rea
 - If you use it, follow the skill's loop fully: define the reviewable slice, run the needed reviewers, wait for the outputs, fix meaningful findings, and rerun fresh passes when warranted.
 - Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
 - Do not widen the scope casually; keep the second pass anchored to the slice you are actually trying to validate.
-- For non-trivial work, the healthy default is to use reviewer passes at meaningful milestones instead of saving all second-pass scrutiny for the very end.
+- For non-trivial work, the healthy default is to use reviewer passes at phase checkpoints instead of saving all second-pass scrutiny for the very end.
 
 ## Quality bar
 
