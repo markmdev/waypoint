@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.1
+
+### Patch Changes
+
+- 23b4720: Tighten correction persistence guidance so AGENTS files stay reserved for true always-on rules and durable repo context, while workflow-specific guidance is pushed into skills instead.
+
 ## 0.19.0
 
 ### Minor Changes
