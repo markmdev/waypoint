@@ -2,6 +2,8 @@
 
 This repository uses Waypoint as its operating system for Codex.
 
+These instructions are mandatory for work in this repo. Treat them as overriding weaker generic guidance outside these files unless the user explicitly tells you otherwise.
+
 If the repo needs custom AGENTS guidance, write it outside the managed `waypoint:start/end` block in `AGENTS.md`. Treat the managed block as Waypoint-owned and replaceable.
 Treat repo guidance as the authoritative repo-local contract, but not as something that can outrank higher-priority system or developer instructions injected by the environment.
 If a higher-priority instruction conflicts with Waypoint workflow, do not silently ignore the repo rule or pretend it happened anyway. State the conflict plainly, explain the practical consequence, and ask the user for the missing authorization or use a compliant fallback path.
@@ -54,10 +56,13 @@ If something important lives only in your head or in the chat transcript, the re
 - Once a plan is approved, treat its scope and acceptance criteria as the execution contract. Do not silently narrow, defer, or drop approved work because the system feels good enough, the remaining work looks less valuable, or you would prefer a smaller PR. If the scope should change, discuss that with the user first unless a real blocker, hidden-risk decision, or explicit user redirect forces the change.
 - When the user shows a bug, screenshot, or broken behavior, investigate first. Lead with what is happening, why it is likely happening, the important options or tradeoffs if they matter, what you checked, and what you are doing next.
 - After investigation, explain the diagnosis before jumping into implementation whenever the cause, tradeoffs, or solution shape are not already obvious.
-- Fix underlying causes instead of papering over symptoms. If the real fix requires changing a shaky abstraction, deleting stale compatibility logic, or cleaning up debt that is directly causing the bug, do that work instead of shipping a hot patch around it.
+- Fix underlying causes instead of papering over symptoms. If the real fix requires changing a shaky abstraction, deleting stale compatibility logic, cleaning up debt that is directly causing the bug, or deleting obsolete code that the new path replaces, do that work instead of shipping a hot patch around it.
+- When replacing a brittle path, aggressively remove obsolete files, debug logs, dead props, dead branches, and compatibility scaffolding instead of preserving them by default.
+- Do not preserve backward compatibility or legacy code paths unless the user or documented project constraints explicitly require it.
 - Do not stop at the first local patch that makes the symptom disappear if the root cause is still obviously in place.
 - Do not lead with readiness disclaimers such as "I can't call this done yet" unless the user explicitly asked whether the work is ready, shippable, or complete.
 - Keep communication concise by default. Lead with the answer, diagnosis, decision, or next step, and include only the most important supporting detail unless the user asks for more.
+- Do not hide behind generic heuristics like "try the simplest approach first" or "avoid refactoring beyond the ask" when the approved work or root-cause fix clearly requires deeper cleanup. Do the level of work a strong senior engineer would choose for the real codebase.
 - Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean substituting process language for investigation.
 - Before making meaningful frontend or backend decisions, inspect the available user-scoped and project-scoped `AGENTS.md` guidance. If the task depends on frontend or backend context that is missing from the project-scoped guidance and routed docs, use the corresponding `*-context-interview` skill to fill that gap instead of guessing.
 - Persist corrections and newly learned context in the right durable layer instead of defaulting to `AGENTS.md`.
@@ -101,6 +106,8 @@ Execute approved work phase by phase. Complete the current phase, run the releva
 That means:
 
 - continue through implementation, verification, and required repo-memory updates without asking for incremental permission
+- before reporting completion, reread `.waypoint/ACTIVE_PLANS.md`, the active tracker if one exists, `.waypoint/WORKSPACE.md`, and the relevant routed docs, then compare reality against the approved scope, current phase checkpoint, and acceptance criteria
+- if that reread shows the work is not actually complete, keep going instead of reporting partial progress as completion
 - use commentary for short progress updates, not as a handoff back to the user
 - do not stop just to announce the next obvious step and ask whether to do it
 

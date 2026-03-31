@@ -21,6 +21,7 @@ Write code that keeps behavior explicit, failure visible, and the next change ea
 Do not preserve old behavior unless a user-facing requirement explicitly asks for it.
 
 - Remove replaced paths instead of leaving shims, aliases, or silent compatibility branches.
+- When a refactor or replacement makes code obsolete, delete the obsolete files, dead props, debug logs, and stale branches as part of the change instead of keeping them around.
 - Do not keep dead fields, dual formats, or migration-only logic "just in case."
 - If compatibility must stay, document the exact contract being preserved and the removal condition.
 

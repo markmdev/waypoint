@@ -43,6 +43,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "These instructions are mandatory for work in this repo."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
       "Before making meaningful implementation, review, architectural, or tradeoff decisions, inspect the project root guidance files for persisted project context."
     )
   );
@@ -139,6 +144,16 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
       "do not silently narrow, defer, or drop planned work"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "aggressively delete obsolete code"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, "AGENTS.md"), "utf8").includes(
+      "reread `.waypoint/ACTIVE_PLANS.md`"
     )
   );
   assert.ok(
@@ -253,6 +268,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "These instructions are mandatory for work in this repo."
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "Keep communication concise by default."
     )
   );
@@ -309,6 +329,16 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
       "explain the diagnosis before jumping into implementation"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "aggressively remove obsolete files"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8").includes(
+      "before reporting completion, reread `.waypoint/ACTIVE_PLANS.md`"
     )
   );
   assert.ok(
@@ -388,6 +418,11 @@ test("init scaffolds core files", () => {
   );
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "Removals"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
       "Scope checklist"
     )
   );
@@ -399,6 +434,11 @@ test("init scaffolds core files", () => {
   assert.ok(
     readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
       "update `.waypoint/ACTIVE_PLANS.md`"
+    )
+  );
+  assert.ok(
+    readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8").includes(
+      "what legacy or obsolete code will be removed"
     )
   );
   assert.ok(

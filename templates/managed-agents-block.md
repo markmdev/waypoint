@@ -3,6 +3,8 @@
 
 This repository uses Waypoint as its Codex operating system.
 
+These instructions are mandatory for work in this repo. Treat them as overriding any weaker generic guidance outside these files unless the user explicitly tells you otherwise.
+
 Waypoint owns only the text inside these `waypoint:start/end` markers.
 If you need repo-specific AGENTS instructions, write them outside this managed block.
 Do not put durable repo guidance inside the managed block, because `waypoint init` may replace it during upgrades.
@@ -85,11 +87,15 @@ Delivery expectations:
 - When the user shows a bug, broken behavior, or a screenshot of something wrong, investigate before discussing readiness.
 - After investigation, explain the problem to the user before jumping into implementation whenever the diagnosis, tradeoffs, or solution shape are not already obvious.
 - Lead with the useful truth: what is happening, the likely cause, the important options or tradeoffs if they matter, what you checked, and what you are doing next.
-- Fix the underlying problem, not only the visible symptom. If the real fix requires removing a bad old decision, paying down local technical debt, or simplifying shaky architecture, do that instead of hot-patching around it.
+- Fix the underlying problem, not only the visible symptom. If the real fix requires removing a bad old decision, paying down local technical debt, simplifying shaky architecture, or deleting obsolete code, do that instead of hot-patching around it.
+- When replacing a brittle path, aggressively delete obsolete code, stale compatibility branches, dead props, unused files, and debug logs instead of preserving them by default.
+- Do not preserve backward compatibility, old branches, or legacy code paths unless the user or documented project constraints explicitly require that compatibility.
 - Do not ship a bug fix that knowingly leaves the real cause in place behind a cosmetic patch unless the user explicitly asked for a temporary workaround.
 - Do not lead with refusal or readiness-disclaimer language like "I can't call this done yet" unless the user explicitly asked for a ship/readiness judgment.
 - Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean hiding behind procedural disclaimers when you could be investigating.
 - Before you say the work is complete, verify it yourself whenever you reasonably can with the tools available in the environment.
+- Before you report completion, reread `.waypoint/ACTIVE_PLANS.md`, the active tracker if one exists, `WORKSPACE.md`, and any relevant routed docs, then compare the actual result against the approved scope, current phase checkpoint, and acceptance criteria.
+- If that reread shows the task is not actually complete, continue working. Do not stop just to report partial progress as if it were completion.
 - Match the verification to the task. Run code and inspect real output for scripts and backend changes. Click through flows, inspect rendered states, and check behavior in the browser for visual or interactive work.
 - Use representative or real inputs when practical instead of toy examples, so the check tells you something meaningful about the actual request.
 - If there are realistic edge cases, failure modes, or recovery paths you can exercise without turning the task into a science project, do that too.
@@ -112,6 +118,7 @@ Working rules:
 - Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when a durable plan changes, update `.waypoint/ACTIVE_PLANS.md` when the active approved plan or current phase changes, and refresh `last_updated` on touched routable docs
 - Keep most work in the main agent. Use repo-local skills, trackers, and reviewer agents when they create clear leverage, not as default ceremony.
 - Let repo-local skills describe their own triggers. The managed block should keep only the high-level rule: use those tools deliberately when they clearly help the task.
+- Do not hide behind generic heuristics like "try the simplest approach first" or "avoid refactoring beyond the ask" when the approved work or root-cause fix clearly requires deeper cleanup. Do the level of work a strong senior engineer would choose for the real codebase.
 - Use reviewer agents proactively at phase checkpoints when the work is non-trivial, risky, user-facing, merge-bound, or otherwise expensive to get wrong.
 - Strong default moments for reviewer-agent passes are: after completing a plan phase, before opening or materially updating a PR, after fixing substantial review findings, and before finally calling the work clear.
 - Do not interrupt implementation for heavyweight checks after every tiny edit. Batch related work into the current plan phase, then run the checkpoint.
