@@ -13,7 +13,6 @@ import path from "node:path";
 import * as TOML from "@iarna/toml";
 
 import { renderDocsIndex } from "./docs-index.js";
-import { renderTracksIndex } from "./track-index.js";
 import {
   defaultWaypointConfig,
   readTemplate,
@@ -28,8 +27,6 @@ const DEFAULT_CONFIG_PATH = ".waypoint/config.toml";
 const DEFAULT_DOCS_DIR = ".waypoint/docs";
 const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_PLANS_DIR = ".waypoint/plans";
-const DEFAULT_TRACK_DIR = ".waypoint/track";
-const DEFAULT_TRACKS_INDEX = ".waypoint/TRACKS_INDEX.md";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
 const DEFAULT_ACTIVE_PLANS = ".waypoint/ACTIVE_PLANS.md";
 const GITIGNORE_WAYPOINT_START = "# Waypoint state";
@@ -45,34 +42,24 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".agents/",
   ".agents/skills/",
   ".agents/skills/planning/",
-  ".agents/skills/work-tracker/",
-  ".agents/skills/docs-sync/",
   ".agents/skills/code-guide-audit/",
   ".agents/skills/adversarial-review/",
   ".agents/skills/visual-explanations/",
-  ".agents/skills/break-it-qa/",
   ".agents/skills/frontend-context-interview/",
   ".agents/skills/backend-context-interview/",
   ".agents/skills/frontend-ship-audit/",
   ".agents/skills/backend-ship-audit/",
-  ".agents/skills/conversation-retrospective/",
-  ".agents/skills/merge-ready-owner/",
-  ".agents/skills/workspace-compress/",
-  ".agents/skills/pre-pr-hygiene/",
   ".agents/skills/pr-review/",
+  ".agents/skills/agi-help/",
   ".waypoint/config.toml",
   ".waypoint/README.md",
-  ".waypoint/SOUL.md",
   ".waypoint/WORKSPACE.md",
   ".waypoint/ACTIVE_PLANS.md",
-  ".waypoint/agent-operating-manual.md",
   ".waypoint/",
   ".waypoint/DOCS_INDEX.md",
-  ".waypoint/TRACKS_INDEX.md",
   ".waypoint/state/",
   ".waypoint/context/",
   ".waypoint/scripts/",
-  ".waypoint/track/",
   ".waypoint/plans/",
   ".waypoint/*",
   "!.waypoint/docs/",
@@ -82,16 +69,10 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
 ]);
 const SHIPPED_SKILL_NAMES = [
   "planning",
-  "work-tracker",
-  "docs-sync",
   "code-guide-audit",
   "adversarial-review",
-  "break-it-qa",
-  "conversation-retrospective",
-  "merge-ready-owner",
-  "workspace-compress",
-  "pre-pr-hygiene",
   "pr-review",
+  "agi-help",
   "frontend-context-interview",
   "backend-context-interview",
   "frontend-ship-audit",
@@ -99,7 +80,6 @@ const SHIPPED_SKILL_NAMES = [
 ];
 const TIMESTAMPED_WORKSPACE_SECTIONS = new Set([
   "## Active Plans",
-  "## Active Trackers",
   "## Current State",
   "## In Progress",
   "## Next",
@@ -153,10 +133,6 @@ function docsRootDirs(projectRoot: string, config?: WaypointConfig): string[] {
   return configuredRootDirs(projectRoot, config?.docs_dirs, config?.docs_dir, DEFAULT_DOCS_DIR);
 }
 
-function plansRootDirs(projectRoot: string, config?: WaypointConfig): string[] {
-  return configuredRootDirs(projectRoot, config?.plans_dirs, config?.plans_dir, DEFAULT_PLANS_DIR);
-}
-
 function docsSectionHeading(projectRoot: string, dir: string): string {
   const relativePath = path.relative(projectRoot, dir).split(path.sep).join("/");
   const normalizedPath = relativePath.length === 0 ? "." : relativePath;
@@ -164,16 +140,10 @@ function docsSectionHeading(projectRoot: string, dir: string): string {
 }
 
 function docsIndexSections(projectRoot: string, config?: WaypointConfig): { heading: string; dir: string }[] {
-  return [
-    ...docsRootDirs(projectRoot, config).map((dir) => ({
-      heading: docsSectionHeading(projectRoot, dir),
-      dir,
-    })),
-    ...plansRootDirs(projectRoot, config).map((dir) => ({
-      heading: docsSectionHeading(projectRoot, dir),
-      dir,
-    })),
-  ];
+  return docsRootDirs(projectRoot, config).map((dir) => ({
+    heading: docsSectionHeading(projectRoot, dir),
+    dir,
+  }));
 }
 
 function buildWaypointConfig(
@@ -193,14 +163,7 @@ function buildWaypointConfig(
     docs_dirs: configuredRootDirs(projectRoot, existingConfig?.docs_dirs, existingConfig?.docs_dir, DEFAULT_DOCS_DIR).map((dir) =>
       path.relative(projectRoot, dir).split(path.sep).join("/")
     ),
-    plans_dirs: configuredRootDirs(projectRoot, existingConfig?.plans_dirs, existingConfig?.plans_dir, DEFAULT_PLANS_DIR).map((dir) =>
-      path.relative(projectRoot, dir).split(path.sep).join("/")
-    ),
     docs_index_file: existingConfig?.docs_index_file ?? defaults.docs_index_file,
-    features: {
-      repo_skills: existingConfig?.features?.repo_skills ?? defaults.features?.repo_skills,
-      docs_index: existingConfig?.features?.docs_index ?? defaults.features?.docs_index,
-    },
   };
 }
 
@@ -402,7 +365,6 @@ function scaffoldSkills(projectRoot: string): void {
 
 function scaffoldWaypointOptionalTemplates(projectRoot: string): void {
   copyTemplateTree(templatePath(".waypoint/scripts"), path.join(projectRoot, ".waypoint/scripts"));
-  copyTemplateTree(templatePath(".waypoint/track"), path.join(projectRoot, ".waypoint/track"));
 }
 
 function scaffoldOptionalCodex(projectRoot: string): void {
@@ -440,6 +402,13 @@ export function initRepository(
     ".agents/skills/waypoint-explore",
     ".agents/skills/waypoint-research",
     ".agents/skills/visual-explanations",
+    ".agents/skills/work-tracker",
+    ".agents/skills/docs-sync",
+    ".agents/skills/break-it-qa",
+    ".agents/skills/conversation-retrospective",
+    ".agents/skills/merge-ready-owner",
+    ".agents/skills/workspace-compress",
+    ".agents/skills/pre-pr-hygiene",
     ".codex/agents/explorer.toml",
     ".codex/agents/reviewer.toml",
     ".codex/agents/architect.toml",
@@ -449,16 +418,22 @@ export function initRepository(
     ".waypoint/MEMORY.md",
     ".waypoint/rules",
     ".waypoint/state",
+    ".waypoint/SOUL.md",
+    ".waypoint/agent-operating-manual.md",
+    ".waypoint/TRACKS_INDEX.md",
+    ".waypoint/track",
+    ".waypoint/context/MANIFEST.md",
+    ".waypoint/context/ACTIVE_PLANS.md",
+    ".waypoint/context/ACTIVE_TRACKERS.md",
+    ".waypoint/context/PULL_REQUESTS.md",
+    ".waypoint/context/RECENT_COMMITS.md",
+    ".waypoint/context/UNCOMMITTED_CHANGES.md",
+    ".waypoint/scripts/build-track-index.mjs",
   ]) {
     removePathIfExists(path.join(projectRoot, deprecatedPath));
   }
 
   writeText(path.join(projectRoot, ".waypoint/README.md"), readTemplate(".waypoint/README.md"));
-  writeText(path.join(projectRoot, ".waypoint/SOUL.md"), readTemplate(".waypoint/SOUL.md"));
-  writeText(
-    path.join(projectRoot, ".waypoint/agent-operating-manual.md"),
-    readTemplate(".waypoint/agent-operating-manual.md"),
-  );
   scaffoldWaypointOptionalTemplates(projectRoot);
 
   writeText(
@@ -469,7 +444,6 @@ export function initRepository(
   writeIfMissing(path.join(projectRoot, DEFAULT_ACTIVE_PLANS), readTemplate(".waypoint/ACTIVE_PLANS.md"));
   ensureDir(path.join(projectRoot, DEFAULT_DOCS_DIR));
   ensureDir(path.join(projectRoot, DEFAULT_PLANS_DIR));
-  ensureDir(path.join(projectRoot, DEFAULT_TRACK_DIR));
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/README.md"), readTemplate(".waypoint/docs/README.md"));
   writeIfMissing(path.join(projectRoot, ".waypoint/docs/code-guide.md"), readTemplate(".waypoint/docs/code-guide.md"));
   writeIfMissing(path.join(projectRoot, ".waypoint/plans/README.md"), readTemplate(".waypoint/plans/README.md"));
@@ -479,17 +453,15 @@ export function initRepository(
   appendGitignoreSnippet(projectRoot);
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
   const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
-  const tracksIndex = renderTracksIndex(projectRoot, path.join(projectRoot, DEFAULT_TRACK_DIR));
   writeText(docsIndexPath, `${docsIndex.content}\n`);
-  writeText(path.join(projectRoot, DEFAULT_TRACKS_INDEX), `${tracksIndex.content}\n`);
 
   return [
     "Initialized Waypoint scaffold",
     "Installed managed AGENTS block",
-    "Created .waypoint/WORKSPACE.md, .waypoint/ACTIVE_PLANS.md, .waypoint/docs/, .waypoint/plans/, and .waypoint/track/ scaffold",
+    "Created .waypoint/WORKSPACE.md, .waypoint/ACTIVE_PLANS.md, .waypoint/docs/, and .waypoint/plans/ scaffold",
     "Installed repo-local Waypoint skills",
     "Installed coding/reviewer agents and project Codex config",
-    "Generated .waypoint/DOCS_INDEX.md and .waypoint/TRACKS_INDEX.md",
+    "Generated .waypoint/DOCS_INDEX.md",
   ];
 }
 
@@ -575,7 +547,6 @@ export function doctorRepository(projectRoot: string): Finding[] {
     for (const section of [
       "## Active Goal",
       "## Active Plans",
-      "## Active Trackers",
       "## Current State",
       "## In Progress",
       "## Next",
@@ -605,11 +576,8 @@ export function doctorRepository(projectRoot: string): Finding[] {
   }
 
   for (const requiredFile of [
-    path.join(projectRoot, ".waypoint", "SOUL.md"),
-    path.join(projectRoot, ".waypoint", "agent-operating-manual.md"),
     path.join(projectRoot, ".waypoint", "scripts", "prepare-context.mjs"),
     path.join(projectRoot, ".waypoint", "scripts", "build-docs-index.mjs"),
-    path.join(projectRoot, ".waypoint", "scripts", "build-track-index.mjs"),
   ]) {
     if (!existsSync(requiredFile)) {
       findings.push({
@@ -624,11 +592,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
 
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
   const configuredDocsDirs = docsRootDirs(projectRoot, config);
-  const configuredPlansDirs = plansRootDirs(projectRoot, config);
   const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
-  const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
-  const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
-  const tracksIndex = renderTracksIndex(projectRoot, trackDir);
   for (const docsDir of configuredDocsDirs) {
     if (existsSync(docsDir)) {
       continue;
@@ -642,16 +606,13 @@ export function doctorRepository(projectRoot: string): Finding[] {
       paths: [docsDir],
     });
   }
-  for (const plansDir of configuredPlansDirs) {
-    if (existsSync(plansDir)) {
-      continue;
-    }
-
+  const plansDir = path.join(projectRoot, DEFAULT_PLANS_DIR);
+  if (!existsSync(plansDir)) {
     findings.push({
       severity: "error",
       category: "docs",
-      message: `${docsSectionHeading(projectRoot, plansDir)} directory is missing.`,
-      remediation: "Create the configured plans directory or update `.waypoint/config.toml`.",
+      message: ".waypoint/plans/ directory is missing.",
+      remediation: "Run `waypoint init` to restore the plans directory.",
       paths: [plansDir],
     });
   }
@@ -669,7 +630,7 @@ export function doctorRepository(projectRoot: string): Finding[] {
       severity: "warn",
       category: "docs",
       message: ".waypoint/DOCS_INDEX.md is missing.",
-      remediation: "Run `waypoint sync` to generate the docs/plans index.",
+      remediation: "Run `waypoint sync` to generate the docs index.",
       paths: [docsIndexPath],
     });
   } else if (readFileSync(docsIndexPath, "utf8").trimEnd() !== docsIndex.content.trimEnd()) {
@@ -677,43 +638,8 @@ export function doctorRepository(projectRoot: string): Finding[] {
       severity: "warn",
       category: "docs",
       message: ".waypoint/DOCS_INDEX.md is stale.",
-      remediation: "Run `waypoint sync` to rebuild the docs/plans index.",
+      remediation: "Run `waypoint sync` to rebuild the docs index.",
       paths: [docsIndexPath],
-    });
-  }
-  if (!existsSync(trackDir)) {
-    findings.push({
-      severity: "error",
-      category: "track",
-      message: ".waypoint/track/ directory is missing.",
-      remediation: "Run `waypoint init` to scaffold track files.",
-      paths: [trackDir],
-    });
-  }
-  for (const relPath of tracksIndex.invalidTracks) {
-    findings.push({
-      severity: "warn",
-      category: "track",
-      message: `Tracker is missing valid frontmatter or status: ${relPath}`,
-      remediation: "Add `summary`, `last_updated`, `status`, and `read_when` frontmatter using the track template.",
-      paths: [path.join(projectRoot, relPath)],
-    });
-  }
-  if (!existsSync(tracksIndexPath)) {
-    findings.push({
-      severity: "warn",
-      category: "track",
-      message: ".waypoint/TRACKS_INDEX.md is missing.",
-      remediation: "Run `waypoint sync` to generate the tracks index.",
-      paths: [tracksIndexPath],
-    });
-  } else if (readFileSync(tracksIndexPath, "utf8").trimEnd() !== tracksIndex.content.trimEnd()) {
-    findings.push({
-      severity: "warn",
-      category: "track",
-      message: ".waypoint/TRACKS_INDEX.md is stale.",
-      remediation: "Run `waypoint sync` to rebuild the tracks index.",
-      paths: [tracksIndexPath],
     });
   }
   const activePlansPath = path.join(projectRoot, DEFAULT_ACTIVE_PLANS);
@@ -732,19 +658,6 @@ export function doctorRepository(projectRoot: string): Finding[] {
       message: "Workspace does not reference .waypoint/ACTIVE_PLANS.md under `## Active Plans`.",
       remediation: "Point `## Active Plans` at `.waypoint/ACTIVE_PLANS.md` and summarize the current active phase.",
       paths: [workspacePath, activePlansPath],
-    });
-  }
-  if (
-    existsSync(workspacePath) &&
-    tracksIndex.activeTrackPaths.length > 0 &&
-    !tracksIndex.activeTrackPaths.some((trackPath) => readFileSync(workspacePath, "utf8").includes(trackPath))
-  ) {
-    findings.push({
-      severity: "warn",
-      category: "track",
-      message: "Workspace does not reference any active tracker file.",
-      remediation: "Add the active `.waypoint/track/*.md` file paths under `## Active Trackers` in `.waypoint/WORKSPACE.md`.",
-      paths: [workspacePath, ...tracksIndex.activeTrackPaths.map((trackPath) => path.join(projectRoot, trackPath))],
     });
   }
 
@@ -790,11 +703,7 @@ export function syncRepository(projectRoot: string): string[] {
   const config = loadWaypointConfig(projectRoot);
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
   const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
-  const trackDir = path.join(projectRoot, DEFAULT_TRACK_DIR);
-  const tracksIndexPath = path.join(projectRoot, DEFAULT_TRACKS_INDEX);
-  const tracksIndex = renderTracksIndex(projectRoot, trackDir);
   writeText(docsIndexPath, `${docsIndex.content}\n`);
-  writeText(tracksIndexPath, `${tracksIndex.content}\n`);
 
-  return ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"];
+  return ["Rebuilt .waypoint/DOCS_INDEX.md"];
 }

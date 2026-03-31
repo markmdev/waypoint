@@ -1,4 +1,0 @@
-interface:
-  display_name: "Merge-Ready Owner"
-  short_description: "Own approved work through merge-ready closeout"
-  default_prompt: "Use $merge-ready-owner when the plan is already approved and you should carry the work all the way through implementation, verification, reviewer-agent passes, PR handling, and merge-ready handoff without repeated check-ins."

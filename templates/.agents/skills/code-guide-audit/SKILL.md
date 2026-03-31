@@ -11,7 +11,7 @@ This skill owns one job: inspect the specific code the user points at, map it ag
 
 ## When Not To Use This Skill
 
-- Skip it for broad ship-readiness review; use `pre-pr-hygiene` or a ship-audit workflow for that.
+- Skip it for broad ship-readiness review; use a ship-audit workflow for that.
 - Skip it for generic bug finding or regression review that is not specifically about the coding guide.
 - Skip it for active PR comment triage; use `pr-review` for that loop.
 - Skip it for repo-wide cleanup unless the user explicitly asked for a repo-wide coding-guide audit.
@@ -51,10 +51,6 @@ Skip rules that genuinely do not apply, but say that you skipped them.
 - Report only coding-guide findings for the requested scope.
 - Do not drift into generic architecture advice, repo-wide cleanup, docs sync, or PR readiness unless the finding is directly required by the guide.
 - If you notice issues outside scope, mention them only if they are severe enough that ignoring them would mislead the user about this audit.
-
-This skill is narrower than `pre-pr-hygiene`. Use that other skill for broader ship-readiness.
-
-If this audit produces a large remediation campaign, create or update a tracker under `.waypoint/track/` before switching into implementation so the fix list does not live only in chat.
 
 ## Step 4: Verify Evidence
 

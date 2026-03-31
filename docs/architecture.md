@@ -12,6 +12,7 @@ The always-on layer should stay lean and load-bearing:
 
 - `AGENTS.md`
 - `.waypoint/WORKSPACE.md`
+- `.waypoint/ACTIVE_PLANS.md`
 - `.waypoint/DOCS_INDEX.md`
 - generated startup context in `.waypoint/context/`
 
@@ -31,11 +32,12 @@ Waypoint separates repo memory into three different jobs:
 - user-scoped `AGENTS.md` for cross-project preferences, standing rules, and stable defaults
 - the repo root `AGENTS.md` for project-specific context, constraints, and durable collaboration rules
 - `.waypoint/WORKSPACE.md` for live operational state
+- `.waypoint/ACTIVE_PLANS.md` for the active plan pointer, execution checklist, blockers, and verification state
 - `.waypoint/docs/` for durable project behavior, architecture, decisions, and debugging knowledge
 - `.waypoint/plans/` for durable implementation, rollout, migration, and investigation plans
 
-Waypoint uses those as the default routed roots, but the docs index can also include additional explicit docs and plans roots from `.waypoint/config.toml`.
-Each configured root is scanned recursively, and only Markdown files with valid Waypoint frontmatter are routed into `.waypoint/DOCS_INDEX.md`.
+Waypoint uses docs roots from `.waypoint/config.toml`.
+Each configured docs root is scanned recursively, and only Markdown files with valid Waypoint frontmatter are routed into `.waypoint/DOCS_INDEX.md`.
 
 This separation matters because many bad agent experiences come from mixing personal preferences, active task state, and project knowledge into one noisy blob.
 
@@ -44,13 +46,11 @@ This separation matters because many bad agent experiences come from mixing pers
 Repo-local skills under `.agents/skills/` handle structured workflows such as:
 
 - planning
-- work tracking
-- merge-ready ownership
 - code-guide audits
 - adversarial review
 - PR review
-- retrospectives
 - ship-readiness audits
+- context interviews
 
 The key design choice is that these workflows are optional tools.
 
@@ -73,8 +73,7 @@ The main agent should keep most work local by default.
 Waypoint rebuilds explicit startup context on purpose:
 
 - `.waypoint/DOCS_INDEX.md`
-- `.waypoint/TRACKS_INDEX.md`
-- `.waypoint/context/MANIFEST.md`
+- `.waypoint/context/SNAPSHOT.md`
 - generated recent-thread continuity
 
 This gives the agent continuity without requiring hidden prompt magic.
@@ -84,12 +83,8 @@ This gives the agent continuity without requiring hidden prompt magic.
 Waypoint also needs a way to learn from real usage.
 
 That means user corrections should not disappear into chat history.
-They should flow into the right durable surfaces such as:
-
-- user-scoped guidance
-- project-scoped guidance
-- repo-local skills
-- retrospectives that capture repeated friction
+They should flow into the right durable surfaces such as user-scoped guidance,
+project-scoped guidance, repo-local skills, or durable docs when they are worth preserving.
 
 ## Execution model
 
@@ -132,11 +127,12 @@ Use second-pass review when:
 Waypoint's session bootstrap is explicit and event-based:
 
 1. run `.waypoint/scripts/prepare-context.mjs`
-2. read `.waypoint/SOUL.md`
-3. read `.waypoint/agent-operating-manual.md`
-4. read `.waypoint/WORKSPACE.md`
-5. read `.waypoint/context/MANIFEST.md`
-6. read everything listed there
+2. read `AGENTS.md`
+3. read `.waypoint/WORKSPACE.md`
+4. read `.waypoint/ACTIVE_PLANS.md`
+5. read `.waypoint/DOCS_INDEX.md`
+6. read `.waypoint/context/SNAPSHOT.md`
+7. read `.waypoint/context/RECENT_THREAD.md`
 
 This is the replacement for hidden hook-based context injection.
 

@@ -10,7 +10,6 @@ Use this skill to drive the PR through review instead of treating review as a on
 ## When Not To Use This Skill
 
 - Skip it before a PR has active review or automated review in flight.
-- Skip it for local pre-push hygiene; use `pre-pr-hygiene` for that workflow.
 - Skip it for the repo-internal closeout loop on an unpushed slice; use the normal review workflows instead.
 
 ## Step 1: Wait For Review To Settle

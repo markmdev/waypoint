@@ -22,11 +22,5 @@ export interface WaypointConfig {
   workspace_file?: string;
   docs_dir?: string;
   docs_dirs?: string[];
-  plans_dir?: string;
-  plans_dirs?: string[];
   docs_index_file?: string;
-  features?: {
-    repo_skills?: boolean;
-    docs_index?: boolean;
-  };
 }

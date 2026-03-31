@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0
+
+### Major Changes
+
+- Simplify Waypoint around a single always-on AGENTS contract, a lighter active-plan workflow, and a smaller context bundle.
+
+  This release removes tracker-based scaffolding, drops several shipped skills that mainly supported that complexity, collapses the old multi-file core prompt into the managed AGENTS block, makes DOCS_INDEX docs-only, and replaces the generated context bundle with `SNAPSHOT.md` plus `RECENT_THREAD.md`.
+
 ## 0.20.0
 
 ### Minor Changes

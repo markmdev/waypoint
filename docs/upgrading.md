@@ -41,9 +41,8 @@ waypoint doctor
 Focus on the files that define the default behavior:
 
 - `AGENTS.md`
-- `.waypoint/SOUL.md`
-- `.waypoint/agent-operating-manual.md`
 - `.waypoint/WORKSPACE.md`
+- `.waypoint/ACTIVE_PLANS.md`
 - `.waypoint/DOCS_INDEX.md`
 - `.waypoint/context/`
 - `.agents/skills/`
@@ -57,7 +56,7 @@ After an upgrade, sanity-check three things:
 The core contract should read like a strong collaborator with clear judgment and useful next actions.
 
 2. Heavy workflows still live in tools.
-Review loops, ship audits, trackers, and retrospectives should stay available without taking over the always-on layer.
+Review loops and ship audits should stay available without taking over the always-on layer.
 
 3. Repo memory still has clear boundaries.
 User-scoped `AGENTS.md`, project-scoped `AGENTS.md`, `.waypoint/WORKSPACE.md`, `.waypoint/docs/`, and `.waypoint/plans/` should still have distinct jobs.

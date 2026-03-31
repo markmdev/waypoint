@@ -73,7 +73,7 @@ better default.
 ### 1. Better default behavior
 
 Waypoint gives Codex stronger repo guidance through the generated contract,
-operating manual, core behavior files, and repo-local instructions.
+workspace files, and repo-local instructions.
 
 That means the agent is pushed to:
 
@@ -120,9 +120,7 @@ Waypoint also helps Codex follow through on bigger tasks.
 
 It includes workflows for:
 
-- long-running task tracking
 - ship-readiness audits
-- merge-ready ownership
 - deliberate review passes before PR or merge
 
 This helps the agent keep moving until the work is actually ready, not just
@@ -141,8 +139,6 @@ That includes:
 - user-scoped guidance for true cross-project standing rules
 - project-scoped guidance for durable repo-wide context and always-on rules
 - repo-local skills for workflow-specific or method-specific guidance
-- retrospectives that turn friction from the current conversation into lasting
-  improvements
 
 ### 6. Better continuity
 
@@ -163,23 +159,20 @@ Waypoint scaffolds a Codex-friendly repo around a few core pieces:
 
 - `AGENTS.md` for the project-scoped startup contract and durable repo guidance
 - `.waypoint/WORKSPACE.md` for live operational state
-- `.waypoint/ACTIVE_PLANS.md` for the currently approved plan and active phase checkpoints
+- `.waypoint/ACTIVE_PLANS.md` for the current active plan, checklist, blockers, and verification state
 - `.waypoint/docs/` for long-lived project docs
 - `.waypoint/plans/` for durable plan documents
-- `.waypoint/DOCS_INDEX.md` for docs and plans routing, so the agent knows what
-  to read and when
-- `.waypoint/context/` for generated startup context
+- `.waypoint/DOCS_INDEX.md` for docs routing, so the agent knows what to read and when
+- `.waypoint/context/` for generated volatile context
+- `.waypoint/context/SNAPSHOT.md` for repo state and PR context
 - `.waypoint/context/RECENT_THREAD.md` for compact continuity from the previous
   conversation
-- `.waypoint/track/` for long-running work that truly needs durable progress
-  tracking
 - `.agents/skills/` for optional structured workflows
 - `.codex/` for optional reviewer and helper agents
 
-By default, Waypoint routes docs from `.waypoint/docs/` and plans from
-`.waypoint/plans/`.
+By default, Waypoint routes docs from `.waypoint/docs/`.
 If your repo keeps routable docs elsewhere, you can add more explicit roots in
-`.waypoint/config.toml` with `docs_dirs` and `plans_dirs`.
+`.waypoint/config.toml` with `docs_dirs`.
 Waypoint scans each configured root recursively and only includes Markdown files
 with valid Waypoint frontmatter.
 
@@ -237,12 +230,10 @@ repo/
 │   └── skills/
 └── .waypoint/
     ├── DOCS_INDEX.md
-    ├── TRACKS_INDEX.md
     ├── WORKSPACE.md
     ├── ACTIVE_PLANS.md
     ├── docs/
     ├── plans/
-    ├── track/
     ├── context/
     ├── scripts/
     └── ...
@@ -257,11 +248,6 @@ docs_dirs = [
   ".waypoint/docs",
   "services/app/docs",
 ]
-
-plans_dirs = [
-  ".waypoint/plans",
-  "services/app/plans",
-]
 ```
 
 ## Built-in skills
@@ -269,18 +255,13 @@ plans_dirs = [
 Waypoint ships a strong default skill pack for real coding work:
 
 - `planning`
-- `work-tracker`
-- `docs-sync`
 - `code-guide-audit`
 - `adversarial-review`
-- `break-it-qa`
-- `conversation-retrospective`
 - `frontend-ship-audit`
 - `backend-ship-audit`
-- `merge-ready-owner`
-- `workspace-compress`
-- `pre-pr-hygiene`
 - `pr-review`
+- `frontend-context-interview`
+- `backend-context-interview`
 - `agi-help`
 
 These are repo-local, so the workflow travels with the project.
@@ -305,18 +286,18 @@ The most important ones are:
   pass
 - `frontend-ship-audit` when frontend work needs a deeper product, UX, and ship
   readiness pass
-- `docs-sync` when the implementation changed and the repo docs should be
-  brought back in sync
-- `conversation-retrospective` when the conversation exposed friction,
-  corrections, or workflow problems that should become durable improvements
-- `merge-ready-owner` when you want the agent to own the task all the way to a
-  merge-ready result with stronger autonomy
+- `frontend-context-interview` / `backend-context-interview` when durable
+  project context is missing and would materially change implementation choices
+- `pr-review` when an open PR already has active review comments or automated
+  review in flight
+- `agi-help` when you want a high-quality external handoff package for
+  GPT-5.4-Pro
 
 The practical rule is:
 
 - install Waypoint for better defaults
 - invoke the higher-rigor skills when you want a stronger planning, audit,
-  review, docs, or closeout pass
+  review, or closeout pass
 
 ## Reviewer agents
 
@@ -326,7 +307,7 @@ Waypoint scaffolds these reviewer agents by default:
 - `code-reviewer`
 - `plan-reviewer`
 
-They are available for deliberate second passes and for ownership workflows like `merge-ready-owner`.
+They are available for deliberate second passes.
 
 ## What makes Waypoint different
 
@@ -346,7 +327,7 @@ Waypoint is opinionated, but explicit:
 
 - `waypoint init` — scaffold or refresh the repo and, by default, update the global CLI first
 - `waypoint doctor` — validate health and report drift
-- `waypoint sync` — rebuild the docs/plans and tracker indexes
+- `waypoint sync` — rebuild the docs index
 - `waypoint upgrade` — update the CLI and refresh the current repo using its saved config
 
 ## Learn more

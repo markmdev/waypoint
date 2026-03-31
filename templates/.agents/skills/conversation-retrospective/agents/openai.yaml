@@ -1,4 +1,0 @@
-interface:
-  display_name: "Conversation Retrospective"
-  short_description: "Harvest the live conversation into repo memory"
-  default_prompt: "Use $conversation-retrospective to preserve the durable lessons, repo-memory updates, and skill learnings from this live conversation."

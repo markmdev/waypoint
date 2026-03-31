@@ -46,10 +46,11 @@ Waypoint combines:
 - user-scoped `AGENTS.md` for cross-project preferences and standing rules
 - project-scoped repo `AGENTS.md` for repo-specific context and constraints
 - live operating state in `.waypoint/WORKSPACE.md`
+- active execution state in `.waypoint/ACTIVE_PLANS.md`
 - long-lived project memory in `.waypoint/docs/`
 - durable planning docs in `.waypoint/plans/`
-- generated routing and context files such as `.waypoint/DOCS_INDEX.md` and
-  `.waypoint/context/RECENT_THREAD.md`
+- generated routing and context files such as `.waypoint/DOCS_INDEX.md`,
+  `.waypoint/context/SNAPSHOT.md`, and `.waypoint/context/RECENT_THREAD.md`
 - repo-local skills for optional structured workflows
 - optional reviewer/helper agents for deliberate second passes
 
@@ -79,9 +80,8 @@ Heavier rigor should still exist, but as tools:
 - plan review
 - adversarial review
 - ship audits
-- trackers
-- retrospectives
-- pre-PR hygiene
+- PR review
+- context interviews
 
 Waypoint also treats corrections as a lasting improvement loop.
 If the user corrects behavior, rules, or workflow, the system should update the

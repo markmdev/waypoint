@@ -25,13 +25,12 @@ Good plans prove you understand the problem. Size matches complexity — a renam
 
 Before planning:
 
-1. Read `.waypoint/SOUL.md`
-2. Read `.waypoint/agent-operating-manual.md`
-3. Read `.waypoint/WORKSPACE.md`
-4. Read `.waypoint/ACTIVE_PLANS.md`
-5. Read `.waypoint/context/MANIFEST.md`
-6. Read every file listed in the manifest
-7. Read the routed docs relevant to the task
+1. Read `AGENTS.md`
+2. Read `.waypoint/WORKSPACE.md`
+3. Read `.waypoint/ACTIVE_PLANS.md`
+4. Read `.waypoint/DOCS_INDEX.md`
+5. Read `.waypoint/context/SNAPSHOT.md`
+6. Read the routed docs relevant to the task
 
 ## Output Location
 
@@ -40,11 +39,8 @@ The plan belongs in the repo, not only in chat.
 - Write or update a durable plan doc under `.waypoint/plans/`.
 - Choose the smallest routed location that matches the work, such as a project plan, implementation plan, or focused design note.
 - If a relevant plan doc already exists, update it instead of creating a competing one.
-- Make sure the doc remains discoverable through the routed docs layer.
 - Update `.waypoint/ACTIVE_PLANS.md` when this plan becomes the approved active plan or when its current phase changes.
 - In chat, return only a concise summary plus the path to the plan doc.
-
-If the planned implementation will be large, multi-step, or likely to span multiple sessions, also create or update a tracker under `.waypoint/track/` and link it from `WORKSPACE.md` before implementation begins.
 
 ## The Core Loop
 

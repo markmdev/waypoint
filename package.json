@@ -1,6 +1,6 @@
 {
   "name": "waypoint-codex",
-  "version": "0.20.0",
+  "version": "1.0.0",
   "description": "Make Codex better by default with stronger planning, code quality, reviews, tracking, and repo guidance.",
   "license": "MIT",
   "type": "module",

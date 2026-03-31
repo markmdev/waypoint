@@ -14,8 +14,6 @@ These are **project docs**, not Waypoint internals.
 
 Put durable implementation and rollout plans in `.waypoint/plans/`.
 
-Do not use `.waypoint/docs/` as the execution tracker layer for active long-running work. That belongs under `.waypoint/track/`.
-
 Every routable doc needs YAML frontmatter:
 
 ```yaml
@@ -27,4 +25,4 @@ read_when:
 ---
 ```
 
-Refresh `last_updated` whenever you materially change a doc. `DOCS_INDEX.md` is generated from both `.waypoint/docs/` and `.waypoint/plans/`.
+Refresh `last_updated` whenever you materially change a doc. `DOCS_INDEX.md` is generated from routed docs only.

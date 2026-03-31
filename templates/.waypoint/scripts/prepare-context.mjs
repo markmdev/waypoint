@@ -7,10 +7,20 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { findProjectRoot, writeDocsIndex } from "./build-docs-index.mjs";
-import { writeTracksIndex } from "./build-track-index.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const CODEX_SESSION_DIR_NAMES = ["sessions", "archived_sessions"];
+const SECRET_PATTERNS = [
+  /npm_[A-Za-z0-9]+/g,
+  /github_pat_[A-Za-z0-9_]+/g,
+  /gh[pousr]_[A-Za-z0-9]+/g,
+  /sk-[A-Za-z0-9]+/g,
+  /sk_[A-Za-z0-9]+/g,
+  /fc-[A-Za-z0-9]+/g,
+  /AIza[0-9A-Za-z\-_]{20,}/g,
+];
+const MAX_RECENT_TURNS = 25;
 
 function detectProjectRoot() {
   const scriptBasedRoot = findProjectRoot(path.resolve(__dirname, "../.."));
@@ -47,11 +57,6 @@ function runCommand(command, cwd) {
             : "Unknown command failure",
     };
   }
-}
-
-function safeExec(command, cwd) {
-  const result = runCommand(command, cwd);
-  return result.ok ? result.stdout : "";
 }
 
 function escapeRegex(value) {
@@ -115,18 +120,6 @@ function renderPullRequestBlock(result, emptyMessage) {
   }
   return result.stdout || emptyMessage;
 }
-
-const CODEX_SESSION_DIR_NAMES = ["sessions", "archived_sessions"];
-const SECRET_PATTERNS = [
-  /npm_[A-Za-z0-9]+/g,
-  /github_pat_[A-Za-z0-9_]+/g,
-  /gh[pousr]_[A-Za-z0-9]+/g,
-  /sk-[A-Za-z0-9]+/g,
-  /sk_[A-Za-z0-9]+/g,
-  /fc-[A-Za-z0-9]+/g,
-  /AIza[0-9A-Za-z\-_]{20,}/g,
-];
-const MAX_RECENT_TURNS = 25;
 
 function codexHome() {
   return process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
@@ -491,9 +484,7 @@ function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
     `- Session cwd: \`${snapshot.sessionCwd}\``,
     `- Included turns: ${selectedTurns.length} of ${snapshot.turns.length} meaningful turns`,
     `- Compactions in source session: ${snapshot.compactionCount}`,
-    snapshot.selectedFromPreCompaction
-      ? "- Selection rule: take the 25 meaningful turns immediately before the last compaction."
-      : "- Selection rule: no compaction found, so take the latest meaningful turns from the local transcript.",
+    "- Selection rule: take the 25 meaningful turns immediately before the last compaction.",
     "- Noise filter: bootstrap AGENTS payloads are excluded.",
     "- Secret handling: obvious token formats are redacted before writing this file.",
     "",
@@ -512,91 +503,14 @@ function writeRecentThread(contextDir, projectRoot, threadIdOverride = null) {
   return filePath;
 }
 
-function writeContextFile(contextDir, name, title, body) {
-  const filePath = path.join(contextDir, name);
-  const content = `# ${title}\n\n${body && body.trim().length > 0 ? body.trim() : "None."}\n`;
-  writeFileSync(filePath, content, "utf8");
-  return filePath;
-}
-
-function writeActiveTrackers(contextDir, projectRoot, activeTracks) {
-  return writeContextFile(
-    contextDir,
-    "ACTIVE_TRACKERS.md",
-    "Active Trackers",
-    activeTracks.length === 0
-      ? "No active tracker files found."
-      : [
-          "These trackers should be read when resuming long-running work:",
-          "",
-          ...activeTracks.map((trackPath) => `- \`${trackPath}\``),
-        ].join("\n"),
-  );
-}
-
-function writeActivePlans(contextDir, projectRoot) {
-  const activePlansPath = path.join(projectRoot, ".waypoint", "ACTIVE_PLANS.md");
-  return writeContextFile(
-    contextDir,
-    "ACTIVE_PLANS.md",
-    "Active Plans",
-    existsSync(activePlansPath)
-      ? [
-          "Read this file before meaningful implementation when approved plan work is in flight:",
-          "",
-          `- \`${path.relative(projectRoot, activePlansPath)}\``,
-        ].join("\n")
-      : "`.waypoint/ACTIVE_PLANS.md` is missing.",
-  );
-}
-
-function main() {
-  const projectRoot = detectProjectRoot();
-  const contextDir = path.join(projectRoot, ".waypoint", "context");
-  ensureDir(contextDir);
-  const threadIdFlagIndex = process.argv.indexOf("--thread-id");
-  const threadIdOverride =
-    threadIdFlagIndex >= 0 && threadIdFlagIndex + 1 < process.argv.length
-      ? process.argv[threadIdFlagIndex + 1]
-      : null;
-
-  const docsIndexPath = writeDocsIndex(projectRoot);
-  const { outputPath: tracksIndexPath, activeTracks } = writeTracksIndex(projectRoot);
-  const codingAgent = loadCodingAgent(projectRoot);
-  const codingAgentLabelText = codingAgentLabel(codingAgent);
-
+function writeSnapshot(contextDir, projectRoot) {
+  const filePath = path.join(contextDir, "SNAPSHOT.md");
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const currentLocalDatetime = new Date().toString();
 
-  const uncommittedChangesPath = writeContextFile(
-    contextDir,
-    "UNCOMMITTED_CHANGES.md",
-    "Uncommitted Changes",
-    (() => {
-      const status = runCommand(["git", "status", "--short", "--branch"], projectRoot);
-      const unstaged = runCommand(["git", "diff", "--stat"], projectRoot);
-      const staged = runCommand(["git", "diff", "--stat", "--cached"], projectRoot);
-      return [
-        "## Status",
-        "",
-        "```",
-        renderCommandBlock(status, "No uncommitted changes."),
-        "```",
-        "",
-        "## Diff Stat",
-        "",
-        "```",
-        renderCommandBlock(unstaged, "No unstaged tracked diff."),
-        "```",
-        "",
-        "## Staged Diff Stat",
-        "",
-        "```",
-        renderCommandBlock(staged, "No staged diff."),
-        "```",
-      ].join("\n");
-    })()
-  );
+  const status = runCommand(["git", "status", "--short", "--branch"], projectRoot);
+  const unstaged = runCommand(["git", "diff", "--stat"], projectRoot);
+  const staged = runCommand(["git", "diff", "--stat", "--cached"], projectRoot);
 
   const authorFilter = currentAuthorFilter(projectRoot);
   const recentCommitsResult = authorFilter
@@ -606,128 +520,129 @@ function main() {
         stdout: "",
         stderr: "Could not determine current git author from local git config.",
       };
-  const recentCommitsPath = writeContextFile(
-    contextDir,
-    "RECENT_COMMITS.md",
-    "Recent Commits",
+
+  const prContext = githubPullRequestContext(projectRoot);
+  const openPrs = prContext.ok
+    ? runCommand(
+        [
+          "gh",
+          "pr",
+          "list",
+          "--repo",
+          prContext.repo,
+          "--state",
+          "open",
+          "--author",
+          prContext.viewer,
+          "--limit",
+          "5",
+          "--json",
+          "number,title,author,headRefName",
+          "--template",
+          "{{range .}}#{{.number}} {{.title}} ({{.author.login}}) [{{.headRefName}}]\n{{end}}",
+        ],
+        projectRoot
+      )
+    : prContext;
+  const mergedPrs = prContext.ok
+    ? runCommand(
+        [
+          "gh",
+          "pr",
+          "list",
+          "--repo",
+          prContext.repo,
+          "--state",
+          "merged",
+          "--author",
+          prContext.viewer,
+          "--limit",
+          "5",
+          "--json",
+          "number,title,author,mergedAt",
+          "--template",
+          "{{range .}}#{{.number}} {{.title}} ({{.author.login}}) merged {{timeago .mergedAt}}\n{{end}}",
+        ],
+        projectRoot
+      )
+    : prContext;
+
+  writeFileSync(
+    filePath,
     [
+      "# Snapshot",
+      "",
+      "Generated volatile context for the current repo state.",
+      "",
+      "## Context Snapshot",
+      "",
+      `- Local timezone: ${currentTimezone}`,
+      `- Current local datetime: ${currentLocalDatetime}`,
+      "",
+      "## Git Status",
+      "",
+      "```",
+      renderCommandBlock(status, "No uncommitted changes."),
+      "```",
+      "",
+      "## Unstaged Diff Stat",
+      "",
+      "```",
+      renderCommandBlock(unstaged, "No unstaged tracked diff."),
+      "```",
+      "",
+      "## Staged Diff Stat",
+      "",
+      "```",
+      renderCommandBlock(staged, "No staged diff."),
+      "```",
+      "",
+      "## Recent Commits",
+      "",
       authorFilter ? `Author filter: ${authorFilter.label}` : "Author filter: unavailable",
       "",
       "```",
       renderCommandBlock(recentCommitsResult, "No recent commits found for the current author."),
       "```",
-    ].join("\n")
-  );
-
-  const prContext = githubPullRequestContext(projectRoot);
-  const openPrs =
-    prContext.ok
-      ? runCommand(
-          [
-            "gh",
-            "pr",
-            "list",
-            "--repo",
-            prContext.repo,
-            "--state",
-            "open",
-            "--author",
-            prContext.viewer,
-            "--limit",
-            "5",
-            "--json",
-            "number,title,author,headRefName",
-            "--template",
-            "{{range .}}#{{.number}} {{.title}} ({{.author.login}}) [{{.headRefName}}]\n{{end}}",
-          ],
-          projectRoot
-        )
-      : prContext;
-  const mergedPrs =
-    prContext.ok
-      ? runCommand(
-          [
-            "gh",
-            "pr",
-            "list",
-            "--repo",
-            prContext.repo,
-            "--state",
-            "merged",
-            "--author",
-            prContext.viewer,
-            "--limit",
-            "5",
-            "--json",
-            "number,title,author,mergedAt",
-            "--template",
-            "{{range .}}#{{.number}} {{.title}} ({{.author.login}}) merged {{timeago .mergedAt}}\n{{end}}",
-          ],
-          projectRoot
-        )
-      : prContext;
-  const prsPath = writeContextFile(
-    contextDir,
-    "PULL_REQUESTS.md",
-    "Pull Requests",
-    [
+      "",
+      "## Pull Requests",
+      "",
       prContext.ok ? `GitHub viewer: ${prContext.viewer}` : `GitHub context: ${prContext.error}`,
       prContext.ok ? `GitHub repo: ${prContext.repo}` : "",
       "",
-      "## Open PRs",
+      "### Open PRs",
       "",
       "```",
       renderPullRequestBlock(openPrs, "No open PRs found for the current GitHub user."),
       "```",
       "",
-      "## Recently Merged PRs",
+      "### Recently Merged PRs",
       "",
       "```",
       renderPullRequestBlock(mergedPrs, "No recently merged PRs found for the current GitHub user."),
       "```",
-    ].join("\n")
+      "",
+    ].join("\n"),
+    "utf8"
   );
-  const recentThreadPath = writeRecentThread(contextDir, projectRoot, threadIdOverride);
-  const activePlansPath = writeActivePlans(contextDir, projectRoot);
-  const activeTrackersPath = writeActiveTrackers(contextDir, projectRoot, activeTracks);
 
-  const manifestPath = path.join(contextDir, "MANIFEST.md");
-  const manifestLines = [
-    "# Waypoint Context Manifest",
-    "",
-    "Read every file listed below. This manifest is a required session-start context bundle.",
-    "",
-    "## Context Snapshot",
-    "",
-    `- Local timezone: ${currentTimezone}`,
-    `- Current local datetime: ${currentLocalDatetime}`,
-    "",
-    "## Required generated files",
-    "",
-    `- \`${path.relative(projectRoot, uncommittedChangesPath)}\` — uncommitted change summary`,
-    `- \`${path.relative(projectRoot, recentCommitsPath)}\` — recent commits`,
-    `- \`${path.relative(projectRoot, prsPath)}\` — open and recently merged pull requests`,
-    `- \`${path.relative(projectRoot, recentThreadPath)}\` — latest meaningful turns from the local ${codingAgentLabelText} session for this repo`,
-    `- \`${path.relative(projectRoot, activePlansPath)}\` — active plan summary`,
-    `- \`${path.relative(projectRoot, docsIndexPath)}\` — current docs index`,
-    `- \`${path.relative(projectRoot, tracksIndexPath)}\` — current tracker index`,
-    `- \`${path.relative(projectRoot, activeTrackersPath)}\` — active tracker summary`,
-    "",
-    "## Stable source-of-truth files to read before this manifest",
-    "",
-    "- `.waypoint/SOUL.md`",
-    "- `.waypoint/agent-operating-manual.md`",
-    "- `.waypoint/WORKSPACE.md`",
-    "- `.waypoint/ACTIVE_PLANS.md`",
-    "",
-    "## Active tracker files to read after this manifest",
-    "",
-    ...(activeTracks.length > 0 ? activeTracks.map((trackPath) => `- \`${trackPath}\``) : ["- None."]),
-    "",
-    `Generated by: \`${path.relative(projectRoot, fileURLToPath(import.meta.url))}\``,
-    "",
-  ];
-  writeFileSync(manifestPath, `${manifestLines.join("\n")}`, "utf8");
+  return filePath;
+}
+
+function main() {
+  const projectRoot = detectProjectRoot();
+  const contextDir = path.join(projectRoot, ".waypoint", "context");
+  ensureDir(contextDir);
+
+  const threadIdFlagIndex = process.argv.indexOf("--thread-id");
+  const threadIdOverride =
+    threadIdFlagIndex >= 0 && threadIdFlagIndex + 1 < process.argv.length
+      ? process.argv[threadIdFlagIndex + 1]
+      : null;
+
+  writeDocsIndex(projectRoot);
+  writeSnapshot(contextDir, projectRoot);
+  writeRecentThread(contextDir, projectRoot, threadIdOverride);
 
   console.log(`Prepared Waypoint context in ${contextDir}`);
 }

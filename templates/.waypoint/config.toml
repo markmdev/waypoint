@@ -2,9 +2,4 @@ version = 1
 profile = "__PROFILE__"
 workspace_file = ".waypoint/WORKSPACE.md"
 docs_dirs = [".waypoint/docs"]
-plans_dirs = [".waypoint/plans"]
 docs_index_file = ".waypoint/DOCS_INDEX.md"
-
-[features]
-repo_skills = true
-docs_index = true

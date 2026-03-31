@@ -144,7 +144,7 @@ Examples of relevant files:
 - core implementation files
 - architecture docs
 - plans
-- tracker files
+- active plan or workspace files
 - config files
 - failing or partial implementations
 - screenshots or exported artifacts when available through the current tool surface

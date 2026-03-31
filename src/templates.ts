@@ -46,12 +46,7 @@ export function defaultWaypointConfig(options: {
     coding_agent: "codex",
     workspace_file: ".waypoint/WORKSPACE.md",
     docs_dirs: [".waypoint/docs"],
-    plans_dirs: [".waypoint/plans"],
     docs_index_file: ".waypoint/DOCS_INDEX.md",
-    features: {
-      repo_skills: true,
-      docs_index: true,
-    },
   };
 }
 
@@ -62,12 +57,7 @@ export function renderWaypointConfig(config: WaypointConfig): string {
     coding_agent: config.coding_agent,
     workspace_file: config.workspace_file,
     docs_dirs: config.docs_dirs,
-    plans_dirs: config.plans_dirs,
     docs_index_file: config.docs_index_file,
-    features: config.features ? {
-      repo_skills: config.features.repo_skills,
-      docs_index: config.features.docs_index,
-    } : undefined,
   };
 
   return TOML.stringify(renderedConfig as unknown as TOML.JsonMap);

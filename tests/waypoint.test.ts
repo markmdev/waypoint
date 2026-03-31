@@ -36,42 +36,33 @@ test("init scaffolds core files", () => {
   });
 
   const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
-  const manual = readFileSync(path.join(root, ".waypoint/agent-operating-manual.md"), "utf8");
   const planning = readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8");
-  const trackerSkill = readFileSync(path.join(root, ".agents/skills/work-tracker/SKILL.md"), "utf8");
+  const codeGuideAudit = readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8");
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
 
   assert.ok(agents.includes("<!-- waypoint:start -->"));
   assert.ok(agents.includes("These instructions are mandatory in this repo"));
+  assert.ok(agents.includes("You are a direct, evidence-driven collaborator."));
   assert.ok(agents.includes("Run the Waypoint bootstrap only at session start"));
   assert.ok(agents.includes("approved scope is the execution contract"));
-  assert.ok(agents.includes("`WORKSPACE.md` is the live execution log"));
+  assert.ok(agents.includes("`WORKSPACE.md` is the live state file"));
   assert.ok(agents.includes("use direct replacement, not compatibility scaffolding"));
   assert.ok(agents.includes("Large destructive edits are allowed"));
-  assert.ok(agents.includes("Use reviewer passes at real phase boundaries"));
+  assert.ok(agents.includes("Use reviewer passes when the work is non-trivial or risky"));
   assert.ok(agents.includes("Before reporting completion, verify the result yourself"));
 
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Plans"));
   assert.ok(readFileSync(path.join(root, ".waypoint/ACTIVE_PLANS.md"), "utf8").includes("# Active Plans"));
 
-  assert.ok(manual.includes("These instructions are mandatory in this repo"));
-  assert.ok(manual.includes("The default for refactors and migrations is contract replacement"));
-  assert.ok(manual.includes("Large destructive edits are allowed"));
-  assert.ok(manual.includes("Once scope is approved, execute it without asking for permission again"));
-  assert.ok(manual.includes("legacy seam inventory before implementation"));
-  assert.ok(manual.includes("exact grep gates"));
-  assert.ok(manual.includes("Do not run heavyweight review loops after every tiny edit."));
-  assert.ok(manual.includes("Use `.waypoint/track/` only when `WORKSPACE.md` is no longer enough"));
-
   assert.ok(planning.includes("Legacy seam inventory"));
   assert.ok(planning.includes("Grep gates"));
   assert.ok(planning.includes("what legacy or obsolete code will be removed"));
-  assert.ok(trackerSkill.includes("Legacy Seam Inventory"));
+  assert.ok(codeGuideAudit.includes("report only guide-related findings"));
 
   assert.ok(gitignore.includes(".waypoint/ACTIVE_PLANS.md"));
-  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/plans/"));
-  assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
-  assert.ok(readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("ACTIVE_PLANS.md"));
+  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
+  assert.ok(!existsSync(path.join(root, ".waypoint/TRACKS_INDEX.md")));
+  assert.ok(readFileSync(path.join(root, ".waypoint/scripts/prepare-context.mjs"), "utf8").includes("SNAPSHOT.md"));
   assert.ok(readFileSync(path.join(root, ".codex/config.toml"), "utf8").includes('[agents."code-reviewer"]'));
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "ACTIVE_PLANS.md")), false);
@@ -670,13 +661,13 @@ test("doctor warns when workspace entries are not timestamped", () => {
     [
       "# Workspace",
       "",
-      "Timestamp discipline: Prefix new or materially revised bullets in `Current State`, `In Progress`, `Next`, `Parked`, and `Done Recently` with `[YYYY-MM-DD HH:MM TZ]`.",
+      "Timestamp discipline: Prefix new or materially revised bullets in `Active Plans`, `Current State`, `In Progress`, `Next`, `Parked`, and `Done Recently` with `[YYYY-MM-DD HH:MM TZ]`.",
       "",
       "## Active Goal",
       "",
       "Ship something useful.",
       "",
-      "## Active Trackers",
+      "## Active Plans",
       "",
       "## Current State",
       "",
@@ -736,7 +727,7 @@ test("init preserves AGENTS content outside the managed block", () => {
   assert.ok(agents.includes("<!-- waypoint:start -->"));
 });
 
-test("sync rebuilds docs and tracks indexes only", () => {
+test("sync rebuilds the docs index only", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-sync-"));
 
   initRepository(root, {
@@ -744,18 +735,16 @@ test("sync rebuilds docs and tracks indexes only", () => {
   });
 
   writeFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "stale docs index\n", "utf8");
-  writeFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "stale tracks index\n", "utf8");
 
   const result = syncRepository(root);
-  assert.deepEqual(result, ["Rebuilt .waypoint/DOCS_INDEX.md", "Rebuilt .waypoint/TRACKS_INDEX.md"]);
+  assert.deepEqual(result, ["Rebuilt .waypoint/DOCS_INDEX.md"]);
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
-  assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/plans/"));
-  assert.ok(readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8").includes("## .waypoint/track/"));
+  assert.ok(!readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/plans/"));
   assert.equal(existsSync(path.join(root, ".waypoint/automations")), false);
   assert.equal(existsSync(path.join(root, ".waypoint/rules")), false);
 });
 
-test("sync indexes additional configured docs and plans roots once each", () => {
+test("sync indexes additional configured docs roots once each", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-multi-root-sync-"));
 
   initRepository(root, {
@@ -769,13 +758,7 @@ test("sync indexes additional configured docs and plans roots once each", () => 
       'profile = "universal"',
       'workspace_file = ".waypoint/WORKSPACE.md"',
       'docs_dirs = [ ".waypoint/docs", "services/app/docs", "./services/app/docs" ]',
-      'plans_dirs = [ ".waypoint/plans", "services/app/plans", "services/app/plans/" ]',
       'docs_index_file = ".waypoint/DOCS_INDEX.md"',
-      "",
-      "[features]",
-      "repo_skills = true",
-      "docs_index = true",
-      "",
     ].join("\n"),
     "utf8"
   );
@@ -784,21 +767,15 @@ test("sync indexes additional configured docs and plans roots once each", () => 
     title: "Runtime Guide",
     summary: "Explain the app runtime.",
   });
-  writeRoutableDoc(path.join(root, "services/app/plans/launch.md"), {
-    title: "Launch Plan",
-    summary: "Track the app launch plan.",
-  });
 
   syncRepository(root);
 
   const docsIndex = readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8");
   assert.equal(docsIndex.match(/^## services\/app\/docs\/$/gm)?.length ?? 0, 1);
-  assert.equal(docsIndex.match(/^## services\/app\/plans\/$/gm)?.length ?? 0, 1);
   assert.ok(docsIndex.includes("services/app/docs/runtime.md"));
-  assert.ok(docsIndex.includes("services/app/plans/launch.md"));
 });
 
-test("sync still honors legacy singular docs and plans roots", () => {
+test("sync still honors legacy singular docs roots", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-legacy-roots-"));
 
   initRepository(root, {
@@ -812,13 +789,7 @@ test("sync still honors legacy singular docs and plans roots", () => {
       'profile = "universal"',
       'workspace_file = ".waypoint/WORKSPACE.md"',
       'docs_dir = "services/api/docs"',
-      'plans_dir = "services/api/plans"',
       'docs_index_file = ".waypoint/DOCS_INDEX.md"',
-      "",
-      "[features]",
-      "repo_skills = true",
-      "docs_index = true",
-      "",
     ].join("\n"),
     "utf8"
   );
@@ -827,21 +798,15 @@ test("sync still honors legacy singular docs and plans roots", () => {
     title: "Contracts",
     summary: "Explain the API contracts.",
   });
-  writeRoutableDoc(path.join(root, "services/api/plans/migration.md"), {
-    title: "Migration Plan",
-    summary: "Track the API migration plan.",
-  });
 
   syncRepository(root);
 
   const docsIndex = readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8");
   assert.ok(docsIndex.includes("## services/api/docs/"));
-  assert.ok(docsIndex.includes("## services/api/plans/"));
   assert.ok(docsIndex.includes("services/api/docs/contracts.md"));
-  assert.ok(docsIndex.includes("services/api/plans/migration.md"));
 });
 
-test("doctor flags missing configured docs and plans roots", () => {
+test("doctor flags missing configured docs roots", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-doctor-multi-root-"));
 
   initRepository(root, {
@@ -855,20 +820,13 @@ test("doctor flags missing configured docs and plans roots", () => {
       'profile = "universal"',
       'workspace_file = ".waypoint/WORKSPACE.md"',
       'docs_dirs = [ ".waypoint/docs", "services/app/docs" ]',
-      'plans_dirs = [ ".waypoint/plans", "services/app/plans" ]',
       'docs_index_file = ".waypoint/DOCS_INDEX.md"',
-      "",
-      "[features]",
-      "repo_skills = true",
-      "docs_index = true",
-      "",
     ].join("\n"),
     "utf8"
   );
 
   const findings = doctorRepository(root);
   assert.ok(findings.some((finding) => finding.message.includes("services/app/docs/ directory is missing.")));
-  assert.ok(findings.some((finding) => finding.message.includes("services/app/plans/ directory is missing.")));
 });
 
 test("init preserves custom docs roots and docs index path on refresh", () => {
@@ -879,7 +837,6 @@ test("init preserves custom docs roots and docs index path on refresh", () => {
   });
 
   mkdirp(path.join(root, "services/app/docs"));
-  mkdirp(path.join(root, "services/app/plans"));
   writeFileSync(
     path.join(root, ".waypoint/config.toml"),
     [
@@ -887,13 +844,7 @@ test("init preserves custom docs roots and docs index path on refresh", () => {
       'profile = "universal"',
       'workspace_file = ".waypoint/WORKSPACE.md"',
       'docs_dirs = [ ".waypoint/docs", "services/app/docs" ]',
-      'plans_dirs = [ ".waypoint/plans", "services/app/plans" ]',
       'docs_index_file = ".waypoint/CUSTOM_DOCS_INDEX.md"',
-      "",
-      "[features]",
-      "repo_skills = true",
-      "docs_index = false",
-      "",
     ].join("\n"),
     "utf8"
   );
@@ -902,10 +853,6 @@ test("init preserves custom docs roots and docs index path on refresh", () => {
     title: "Runtime Guide",
     summary: "Explain the refreshed runtime docs.",
   });
-  writeRoutableDoc(path.join(root, "services/app/plans/launch.md"), {
-    title: "Launch Plan",
-    summary: "Explain the refreshed launch plan.",
-  });
 
   initRepository(root, {
     profile: "universal"
@@ -913,13 +860,10 @@ test("init preserves custom docs roots and docs index path on refresh", () => {
 
   const config = readFileSync(path.join(root, ".waypoint/config.toml"), "utf8");
   assert.ok(config.includes('docs_dirs = [ ".waypoint/docs", "services/app/docs" ]'));
-  assert.ok(config.includes('plans_dirs = [ ".waypoint/plans", "services/app/plans" ]'));
   assert.ok(config.includes('docs_index_file = ".waypoint/CUSTOM_DOCS_INDEX.md"'));
-  assert.ok(config.includes("docs_index = false"));
 
   const docsIndex = readFileSync(path.join(root, ".waypoint/CUSTOM_DOCS_INDEX.md"), "utf8");
   assert.ok(docsIndex.includes("## services/app/docs/"));
-  assert.ok(docsIndex.includes("## services/app/plans/"));
 });
 
 test("sync skips symlinked directories while walking docs roots", () => {
@@ -1109,15 +1053,14 @@ test("prepare-context writes merged recent thread with redaction", () => {
   });
 
   const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
-  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
+  const snapshot = readFileSync(path.join(root, ".waypoint/context/SNAPSHOT.md"), "utf8");
 
   assert.ok(recentThread.includes("Assistant (merged 2 messages)"));
   assert.ok(recentThread.includes("I’m validating the package first."));
   assert.ok(recentThread.includes("Published successfully."));
   assert.ok(recentThread.includes("[REDACTED]"));
   assert.ok(!recentThread.includes("npm_ABC123SECRET"));
-  assert.ok(manifest.includes(".waypoint/context/RECENT_THREAD.md"));
-  assert.ok(manifest.includes("latest meaningful turns"));
+  assert.ok(snapshot.includes("## Git Status"));
 });
 
 test("prepare-context reads recent thread from Pi transcripts when configured", () => {
@@ -1199,18 +1142,18 @@ test("prepare-context reads recent thread from Pi transcripts when configured", 
   });
 
   const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
-  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
+  const snapshot = readFileSync(path.join(root, ".waypoint/context/SNAPSHOT.md"), "utf8");
 
   assert.ok(recentThread.includes("sessions/--tmp-waypoint-pi-context--/2026-03-06T05-00-00-000Z_pi-session.jsonl"));
   assert.ok(recentThread.includes("Assistant (merged 2 messages)"));
   assert.ok(recentThread.includes("I’m checking the transcript format first."));
   assert.ok(recentThread.includes("[REDACTED]"));
   assert.ok(!recentThread.includes("npm_ABC123SECRET"));
-  assert.ok(manifest.includes("latest meaningful turns from the local Pi session"));
+  assert.ok(snapshot.includes("## Pull Requests"));
 });
 
-test("prepare-context includes active trackers in generated context", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-active-trackers-"));
+test("prepare-context writes a merged snapshot file", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-snapshot-"));
   const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
   process.env.CODEX_HOME = codexHome;
 
@@ -1218,45 +1161,16 @@ test("prepare-context includes active trackers in generated context", () => {
     profile: "universal"
   });
 
-  writeFileSync(
-    path.join(root, ".waypoint/track/backend-hardening.md"),
-    [
-      "---",
-      "summary: Close the backend hardening fix campaign",
-      'last_updated: "2026-03-13 11:38 PDT"',
-      "status: active",
-      "read_when:",
-      "  - resuming backend hardening",
-      "---",
-      "",
-      "# Backend Hardening",
-      "",
-      "## Goal",
-      "",
-      "Ship the hardening fixes.",
-      ""
-    ].join("\n"),
-    "utf8"
-  );
-
   execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
     cwd: root,
     env: { ...process.env, CODEX_HOME: codexHome },
     stdio: "pipe"
   });
 
-  const tracksIndex = readFileSync(path.join(root, ".waypoint/TRACKS_INDEX.md"), "utf8");
-  const activeTrackers = readFileSync(path.join(root, ".waypoint/context/ACTIVE_TRACKERS.md"), "utf8");
-  const activePlans = readFileSync(path.join(root, ".waypoint/context/ACTIVE_PLANS.md"), "utf8");
-  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
-
-  assert.ok(tracksIndex.includes(".waypoint/track/backend-hardening.md"));
-  assert.ok(activeTrackers.includes(".waypoint/track/backend-hardening.md"));
-  assert.ok(activePlans.includes(".waypoint/ACTIVE_PLANS.md"));
-  assert.ok(manifest.includes(".waypoint/ACTIVE_PLANS.md"));
-  assert.ok(manifest.includes(".waypoint/TRACKS_INDEX.md"));
-  assert.ok(manifest.includes(".waypoint/context/ACTIVE_TRACKERS.md"));
-  assert.ok(manifest.includes(".waypoint/track/backend-hardening.md"));
+  const snapshot = readFileSync(path.join(root, ".waypoint/context/SNAPSHOT.md"), "utf8");
+  assert.ok(snapshot.includes("## Git Status"));
+  assert.ok(snapshot.includes("## Recent Commits"));
+  assert.ok(snapshot.includes("## Pull Requests"));
 });
 
 test("prepare-context prefers turns before the last compaction", () => {
@@ -1531,15 +1445,13 @@ test("prepare-context captures repo state for commits and changes without extra 
     stdio: "pipe"
   });
 
-  const changes = readFileSync(path.join(root, ".waypoint/context/UNCOMMITTED_CHANGES.md"), "utf8");
-  const commits = readFileSync(path.join(root, ".waypoint/context/RECENT_COMMITS.md"), "utf8");
-  const manifest = readFileSync(path.join(root, ".waypoint/context/MANIFEST.md"), "utf8");
+  const snapshot = readFileSync(path.join(root, ".waypoint/context/SNAPSHOT.md"), "utf8");
 
-  assert.ok(changes.includes("scratch.txt"));
-  assert.ok(commits.includes("Initial commit"));
-  assert.ok(manifest.includes("## Context Snapshot"));
-  assert.ok(manifest.includes("Local timezone:"));
-  assert.ok(manifest.includes("Current local datetime:"));
+  assert.ok(snapshot.includes("scratch.txt"));
+  assert.ok(snapshot.includes("Initial commit"));
+  assert.ok(snapshot.includes("## Context Snapshot"));
+  assert.ok(snapshot.includes("Local timezone:"));
+  assert.ok(snapshot.includes("Current local datetime:"));
   assert.equal(existsSync(path.join(root, ".waypoint/context/CURRENT_DATETIME.md")), false);
   assert.equal(existsSync(path.join(root, ".waypoint/context/NESTED_REPOS.md")), false);
 });
@@ -1601,11 +1513,11 @@ test("prepare-context explains PR context using gh output", () => {
     stdio: "pipe"
   });
 
-  const prs = readFileSync(path.join(root, ".waypoint/context/PULL_REQUESTS.md"), "utf8");
-  assert.ok(prs.includes("GitHub viewer: markmdev"));
-  assert.ok(prs.includes("GitHub repo: markmdev/waypoint-test"));
-  assert.ok(prs.includes("#12 Fix transfer bug"));
-  assert.ok(prs.includes("#11 Ship continuity fixes"));
+  const snapshot = readFileSync(path.join(root, ".waypoint/context/SNAPSHOT.md"), "utf8");
+  assert.ok(snapshot.includes("GitHub viewer: markmdev"));
+  assert.ok(snapshot.includes("GitHub repo: markmdev/waypoint-test"));
+  assert.ok(snapshot.includes("#12 Fix transfer bug"));
+  assert.ok(snapshot.includes("#11 Ship continuity fixes"));
 });
 
 test("built cli can read package version", () => {
