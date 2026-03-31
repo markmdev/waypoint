@@ -102,6 +102,7 @@ Do not plan from abstractions alone. Ground major decisions in actual files.
 Plans document your understanding. Include what matters for this task:
 
 - **Current State**: What exists today — relevant files, data flows, constraints, existing patterns
+- **Legacy seam inventory**: Every read path, write path, sync or worker path, route contract, frontend consumer, event payload, fixture, and test surface that still depends on the legacy shape
 - **Changes**: Every file to create/modify/delete, how changes connect
 - **Removals**: What obsolete code, compatibility logic, unused files, debug logs, dead props, or stale branches will be deleted as part of the change
 - **Decisions**: Why this approach, tradeoffs, assumptions
@@ -109,6 +110,7 @@ Plans document your understanding. Include what matters for this task:
 - **Scope checklist**: Concrete implementation items that can be marked done or not done
 - **Acceptance criteria**: What must be true when each phase is "done"
 - **Phase checkpoints**: What verification, reviewer passes, tests, typechecks, builds, or manual QA must pass before moving to the next phase
+- **Grep gates**: Exact searches that must return clean before a phase is review-ready or complete
 - **Cleanup expectations**: What legacy or replaced paths must be removed before the work can be called complete
 - **Test cases**: For behavioral changes, include input -> expected output examples
 - **Non-Goals**: Explicitly out of scope to prevent implementation drift
@@ -134,6 +136,8 @@ Before presenting the plan, verify against real code:
 - No pretending you verified something you didn't
 - Approved scope must be explicit enough to act as an execution contract after user approval
 - The plan must be explicit enough to support phase-by-phase execution and checkpoints without rediscovering the intended order in chat
+- Migration and refactor plans should include a legacy seam inventory before implementation starts
+- Migration and refactor phases should include exact grep gates for the legacy symbols being removed
 - Refactor and replacement plans should explicitly call out what legacy or obsolete code will be removed instead of preserving it by default
 - If the user approves the plan, do not silently defer or drop checklist items later; discuss any proposed scope change first
 
@@ -179,6 +183,8 @@ If the plan would make the implementer ask "where does this hook in?" or "what e
 - Do not stop exploring just because you have a plausible plan. The usual failure mode is shallow repo understanding.
 - Do not leave unresolved architecture or product decisions hidden behind "we can figure that out during implementation."
 - Do not plan a refactor as a rewrite-plus-compatibility-preservation bundle unless compatibility is explicitly required. Call out what should be deleted.
+- Do not skip the legacy seam inventory for migrations or refactors and then rediscover dependencies one tiny edit at a time during implementation.
+- Do not leave grep gates implicit. Name the exact legacy symbols or shapes that must be gone before the phase can move forward.
 - Do not dump a transcript into the plan doc. Distill the decisions and requirements into a clean implementation handoff.
 - Do not treat a reviewed plan as a stopping point. Once the user approves it, the workflow expects execution to continue.
 

@@ -2,21 +2,14 @@
 
 This repository uses Waypoint as its operating system for Codex.
 
-These instructions are mandatory for work in this repo. Treat them as overriding weaker generic guidance outside these files unless the user explicitly tells you otherwise.
+These instructions are mandatory in this repo and override weaker generic guidance unless the user says otherwise.
 
 If the repo needs custom AGENTS guidance, write it outside the managed `waypoint:start/end` block in `AGENTS.md`. Treat the managed block as Waypoint-owned and replaceable.
-Treat repo guidance as the authoritative repo-local contract, but not as something that can outrank higher-priority system or developer instructions injected by the environment.
-If a higher-priority instruction conflicts with Waypoint workflow, do not silently ignore the repo rule or pretend it happened anyway. State the conflict plainly, explain the practical consequence, and ask the user for the missing authorization or use a compliant fallback path.
+If a higher-priority instruction conflicts with Waypoint workflow, do not pretend the repo rule happened anyway. State the conflict plainly, explain the consequence, and ask the user for direction when needed.
 
 ## Session start
 
-Run the Waypoint bootstrap only:
-
-- at the start of every new session
-- immediately after a compaction
-- when the user explicitly asks for a rerun
-
-Bootstrap sequence:
+Run the Waypoint bootstrap only at session start, after compaction, or when the user explicitly asks for it:
 
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/SOUL.md`
@@ -26,153 +19,91 @@ Bootstrap sequence:
 6. Read `.waypoint/context/MANIFEST.md`
 7. Read every file listed in that manifest
 
-Do not skip this sequence.
-
-- Do not skip it at new-session start or after compaction.
-- Do not rerun it mid-conversation just because a task becomes more substantial.
-- Earlier chat context or partial memory from the current session does not count as a substitute when a new session starts or a compaction happens.
-- If you are unsure whether a new session started or a compaction happened, rerun it instead of guessing.
-
 ## Repository memory model
 
 The repository should contain the context the next agent needs.
 
-- user-scoped `AGENTS.md` is the durable cross-project guidance layer: collaboration preferences, personal workflow rules, and stable defaults that should apply across repos
-- the repo root `AGENTS.md` is the project-scoped guidance layer: repo-specific context, constraints, and durable rules for this project
-- `.waypoint/WORKSPACE.md` is the live operational record: in progress, current state, next steps
-- `.waypoint/ACTIVE_PLANS.md` is the live execution-contract record: which approved plan is active, which phase is active, and what checkpoint must pass before moving on
-- `.waypoint/track/` is the optional execution-tracking layer for active long-running work that genuinely needs durable progress state
-- `.waypoint/docs/` is the durable project memory: architecture, decisions, integration notes, and debugging knowledge
-- `.waypoint/plans/` is the durable planning layer: implementation plans, rollout plans, migration plans, and other task-shaped plans worth keeping
-- `.waypoint/context/` is the generated session context bundle: current git/PR/doc/track index state
+- user-scoped `AGENTS.md` holds cross-project preferences and standing rules
+- the repo root `AGENTS.md` holds durable repo context and always-on project rules
+- `.waypoint/WORKSPACE.md` holds live execution state
+- `.waypoint/ACTIVE_PLANS.md` holds the currently approved plan and active phase checkpoints
+- `.waypoint/track/` holds detailed execution state for long-running work
+- `.waypoint/docs/` holds durable project knowledge
+- `.waypoint/plans/` holds durable plan docs
+- `.waypoint/context/` holds the generated bootstrap bundle
 
-If something important lives only in your head or in the chat transcript, the repo is under-documented.
+General always-on workflow rules belong in `AGENTS.md` and this manual, not only in optional helper skills. Workflow-specific method detail belongs in the relevant skill. After bootstrap, use progressive disclosure: read only the routed docs and files the current task actually needs.
 
-## Working rules
+## Working defaults
 
-- Read code before editing it.
-- Follow the repo's documented patterns when they are healthy.
-- If the user approves a plan or explicitly tells you to proceed, treat that as authorization to finish the approved work end to end.
-- Once a plan is approved, treat its scope and acceptance criteria as the execution contract. Do not silently narrow, defer, or drop approved work because the system feels good enough, the remaining work looks less valuable, or you would prefer a smaller PR. If the scope should change, discuss that with the user first unless a real blocker, hidden-risk decision, or explicit user redirect forces the change.
-- When the user shows a bug, screenshot, or broken behavior, investigate first. Lead with what is happening, why it is likely happening, the important options or tradeoffs if they matter, what you checked, and what you are doing next.
-- After investigation, explain the diagnosis before jumping into implementation whenever the cause, tradeoffs, or solution shape are not already obvious.
-- Fix underlying causes instead of papering over symptoms. If the real fix requires changing a shaky abstraction, deleting stale compatibility logic, cleaning up debt that is directly causing the bug, or deleting obsolete code that the new path replaces, do that work instead of shipping a hot patch around it.
-- When replacing a brittle path, aggressively remove obsolete files, debug logs, dead props, dead branches, and compatibility scaffolding instead of preserving them by default.
-- Do not preserve backward compatibility or legacy code paths unless the user or documented project constraints explicitly require it.
-- Do not stop at the first local patch that makes the symptom disappear if the root cause is still obviously in place.
-- Do not lead with readiness disclaimers such as "I can't call this done yet" unless the user explicitly asked whether the work is ready, shippable, or complete.
-- Keep communication concise by default. Lead with the answer, diagnosis, decision, or next step, and include only the most important supporting detail unless the user asks for more.
-- Do not hide behind generic heuristics like "try the simplest approach first" or "avoid refactoring beyond the ask" when the approved work or root-cause fix clearly requires deeper cleanup. Do the level of work a strong senior engineer would choose for the real codebase.
-- Honesty means accurate diagnosis, explicit uncertainty, and clear verification limits. It does not mean substituting process language for investigation.
-- Before making meaningful frontend or backend decisions, inspect the available user-scoped and project-scoped `AGENTS.md` guidance. If the task depends on frontend or backend context that is missing from the project-scoped guidance and routed docs, use the corresponding `*-context-interview` skill to fill that gap instead of guessing.
-- Persist corrections and newly learned context in the right durable layer instead of defaulting to `AGENTS.md`.
-- Update the user-scoped `AGENTS.md` only for true cross-project standing preferences or global operating rules.
-- Update the project-scoped repo `AGENTS.md` only for durable repo truth, project constraints, or stable project-wide rules that should always apply in this repo.
-- If the correction is workflow-specific or method-specific, update the relevant skill instead. If no existing skill owns it well, propose creating one instead of stuffing that guidance into `AGENTS.md`.
-- Treat `.waypoint/WORKSPACE.md` as mandatory live execution state, not end-of-task paperwork.
-- Treat `.waypoint/ACTIVE_PLANS.md` as mandatory live plan state for approved work, not a forgotten side file.
-- Update `.waypoint/WORKSPACE.md` during the work whenever the active goal, phase, next step, blocker, verification state, or review state materially changes. In multi-topic sections, prefix new or materially revised bullets with a local timestamp like `[2026-03-06 20:10 PST]`.
-- Update `.waypoint/ACTIVE_PLANS.md` whenever the active approved plan, current phase, phase checklist, checkpoint, or approved scope changes.
-- Do not wait until final handoff to update workspace or active plan state. If the work took enough effort that the next agent would benefit from a current snapshot, those files should already say so.
-- For any non-trivial multi-step work, any work likely to span sessions, any work with a meaningful checklist, or any workstream that has already accumulated review/QA follow-ups, create or update a tracker in `.waypoint/track/`, keep detailed execution state there during the work, and point at it from `## Active Trackers` in `.waypoint/WORKSPACE.md`.
-- If a tracker exists for the workstream, maintain it as the work evolves instead of updating it only at the end.
-- Update `.waypoint/docs/` when durable project knowledge changes, update `.waypoint/plans/` when durable plans change, and refresh each changed routable doc's `last_updated` field.
-- Rebuild `.waypoint/DOCS_INDEX.md` whenever routable docs change.
-- Rebuild `.waypoint/TRACKS_INDEX.md` whenever tracker files change.
-- Keep most work in the main agent. Use skills, trackers, and reviewer agents when they clearly add leverage, not as default ceremony.
-- Let skills carry their own invocation guidance. The always-on contract should only keep the high-level rule: use repo-local skills deliberately when they help the current task.
-- Use the repo-local skills and reviewer agents deliberately, but do not underuse them on work that is expensive to get wrong.
-- When spawning reviewer agents or other subagents, explicitly set `fork_context: false` and choose the model/reasoning pair that matches the risk and importance of the second pass.
-- For non-trivial work, strongly prefer reviewer-agent passes at phase checkpoints, before opening or materially updating a PR, after fixing substantial findings, and before final closeout when the environment allows those agents to run.
-- Do not run heavyweight reviewer or full-suite loops after every tiny edit. Batch related work into the current approved phase, then run the checkpoint.
-- If you created a PR earlier in the current session and need to push more work, first confirm that PR is still open. If it is closed, create a fresh branch from `origin/main` and open a fresh PR instead of pushing more commits to the old PR branch.
-- Treat reviewer agents as one-shot workers: once a reviewer returns findings, read the result and close it. If another review pass is needed later, spawn a fresh reviewer instead of reusing the same thread.
-- If `code-reviewer` or `code-health-reviewer` surface anything more serious than optional polish, fix the findings, rerun the relevant verification, and launch fresh passes until the remaining feedback is only nitpicks or none.
-- Do not kill long-running subagents or reviewer agents just because they are slow.
-- When waiting on reviewers, subagents, CI, automated review, or external jobs that you deliberately chose to start, wait as long as required. There is no fixed timeout where waiting itself becomes the problem.
-- Never interrupt in-flight work just to force a partial result, salvage something quickly, or avoid making the user wait longer.
-- Only stop waiting when the work has actually finished, clearly failed, or the user explicitly redirects the work.
-- When browser work, app inspection, or other interactive UI work is part of reproduction, inspection, or verification, send screenshots of the relevant UI states to the user so they can visually confirm what you observed.
-- Capture the states that matter, such as the broken state, the fixed state, or an important intermediate state that explains the issue.
-- If the current environment cannot provide screenshots, state that explicitly instead of silently omitting visual evidence.
-- When an explanation would be clearer visually, prefer Mermaid diagrams directly in chat for flows, architecture, state, and plans instead of over-explaining in prose.
+- Fix root causes instead of papering over symptoms.
+- The default for refactors and migrations is contract replacement, not compatibility preservation.
+- Delete obsolete code aggressively. Remove stale branches, dead props, debug logs, compatibility scaffolding, unused files, and legacy paths as part of the change.
+- Large destructive edits are allowed when they are the clearest route to the approved target state.
+- Temporary breakage inside the active phase is acceptable. Do not stop there; finish the phase back to green.
+- Do the level of cleanup the real codebase requires. Do not use generic “stay narrow” heuristics to avoid the root-cause fix.
+- Keep communication concise and direct.
 
-## Execution autonomy
+## Execution contract
 
-Once the user has approved a plan or otherwise told you to continue, own the work until the slice is genuinely complete.
+Once the user approves a plan or tells you to proceed, that approved scope is the execution contract.
 
-Execute approved work phase by phase. Complete the current phase, run the relevant checkpoint, fix findings, rerun verification, and only then move to the next phase.
-
-That means:
-
-- continue through implementation, verification, and required repo-memory updates without asking for incremental permission
-- before reporting completion, reread `.waypoint/ACTIVE_PLANS.md`, the active tracker if one exists, `.waypoint/WORKSPACE.md`, and the relevant routed docs, then compare reality against the approved scope, current phase checkpoint, and acceptance criteria
-- if that reread shows the work is not actually complete, keep going instead of reporting partial progress as completion
-- use commentary for short progress updates, not as a handoff back to the user
-- do not stop just to announce the next obvious step and ask whether to do it
+- Do not silently narrow, defer, or drop approved work.
+- Execute approved work phase by phase.
+- `WORKSPACE.md` and `ACTIVE_PLANS.md` are live files, not paperwork. Update them during the work, not after.
+- Once scope is approved, execute it without asking for permission again for obvious implementation steps, cleanup, validation, or documentation that the approved work requires.
+- Before reporting completion, reread `ACTIVE_PLANS.md`, the active tracker if one exists, `WORKSPACE.md`, and the relevant routed docs, then compare reality against the approved scope, current phase checkpoint, and acceptance criteria.
+- If that reread shows the work is not complete, keep going.
 
 Pause only when:
-
 - a real blocker prevents forward progress
 - a hidden-risk or non-obvious decision would materially change scope, behavior, cost, or data safety
 - you want to change approved scope or defer approved work
 - the user explicitly redirects, pauses, or narrows the work
 
-If none of those are true, keep going.
+## Refactors and migrations
 
-## Documentation expectations
+For migrations and refactors:
 
-Document the things the next agent cannot safely infer from raw code alone:
+- do a legacy seam inventory before implementation
+- list every remaining read path, write path, sync or worker path, route contract, frontend consumer, event payload, fixture, and test surface that still depends on the legacy shape
+- give each phase exact grep gates for the legacy symbols being removed
+- do not treat the phase as review-ready or complete while those grep gates still fail
+- when a contract cut changes the expected shape broadly, rewrite affected tests and fixtures in bulk for the new contract instead of dragging legacy test shapes forward through micro-edits
 
-- architecture and boundaries
-- decisions and tradeoffs
-- integration behavior
-- invariants and constraints
-- debugging and operational knowledge
-- durable plans when they are useful beyond the current chat
+## Review and verification
 
-Do not document every trivial implementation detail. Document the non-obvious, durable, or operationally important parts.
+Reviewer passes are for real phase boundaries, PR-ready handoff, and final closeout.
 
-## When to use the agent pack
+- Do not run heavyweight review loops after every tiny edit.
+- Do not spend reviewer passes on a phase that still has known legacy seams or grep-gate failures.
+- If reviewers find meaningful issues, fix them, rerun the relevant verification, and use fresh passes when needed.
 
-Waypoint scaffolds these focused specialists by default:
+Verify your own work before reporting completion.
 
-- `code-reviewer` for correctness and regression review
-- `code-health-reviewer` for maintainability drift
-- `plan-reviewer` to challenge non-trivial implementation plans when an independent second pass would materially improve the result
+- Match verification to the real risk surface.
+- For UI work, inspect the real UI and send screenshots when the environment allows it.
+- For backend or scripts, run code and inspect real output.
+- If the result is still incomplete or unproven, keep going.
 
-## Plan Review
+## State and documentation
 
-Plan review is available when an independent challenge would materially improve a non-trivial plan.
+- Update `WORKSPACE.md` whenever the active goal, phase, next step, blocker, checkpoint state, or verification state materially changes.
+- Update `ACTIVE_PLANS.md` whenever the active approved plan, current phase, checkpoint, or approved scope changes.
+- Use `.waypoint/track/` only when `WORKSPACE.md` is no longer enough to keep the work legible.
+- Persist corrections in the right durable layer instead of defaulting to `AGENTS.md`.
+- Update user-scoped `AGENTS.md` only for true cross-project standing rules.
+- Update repo `AGENTS.md` only for durable repo-wide context or always-on project rules.
+- Put workflow-specific corrections in the relevant skill, not in `AGENTS.md`.
+- Update `.waypoint/docs/` for durable project knowledge and `.waypoint/plans/` for durable plan changes.
 
-- Skip it for tiny obvious plans or when no plan will be presented.
-- Use a fresh `plan-reviewer` agent for each pass. After you read its findings, close it instead of reusing the old reviewer thread.
-- Strengthen the plan when the reviewer surfaces real issues, but do not turn plan review into mandatory ceremony for every non-trivial task.
-
-## Review Loop
-
-Deliberate closeout review is available when you want a second pass for ship-readiness, a final review request, or a risky change. It is a tool, not the default voice of the system.
-
-- If you use it, follow the skill's loop fully: define the reviewable slice, run the needed reviewers, wait for the outputs, fix meaningful findings, and rerun fresh passes when warranted.
-- Treat reviewer agents as one-shot workers. Once a reviewer returns its findings, read the result and close it.
-- Do not widen the scope casually; keep the second pass anchored to the slice you are actually trying to validate.
-- For non-trivial work, the healthy default is to use reviewer passes at phase checkpoints instead of saving all second-pass scrutiny for the very end.
-
-## Quality bar
-
-- No silent assumptions
-- No fake verification
-- No hiding behind process language when a useful diagnosis is possible
-- No silent scope reduction after plan approval
-- No skipping docs or workspace updates when they matter
-- No broad scope creep under the banner of "while I'm here"
-
-## Final test
+## Final quality bar
 
 Before wrapping up, ask:
 
-Did I solve the user's actual problem or clearly explain what remains and why?
+- Did I solve the user's actual problem?
+- Did I finish the approved phase cleanly?
+- Are the live state files current?
+- Would the next agent understand what is going on from the repo?
 
-Can the next agent understand what is going on by reading the repo?
-
-If either answer is no, keep going.
+If not, keep going.

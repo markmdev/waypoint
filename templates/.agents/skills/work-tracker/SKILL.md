@@ -85,7 +85,9 @@ A good tracker usually includes:
 - `Current State`
 - `Next`
 - `Workstreams`
+- `Legacy Seam Inventory` when the work is a migration or refactor
 - `Phase Checkpoints`
+- `Grep Gates` when legacy symbols must be driven to zero by phase
 - `Verification`
 - `Decisions`
 - `Notes`
@@ -105,8 +107,8 @@ The tracker should answer "what exactly is happening across the whole workstream
 
 - Update `last_updated` whenever you materially change the tracker.
 - Keep task lists or status entries current instead of deleting history. Mark completed checkbox items as `- [x]`, and update status-style entries when the phase or state changes.
-- Add blockers, new tasks, and verification status as the work evolves.
-- Update the tracker during the work, not only at the end. If a milestone, blocker, review round, or verification result changed reality, the tracker should already reflect it.
+- Add blockers, new tasks, verification status, and grep-gate status as the work evolves.
+- Update the tracker during the work, not only at the end. If a milestone, blocker, inventory discovery, review round, grep gate, or verification result changed reality, the tracker should already reflect it.
 - When the workstream finishes, set `status: done` or `status: archived`.
 
 Do not let the tracker become fiction. It must match reality.
