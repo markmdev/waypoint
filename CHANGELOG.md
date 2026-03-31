@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Patch Changes
+
+- Restore a few core always-on AGENTS rules: investigate code and routed context before answering detailed questions or implementing, prefer visible repo state over hidden assumptions, update docs and state files during the work when reality changes, and match verification to the real risk surface.
+
 ## 1.0.1
 
 ### Patch Changes

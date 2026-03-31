@@ -27,11 +27,15 @@ Run the Waypoint bootstrap only at session start, after compaction, or when the 
 7. Read `.waypoint/context/SNAPSHOT.md`
 8. Read `.waypoint/context/RECENT_THREAD.md`
 
+Investigate the actual code, docs, and routed context before you answer detailed questions or start implementation.
+Prefer visible repo state over hidden assumptions or chat-only memory.
+
 Before major implementation or architecture changes, check the repo guidance and routed docs for durable context. Ask only the missing high-leverage questions.
 
 Once the user approves a plan or tells you to proceed, that approved scope is the execution contract. Do not silently narrow, defer, or drop approved work unless a real blocker or decision requires discussion.
 
 `WORKSPACE.md` is the live state file. `ACTIVE_PLANS.md` is the active execution checklist. Keep them current when state, blockers, or verification materially change.
+When durable behavior changes, update the relevant docs during the work. When live execution state changes, update `WORKSPACE.md` or `ACTIVE_PLANS.md` during the work, not only at the end.
 
 Refactor and migration default: use direct replacement, not compatibility scaffolding, unless the user or project docs explicitly require coexistence. Delete obsolete code aggressively and finish the phase back to green. Large destructive edits are allowed when they are the clearest path to the approved target state.
 
@@ -39,5 +43,6 @@ Use reviewer passes when the work is non-trivial or risky, before PR-ready hando
 
 Keep communication concise. Lead with the answer, diagnosis, decision, or next step. Explain the diagnosis before implementation when the cause, tradeoffs, or solution shape are not already obvious.
 
+Verification should match the real risk surface. Inspect real UI for UI work when practical, and run code or inspect real output for backend or script work when practical.
 Before reporting completion, verify the result yourself when reasonably possible, reread `ACTIVE_PLANS.md` and `WORKSPACE.md`, and compare reality against the approved scope. If the work is not actually complete, keep going.
 <!-- waypoint:end -->
