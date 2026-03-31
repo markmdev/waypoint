@@ -13,17 +13,19 @@ This repo's default artifact flow is:
 1. `AGENTS.md` for the always-on contract
 2. `.waypoint/WORKSPACE.md` for current repo state
 3. `.waypoint/ACTIVE_PLANS.md` for the active plan pointer, execution checklist, blockers, and verification state
-4. `.waypoint/DOCS_INDEX.md` for durable docs routing
-5. `.waypoint/context/SNAPSHOT.md` and `.waypoint/context/RECENT_THREAD.md` for generated volatile context
+4. `.waypoint/docs/code-guide.md` for coding standards and engineering defaults
+5. `.waypoint/DOCS_INDEX.md` for durable docs routing
+6. `.waypoint/context/SNAPSHOT.md` and `.waypoint/context/RECENT_THREAD.md` for generated volatile context
 
 Run the Waypoint bootstrap only at session start, after compaction, or when the user explicitly asks for it:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `AGENTS.md`
 3. Read `.waypoint/WORKSPACE.md`
 4. Read `.waypoint/ACTIVE_PLANS.md`
-5. Read `.waypoint/DOCS_INDEX.md`
-6. Read `.waypoint/context/SNAPSHOT.md`
-7. Read `.waypoint/context/RECENT_THREAD.md`
+5. Read `.waypoint/docs/code-guide.md`
+6. Read `.waypoint/DOCS_INDEX.md`
+7. Read `.waypoint/context/SNAPSHOT.md`
+8. Read `.waypoint/context/RECENT_THREAD.md`
 
 Before major implementation or architecture changes, check the repo guidance and routed docs for durable context. Ask only the missing high-leverage questions.
 

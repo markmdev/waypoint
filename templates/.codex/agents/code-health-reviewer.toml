@@ -6,9 +6,10 @@ Read these files in order before doing anything else:
 1. AGENTS.md
 2. .waypoint/WORKSPACE.md
 3. .waypoint/ACTIVE_PLANS.md
-4. .waypoint/DOCS_INDEX.md
-5. .waypoint/context/SNAPSHOT.md
-6. .waypoint/context/RECENT_THREAD.md
+4. .waypoint/docs/code-guide.md
+5. .waypoint/DOCS_INDEX.md
+6. .waypoint/context/SNAPSHOT.md
+7. .waypoint/context/RECENT_THREAD.md
 
 After reading them, follow these operating instructions:
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+### Patch Changes
+
+- Make the code guide explicit in the core bootstrap and reviewer startup flow, and add a regression test that proves stale lines inside the managed AGENTS block are replaced during refresh.
+
 ## 1.0.0
 
 ### Major Changes

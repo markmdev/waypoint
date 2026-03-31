@@ -45,6 +45,7 @@ test("init scaffolds core files", () => {
   assert.ok(agents.includes("You are a direct, evidence-driven collaborator."));
   assert.ok(agents.includes("Run the Waypoint bootstrap only at session start"));
   assert.ok(agents.includes("approved scope is the execution contract"));
+  assert.ok(agents.includes(".waypoint/docs/code-guide.md"));
   assert.ok(agents.includes("`WORKSPACE.md` is the live state file"));
   assert.ok(agents.includes("use direct replacement, not compatibility scaffolding"));
   assert.ok(agents.includes("Large destructive edits are allowed"));
@@ -725,6 +726,29 @@ test("init preserves AGENTS content outside the managed block", () => {
   const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
   assert.ok(agents.includes("This text should survive upgrades."));
   assert.ok(agents.includes("<!-- waypoint:start -->"));
+});
+
+test("init fully replaces stale lines inside the managed AGENTS block", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-agents-refresh-"));
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const agentsPath = path.join(root, "AGENTS.md");
+  const staleAgents = readFileSync(agentsPath, "utf8").replace(
+    "Run the Waypoint bootstrap only at session start",
+    "Run the Waypoint bootstrap only at session start\nSTALE WAYPOINT LINE"
+  );
+  writeFileSync(agentsPath, staleAgents, "utf8");
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const refreshed = readFileSync(agentsPath, "utf8");
+  assert.equal(refreshed.includes("STALE WAYPOINT LINE"), false);
+  assert.ok(refreshed.includes(".waypoint/docs/code-guide.md"));
 });
 
 test("sync rebuilds the docs index only", () => {
