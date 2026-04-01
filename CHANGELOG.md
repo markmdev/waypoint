@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+### Patch Changes
+
+- Clarify the `agi-help` skill so handoff bundles include all materially relevant files, including supporting context that changes the reasoning even when it does not directly answer the question.
+
 ## 1.0.2
 
 ### Patch Changes

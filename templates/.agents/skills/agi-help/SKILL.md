@@ -98,6 +98,7 @@ Do not optimize for brevity by dropping relevant material.
 If a file is relevant, include it in full.
 If multiple files are relevant, include all of them.
 If prior plans, failed attempts, docs, architecture notes, or state files materially change the answer, include them too.
+Do not trim the bundle down to only the files that seem to directly answer the question. Include files that define constraints, history, surrounding system behavior, rejected approaches, current state, or any other context that materially changes how GPT-5.4-Pro should reason.
 
 The bottleneck here is not token thrift inside Codex. The bottleneck is giving GPT-5.4-Pro enough real context to reason well.
 
@@ -139,9 +140,13 @@ This is not a fixed checklist. Include whatever materially changes the quality o
 
 Create `files/` and copy in the relevant source material.
 
+The standard is completeness, not minimality.
+If a file materially affects the question, the answer, the constraints, or the reasoning path, include it even when it is only indirectly relevant.
+
 Examples of relevant files:
 
 - core implementation files
+- supporting files that materially change the reasoning, even if they do not directly answer the question
 - architecture docs
 - plans
 - active plan or workspace files
