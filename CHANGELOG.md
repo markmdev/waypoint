@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6
+
+### Patch Changes
+
+- Fix the generated `build-docs-index` script so it skips looped symlink directories instead of recursing into them during context preparation.
+
 ## 1.0.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -101,19 +101,28 @@ function parseFrontmatter(filePath) {
   return { summary, readWhen };
 }
 
-function walkDocs(projectRoot, currentDir, output) {
-  for (const entry of readdirSync(currentDir)) {
-    const fullPath = path.join(currentDir, entry);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      if (SKIP_DIRS.has(entry)) {
-        continue;
-      }
-      walkDocs(projectRoot, fullPath, output);
+function walkDocs(projectRoot, currentDir, output, visitedDirs) {
+  const resolvedCurrentDir = realpathSync(currentDir);
+  if (visitedDirs.has(resolvedCurrentDir)) {
+    return;
+  }
+  visitedDirs.add(resolvedCurrentDir);
+
+  for (const entry of readdirSync(currentDir, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) {
       continue;
     }
 
-    if (!entry.endsWith(".md") || SKIP_NAMES.has(entry)) {
+    const fullPath = path.join(currentDir, entry.name);
+    if (entry.isDirectory()) {
+      if (SKIP_DIRS.has(entry.name)) {
+        continue;
+      }
+      walkDocs(projectRoot, fullPath, output, visitedDirs);
+      continue;
+    }
+
+    if (!entry.isFile() || !entry.name.endsWith(".md") || SKIP_NAMES.has(entry.name)) {
       continue;
     }
 
@@ -134,7 +143,7 @@ function collectDocEntries(projectRoot, docsDir) {
   const entries = [];
 
   if (existsSync(docsDir)) {
-    walkDocs(projectRoot, docsDir, entries);
+    walkDocs(projectRoot, docsDir, entries, new Set());
   }
 
   return entries;

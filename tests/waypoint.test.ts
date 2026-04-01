@@ -912,6 +912,34 @@ test("sync skips symlinked directories while walking docs roots", () => {
   assert.equal(docsIndex.match(/\.waypoint\/docs\/reference\.md/g)?.length ?? 0, 1);
 });
 
+test("prepare-context skips looped symlink directories while rebuilding docs index", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-generated-docs-loop-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  writeRoutableDoc(path.join(root, ".waypoint/docs/reference.md"), {
+    title: "Reference",
+    summary: "Explain the stable reference doc.",
+  });
+
+  if (process.platform !== "win32") {
+    symlinkSync(path.join(root, ".waypoint/docs"), path.join(root, ".waypoint/docs/loop"));
+  }
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const docsIndex = readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8");
+  assert.equal(docsIndex.match(/\.waypoint\/docs\/reference\.md/g)?.length ?? 0, 1);
+});
+
 test("init scaffolds codex agent pack by default", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-roles-"));
   initRepository(root, {
