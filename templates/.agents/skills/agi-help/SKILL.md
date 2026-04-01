@@ -105,6 +105,40 @@ The bottleneck here is not token thrift inside Codex. The bottleneck is giving G
 Curate relevance aggressively. Compress relevance only by excluding things that truly do not matter.
 Do **not** compress relevant context just because it is long.
 
+## Core Rule: Make The Request Standalone
+
+Write the handoff so GPT-5.4-Pro can produce a strong answer in a brand new session with no prior context and no follow-up.
+
+Do not rely on:
+
+- prior chat history
+- "as discussed above"
+- local repo knowledge
+- implicit shared assumptions
+- GPT-5.4-Pro asking clarifying questions before it can reason well
+
+The request should contain the full problem, the full context, the real objective, and the expected output shape.
+
+## Core Rule: Ask Outcome-Level Questions
+
+Frame the request around the real goal, source of truth, or decision to be made.
+
+Prefer:
+
+- "Given the attached context, propose the best architecture for this system"
+- "Evaluate the current implementation against the attached north-star document and identify all important mismatches"
+- "Given the current product, constraints, and code, recommend the best migration strategy"
+
+Avoid narrow, history-led framing unless the task is intentionally narrow.
+
+Avoid prompts like:
+
+- "We recently changed X, can you check if this looks right?"
+- "Did we fix issue Y?"
+- "Can you look at this follow-up from the last pass?"
+
+Prior findings, recent changes, and local debates can be included as background, but they should not become the main frame unless that is truly the task.
+
 ## Workflow
 
 ### 1. Justify AGI-Help
@@ -133,6 +167,7 @@ Collect the context it would need to reason well, such as:
 - what has already been tried
 - what is blocked, unclear, risky, or contentious
 - what a successful answer would help us decide or do next
+- what source of truth, target state, desired behavior, or decision standard should govern the answer
 
 This is not a fixed checklist. Include whatever materially changes the quality of the answer.
 
@@ -154,6 +189,8 @@ Examples of relevant files:
 - failing or partial implementations
 - screenshots or exported artifacts when available through the current tool surface
 - strategy docs, briefs, drafts, notes, or prior outputs that define the problem
+- source-of-truth documents such as specs, north-star docs, acceptance criteria, or decision memos
+- surrounding files that materially affect the verdict even if they were not changed recently
 
 Preserve relative structure inside `files/` when it helps orientation.
 
@@ -172,6 +209,8 @@ Keep this concise but useful.
 
 Write the prompt as if briefing a world-class expert who has zero implicit context.
 
+The prompt should ask for a complete answer to the actual problem, not a reaction to the latest local narrative.
+
 The prompt should usually include:
 
 1. **Role / framing**
@@ -189,7 +228,7 @@ The prompt should usually include:
 7. **Attached materials**
    - tell it that files are attached and should be read before answering
 8. **Specific request**
-   - the concrete question or task
+   - the concrete task framed at the outcome/spec/decision level
 9. **Desired output shape**
    - exactly how the answer should be structured
 
@@ -212,6 +251,14 @@ Ask for something concrete, such as:
 - a better strategy or positioning approach
 - a decision memo with tradeoffs and risks
 
+When the task is evaluative, ask for a complete evaluation against the governing standard, not confirmation of recent fixes.
+
+Examples:
+
+- "Does the current system satisfy the attached target architecture? If not, identify all important mismatches with evidence."
+- "Given the attached implementation and requirements, what is the best recommendation and why?"
+- "Using the attached code, docs, and constraints, produce a complete architecture proposal for the new system."
+
 ### Specify The Output Format
 
 Tell GPT-5.4-Pro how to respond.
@@ -225,6 +272,17 @@ Good example shapes:
 ### Tell It To Read The Attachments First
 
 Explicitly instruct it to review the attached files before answering.
+
+### Do Not Depend On Follow-Up
+
+Assume Mark wants one strong answer, not a clarification loop.
+
+So:
+
+- front-load the necessary context
+- state the objective precisely
+- include the governing constraints and source of truth
+- ask for the full answer in one pass
 
 ## Final Handoff To Mark
 

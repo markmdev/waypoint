@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+### Patch Changes
+
+- Clarify AGI Help guidance so external handoff packets are standalone, outcome-level, and complete rather than framed around recent local fixes or prior conversation context.
+
 ## 1.0.3
 
 ### Patch Changes
