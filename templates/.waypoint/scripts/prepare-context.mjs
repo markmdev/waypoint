@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -172,17 +172,27 @@ function isWithinPath(childPath, parentPath) {
 
 function collectSessionFiles(rootDir) {
   const files = [];
+  const visitedDirs = new Set();
 
   function walk(currentDir) {
     if (!existsSync(currentDir)) {
       return;
     }
+    const resolvedCurrentDir = safeRealpath(currentDir);
+    if (!resolvedCurrentDir || visitedDirs.has(resolvedCurrentDir)) {
+      return;
+    }
+    visitedDirs.add(resolvedCurrentDir);
+
     for (const entry of readdirSync(currentDir)) {
       const fullPath = path.join(currentDir, entry);
       let stats;
       try {
-        stats = statSync(fullPath);
+        stats = lstatSync(fullPath);
       } catch {
+        continue;
+      }
+      if (stats.isSymbolicLink()) {
         continue;
       }
       if (stats.isDirectory()) {

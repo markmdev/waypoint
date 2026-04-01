@@ -1446,6 +1446,50 @@ test("prepare-context skips stale sessions whose cwd no longer exists", () => {
   assert.ok(!recentThread.includes("Old session that should be ignored."));
 });
 
+test("prepare-context skips looped symlink directories in Codex session roots", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-looped-session-"));
+  const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));
+  process.env.CODEX_HOME = codexHome;
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const sessionDir = path.join(codexHome, "sessions/2026/04/01");
+  mkdirp(sessionDir);
+
+  writeFileSync(
+    path.join(sessionDir, "valid-session.jsonl"),
+    [
+      JSON.stringify({ type: "session_meta", payload: { cwd: root } }),
+      JSON.stringify({
+        type: "response_item",
+        timestamp: "2026-04-01T17:00:00.000Z",
+        payload: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "Session survives looped symlink traversal.\n" }]
+        }
+      }),
+      JSON.stringify({ type: "compacted", payload: { message: "", replacement_history: [] } })
+    ].join("\n") + "\n",
+    "utf8"
+  );
+
+  if (process.platform !== "win32") {
+    symlinkSync(path.join(codexHome, "sessions"), path.join(sessionDir, "loop"));
+  }
+
+  execFileSync("node", [path.join(root, ".waypoint/scripts/prepare-context.mjs")], {
+    cwd: root,
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: "pipe"
+  });
+
+  const recentThread = readFileSync(path.join(root, ".waypoint/context/RECENT_THREAD.md"), "utf8");
+  assert.ok(recentThread.includes("Session survives looped symlink traversal."));
+});
+
 test("prepare-context captures repo state for commits and changes without extra context files", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-repo-state-"));
   const codexHome = mkdtempSync(path.join(os.tmpdir(), "waypoint-codex-home-"));

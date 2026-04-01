@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+
+### Patch Changes
+
+- Fix `prepare-context` so session scanning skips looped symlink directories instead of recursing into them.
+
 ## 1.0.4
 
 ### Patch Changes
