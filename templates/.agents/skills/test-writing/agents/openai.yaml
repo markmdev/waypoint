@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Writing"
+  short_description: "Write high-signal tests with minimal bloat"
+  default_prompt: "Use $test-writing to design and add the smallest durable test set that gives strong confidence for this change."

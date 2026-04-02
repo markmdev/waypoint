@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.12
+
+### Patch Changes
+
+- Add `test-writing` skill scaffold with metadata for skill discovery and invocation defaults.
+
 ## 1.0.11
 
 ### Patch Changes
