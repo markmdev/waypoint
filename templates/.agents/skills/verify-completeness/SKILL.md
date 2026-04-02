@@ -16,10 +16,11 @@ Use this skill at final closeout, right before you would report the work complet
 5. Compare expected scope vs actual outcome and list any missing or partially completed items.
 6. Run a scope-discipline pass: identify additions that were not requested or approved. Remove/simplify them before completion, or explicitly ask the user to approve keeping them.
 7. Run a cleanup pass on changed files: remove duplicated logic, unnecessary abstractions/files, and low-value comments that create maintenance bloat.
-8. Run a file-footprint sanity pass: collapse avoidable tiny-file fragmentation and keep code that changes together in the same place when boundary/reuse/size reasons are weak.
-9. Run a test-signal sanity pass: remove redundant or brittle tests and keep the smallest high-signal set that still protects the contract.
-10. Before commit/final handoff, run the full checks required by the plan (for example full typecheck/test/build sweep) once, unless explicitly blocked or the user asks for a different cadence.
-11. If any approved item is missing, incomplete, or silently deferred, do not report completion. Continue working until the agreed scope is fully satisfied or discuss a scope change explicitly.
+8. If changed code is still hard to read or reason about, run `legibility-pass` before completion and apply the resulting readability cleanup.
+9. Run a file-footprint sanity pass: collapse avoidable tiny-file fragmentation and keep code that changes together in the same place when boundary/reuse/size reasons are weak.
+10. Run a test-signal sanity pass: remove redundant or brittle tests and keep the smallest high-signal set that still protects the contract.
+11. Before commit/final handoff, run the full checks required by the plan (for example full typecheck/test/build sweep) once, unless explicitly blocked or the user asks for a different cadence.
+12. If any approved item is missing, incomplete, or silently deferred, do not report completion. Continue working until the agreed scope is fully satisfied or discuss a scope change explicitly.
 
 ## Completion gate
 
@@ -42,6 +43,7 @@ Before final status, summarize briefly:
 - files re-read for final verification
 - completed items
 - removed unapproved extras or bloat cleanup applied
+- legibility cleanup applied (if run)
 - file-collapsing or test-pruning done during sanity passes
 - remaining gaps (if any)
 - next action (continue execution or complete)

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Legibility Pass"
+  short_description: "Improve readability without changing behavior"
+  default_prompt: "Use $legibility-pass on the current scope to improve naming, control-flow clarity, and local reasoning while preserving intended behavior."

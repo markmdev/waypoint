@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.13
+
+### Patch Changes
+
+- Add `legibility-pass` skill scaffold, wire in skill metadata, and integrate a conditional legibility cleanup step into `verify-completeness` closeout guidance.
+
 ## 1.0.12
 
 ### Patch Changes
