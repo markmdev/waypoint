@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.8
+
+### Patch Changes
+
+- Adjust execution guidance so full typecheck/test/build sweeps default to pre-commit or final handoff instead of after tiny edits, tighten completion verification cadence, and add new skill scaffolds (`execution-reset`, `plan-start`, and `replace-dont-layer`).
+
 ## 1.0.7
 
 ### Patch Changes

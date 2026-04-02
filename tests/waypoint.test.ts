@@ -62,6 +62,7 @@ test("init scaffolds core files", () => {
   assert.ok(agents.includes("This final file re-read is mandatory"));
   assert.ok(agents.includes("run `verify-completeness` for a final scope-and-files closeout pass"));
   assert.ok(agents.includes("unapproved-scope and bloat cleanup checks"));
+  assert.ok(agents.includes("Do not run full repo typecheck/test/build loops after every small edit by default"));
 
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Plans"));
   assert.ok(readFileSync(path.join(root, ".waypoint/ACTIVE_PLANS.md"), "utf8").includes("# Active Plans"));
@@ -69,12 +70,14 @@ test("init scaffolds core files", () => {
   assert.ok(planning.includes("Legacy seam inventory"));
   assert.ok(planning.includes("Grep gates"));
   assert.ok(planning.includes("what legacy or obsolete code will be removed"));
+  assert.ok(planning.includes("full sweeps at phase-complete or pre-commit checkpoints"));
   assert.ok(foundationalRedesign.includes("For each change, examine the existing system"));
   assert.ok(foundationalRedesign.includes("Before stopping, re-read every changed file"));
   assert.ok(verifyCompleteness.includes("Use this skill at final closeout"));
   assert.ok(verifyCompleteness.includes("do not report completion"));
   assert.ok(verifyCompleteness.includes("Run a scope-discipline pass"));
   assert.ok(verifyCompleteness.includes("Run a cleanup pass on changed files"));
+  assert.ok(verifyCompleteness.includes("Before commit/final handoff, run the full checks required by the plan"));
   assert.ok(verifyCompleteness.includes("Do not keep speculative extras"));
   assert.ok(codeGuideAudit.includes("report only guide-related findings"));
 

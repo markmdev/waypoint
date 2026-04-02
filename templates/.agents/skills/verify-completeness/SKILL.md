@@ -16,7 +16,8 @@ Use this skill at final closeout, right before you would report the work complet
 5. Compare expected scope vs actual outcome and list any missing or partially completed items.
 6. Run a scope-discipline pass: identify additions that were not requested or approved. Remove/simplify them before completion, or explicitly ask the user to approve keeping them.
 7. Run a cleanup pass on changed files: remove duplicated logic, unnecessary abstractions/files, and low-value comments that create maintenance bloat.
-8. If any approved item is missing, incomplete, or silently deferred, do not report completion. Continue working until the agreed scope is fully satisfied or discuss a scope change explicitly.
+8. Before commit/final handoff, run the full checks required by the plan (for example full typecheck/test/build sweep) once, unless explicitly blocked or the user asks for a different cadence.
+9. If any approved item is missing, incomplete, or silently deferred, do not report completion. Continue working until the agreed scope is fully satisfied or discuss a scope change explicitly.
 
 ## Completion gate
 
@@ -24,7 +25,7 @@ You can report complete only when all are true:
 
 - approved scope items are done
 - planned file changes match reality
-- verification/checkpoints required by the plan were run (or explicitly called out as blocked)
+- verification/checkpoints required by the plan were run at the required cadence, including full pre-commit checks when required (or explicitly called out as blocked)
 - no hidden scope reduction occurred
 - no unapproved scope expansion remains
 - no obvious duplication or avoidable bloat remains in touched files

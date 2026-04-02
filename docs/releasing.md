@@ -15,10 +15,18 @@ Waypoint uses **Changesets**.
 Normal flow:
 
 1. a user-visible change lands with a changeset file in `.changeset/`
-2. when those changesets reach `main`, GitHub Actions opens or updates a release PR
-3. merging that release PR publishes the npm package and writes the version/changelog commit
+2. when those changesets reach `main`, the `Release` GitHub Action runs `changesets/action`
+3. that workflow handles version/changelog commits or publishing, depending on pending changesets state and config
 
 This keeps releases explicit.
+
+### Important: local publish expectation
+
+Treat npm publishing as **GitHub Actions-owned** for this repo.
+
+- Do not assume local `npm publish` will succeed.
+- A local publish failure (auth/permission) is not a release failure if the `Release` workflow on `main` succeeds.
+- Confirm the release via GitHub Actions run status and `npm view waypoint-codex version`.
 
 ## What counts as user-visible
 

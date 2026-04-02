@@ -105,7 +105,7 @@ Plans document your understanding. Include what matters for this task:
 - **Phase breakdown**: Distinct execution phases in the order they should happen
 - **Scope checklist**: Concrete implementation items that can be marked done or not done
 - **Acceptance criteria**: What must be true when each phase is "done"
-- **Phase checkpoints**: What verification, reviewer passes, tests, typechecks, builds, or manual QA must pass before moving to the next phase
+- **Phase checkpoints**: What verification, reviewer passes, tests, typechecks, builds, or manual QA must pass before moving to the next phase, with explicit cadence (targeted checks during implementation, full sweeps at phase-complete or pre-commit checkpoints unless the user asks otherwise)
 - **Grep gates**: Exact searches that must return clean before a phase is review-ready or complete
 - **Cleanup expectations**: What legacy or replaced paths must be removed before the work can be called complete
 - **Test cases**: For behavioral changes, include input -> expected output examples

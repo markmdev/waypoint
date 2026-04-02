@@ -1,0 +1,4 @@
+interface:
+  display_name: "Execution Reset"
+  short_description: "Reset stalled plan execution and restore phase progress"
+  default_prompt: "Use $execution-reset with the active plan path and current phase to reset execution momentum and drive meaningful checklist progress."

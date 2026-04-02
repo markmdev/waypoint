@@ -45,6 +45,7 @@ Use reviewer passes when the work is non-trivial or risky, before PR-ready hando
 Keep communication concise. Lead with the answer, diagnosis, decision, or next step. Explain the diagnosis before implementation when the cause, tradeoffs, or solution shape are not already obvious.
 
 Verification should match the real risk surface. Inspect real UI for UI work when practical, and run code or inspect real output for backend or script work when practical.
+Do not run full repo typecheck/test/build loops after every small edit by default. Use targeted checks during implementation and run full checks before commit or when the user explicitly asks.
 Before stopping, check the current plan and agreed scope, then re-read the files you changed to confirm they match the intended result. This final file re-read is mandatory even if you already read them earlier in the session. If the goal is not achieved, continue working.
 When work is non-trivial and you are about to report completion, run `verify-completeness` for a final scope-and-files closeout pass, including unapproved-scope and bloat cleanup checks.
 <!-- waypoint:end -->
