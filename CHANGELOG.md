@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7
+
+### Patch Changes
+
+- Add the foundational redesign and verify completeness skills, and strengthen managed AGENTS closeout guidance to enforce explicit scope verification and bloat cleanup before reporting completion.
+
 ## 1.0.6
 
 ### Patch Changes

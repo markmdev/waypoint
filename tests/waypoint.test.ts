@@ -37,20 +37,31 @@ test("init scaffolds core files", () => {
 
   const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
   const planning = readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8");
+  const foundationalRedesign = readFileSync(path.join(root, ".agents/skills/foundational-redesign/SKILL.md"), "utf8");
+  const verifyCompleteness = readFileSync(path.join(root, ".agents/skills/verify-completeness/SKILL.md"), "utf8");
   const codeGuideAudit = readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8");
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
 
   assert.ok(agents.includes("<!-- waypoint:start -->"));
   assert.ok(agents.includes("These instructions are mandatory in this repo"));
+  assert.ok(
+    agents.includes(
+      "The most important rule: For each change, examine the existing system and redesign it into the most elegant solution that would have emerged if the change had been a foundational assumption from the start."
+    )
+  );
   assert.ok(agents.includes("You are a direct, evidence-driven collaborator."));
   assert.ok(agents.includes("Run the Waypoint bootstrap only at session start"));
+  assert.equal(agents.includes("Read `AGENTS.md`"), false);
   assert.ok(agents.includes("approved scope is the execution contract"));
   assert.ok(agents.includes(".waypoint/docs/code-guide.md"));
   assert.ok(agents.includes("`WORKSPACE.md` is the live state file"));
-  assert.ok(agents.includes("use direct replacement, not compatibility scaffolding"));
-  assert.ok(agents.includes("Large destructive edits are allowed"));
+  assert.ok(agents.includes("do not hesitate to aggressively delete legacy code"));
+  assert.ok(agents.includes("Prefer clean replacement over compatibility scaffolding"));
   assert.ok(agents.includes("Use reviewer passes when the work is non-trivial or risky"));
-  assert.ok(agents.includes("Before reporting completion, verify the result yourself"));
+  assert.ok(agents.includes("Before stopping, check the current plan and agreed scope"));
+  assert.ok(agents.includes("This final file re-read is mandatory"));
+  assert.ok(agents.includes("run `verify-completeness` for a final scope-and-files closeout pass"));
+  assert.ok(agents.includes("unapproved-scope and bloat cleanup checks"));
 
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Plans"));
   assert.ok(readFileSync(path.join(root, ".waypoint/ACTIVE_PLANS.md"), "utf8").includes("# Active Plans"));
@@ -58,8 +69,16 @@ test("init scaffolds core files", () => {
   assert.ok(planning.includes("Legacy seam inventory"));
   assert.ok(planning.includes("Grep gates"));
   assert.ok(planning.includes("what legacy or obsolete code will be removed"));
+  assert.ok(foundationalRedesign.includes("For each change, examine the existing system"));
+  assert.ok(foundationalRedesign.includes("Before stopping, re-read every changed file"));
+  assert.ok(verifyCompleteness.includes("Use this skill at final closeout"));
+  assert.ok(verifyCompleteness.includes("do not report completion"));
+  assert.ok(verifyCompleteness.includes("Run a scope-discipline pass"));
+  assert.ok(verifyCompleteness.includes("Run a cleanup pass on changed files"));
+  assert.ok(verifyCompleteness.includes("Do not keep speculative extras"));
   assert.ok(codeGuideAudit.includes("report only guide-related findings"));
 
+  assert.ok(gitignore.includes(".agents/skills/verify-completeness/"));
   assert.ok(gitignore.includes(".waypoint/ACTIVE_PLANS.md"));
   assert.ok(readFileSync(path.join(root, ".waypoint/DOCS_INDEX.md"), "utf8").includes("## .waypoint/docs/"));
   assert.ok(!existsSync(path.join(root, ".waypoint/TRACKS_INDEX.md")));
@@ -607,6 +626,8 @@ test("init removes retired audit skill directories on refresh", () => {
   assert.equal(existsSync(path.join(root, ".agents/skills/observability-audit")), false);
   assert.equal(existsSync(path.join(root, ".agents/skills/ux-states-audit")), false);
   assert.equal(existsSync(path.join(root, ".agents/skills/planning/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/foundational-redesign/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/verify-completeness/SKILL.md")), true);
   assert.equal(existsSync(path.join(root, ".agents/skills/pr-review/SKILL.md")), true);
   assert.equal(existsSync(path.join(root, ".agents/skills/adversarial-review/SKILL.md")), true);
 });

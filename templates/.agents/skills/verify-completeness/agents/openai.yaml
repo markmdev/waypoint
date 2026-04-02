@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify Completeness"
+  short_description: "Run a strict final scope and file verification pass"
+  default_prompt: "Use $verify-completeness now: re-read the approved plan and scope, re-read all files that were supposed to change, remove unapproved extras and obvious bloat, verify nothing was dropped, and keep working if any approved scope item is still incomplete."

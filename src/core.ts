@@ -42,6 +42,8 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".agents/",
   ".agents/skills/",
   ".agents/skills/planning/",
+  ".agents/skills/foundational-redesign/",
+  ".agents/skills/verify-completeness/",
   ".agents/skills/code-guide-audit/",
   ".agents/skills/adversarial-review/",
   ".agents/skills/visual-explanations/",
@@ -69,6 +71,8 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
 ]);
 const SHIPPED_SKILL_NAMES = [
   "planning",
+  "foundational-redesign",
+  "verify-completeness",
   "code-guide-audit",
   "adversarial-review",
   "pr-review",

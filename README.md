@@ -255,6 +255,8 @@ docs_dirs = [
 Waypoint ships a strong default skill pack for real coding work:
 
 - `planning`
+- `foundational-redesign`
+- `verify-completeness`
 - `code-guide-audit`
 - `adversarial-review`
 - `frontend-ship-audit`
@@ -280,6 +282,8 @@ be used deliberately when the moment calls for them.
 
 The most important ones are:
 
+- `foundational-redesign` when the right move is a cleaner replacement that deletes legacy seams instead of patching around them
+- `verify-completeness` when you think implementation is done and need a strict final pass against approved scope, planned file changes, and completion gates
 - `code-guide-audit` when you want a code quality pass against your repo's
   standards and working rules
 - `backend-ship-audit` when backend work needs a deeper production-readiness
