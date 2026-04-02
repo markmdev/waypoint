@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.11
+
+### Patch Changes
+
+- Generate managed `.gitignore` skill entries dynamically from `templates/.agents/skills/*` to prevent drift when skills are added or removed.
+- Replace hardcoded skill rules in `templates/.gitignore.snippet` with a runtime placeholder expansion.
+- Add regression coverage to assert that scaffolded `.gitignore` includes every template skill and excludes retired static entries.
+
 ## 1.0.10
 
 ### Patch Changes

@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -56,6 +56,30 @@ test("init scaffolds core files", () => {
   assert.equal(existsSync(path.join(root, "WORKSPACE.md")), false);
   assert.equal(existsSync(path.join(root, "ACTIVE_PLANS.md")), false);
   assert.equal(existsSync(path.join(root, "DOCS_INDEX.md")), false);
+});
+
+test("init generates gitignore skill entries from template skill directories", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-gitignore-generated-skills-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8").replace(/\r\n/g, "\n");
+  const templateSkillsRoot = path.join(process.cwd(), "templates/.agents/skills");
+  const templateSkillDirs = readdirSync(templateSkillsRoot)
+    .filter((entry) => statSync(path.join(templateSkillsRoot, entry)).isDirectory())
+    .sort((left, right) => left.localeCompare(right));
+
+  for (const skillName of templateSkillDirs) {
+    const rule = `.agents/skills/${skillName}/`;
+    assert.equal(
+      gitignore.match(new RegExp(`^${rule.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "gm"))?.length ?? 0,
+      1
+    );
+  }
+
+  assert.equal(gitignore.includes(".agents/skills/work-tracker/"), false);
+  assert.equal(gitignore.includes(".agents/skills/docs-sync/"), false);
 });
 
 test("doctor is clean after init", () => {

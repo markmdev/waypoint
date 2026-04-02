@@ -31,6 +31,7 @@ const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
 const DEFAULT_ACTIVE_PLANS = ".waypoint/ACTIVE_PLANS.md";
 const GITIGNORE_WAYPOINT_START = "# Waypoint state";
 const GITIGNORE_WAYPOINT_END = "# End Waypoint state";
+const GITIGNORE_SKILLS_PLACEHOLDER = "__WAYPOINT_SKILL_IGNORES__";
 const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".codex/",
   ".codex/config.toml",
@@ -204,9 +205,35 @@ function migrateLegacyRootFiles(projectRoot: string): void {
   removePathIfExists(path.join(projectRoot, "DOCS_INDEX.md"));
 }
 
+function templateSkillIgnoreLines(): string[] {
+  const skillsRoot = templatePath(".agents/skills");
+  if (!existsSync(skillsRoot)) {
+    return [];
+  }
+
+  return readdirSync(skillsRoot)
+    .filter((entry) => statSync(path.join(skillsRoot, entry)).isDirectory())
+    .sort((left, right) => left.localeCompare(right))
+    .map((skillName) => `.agents/skills/${skillName}/`);
+}
+
+function renderGitignoreSnippet(): string {
+  const snippet = readTemplate(".gitignore.snippet").trim();
+  const renderedLines: string[] = [];
+  for (const line of snippet.split("\n")) {
+    if (line === GITIGNORE_SKILLS_PLACEHOLDER) {
+      renderedLines.push(...templateSkillIgnoreLines());
+      continue;
+    }
+    renderedLines.push(line);
+  }
+
+  return renderedLines.join("\n");
+}
+
 function appendGitignoreSnippet(projectRoot: string): void {
   const gitignorePath = path.join(projectRoot, ".gitignore");
-  const snippet = readTemplate(".gitignore.snippet").trim();
+  const snippet = renderGitignoreSnippet();
   const snippetLines = snippet.split("\n");
   if (!existsSync(gitignorePath)) {
     writeText(gitignorePath, `${snippet}\n`);
@@ -284,7 +311,8 @@ function findLegacyWaypointGitignoreBlockEnd(lines: string[], startIndex: number
 
 function isLegacyWaypointGitignoreRule(line: string): boolean {
   const normalizedLine = line.startsWith("/") ? line.slice(1) : line;
-  return LEGACY_WAYPOINT_GITIGNORE_RULES.has(normalizedLine);
+  return LEGACY_WAYPOINT_GITIGNORE_RULES.has(normalizedLine)
+    || /^\.agents\/skills\/[^/]+\/$/.test(normalizedLine);
 }
 
 function isManagedWaypointGitignoreLine(line: string, managedLineSet: Set<string>): boolean {
