@@ -106,6 +106,8 @@ Plans document your understanding. Include what matters for this task:
 - **Scope checklist**: Concrete implementation items that can be marked done or not done
 - **Acceptance criteria**: What must be true when each phase is "done"
 - **Phase checkpoints**: What verification, reviewer passes, tests, typechecks, builds, or manual QA must pass before moving to the next phase, with explicit cadence (targeted checks during implementation, full sweeps at phase-complete or pre-commit checkpoints unless the user asks otherwise)
+- **File strategy**: Why each new file is necessary, how edit locality is preserved, and which splits are intentionally avoided
+- **Test strategy**: The smallest durable test set that gives confidence for this change, plus why additional tests are not needed right now
 - **Grep gates**: Exact searches that must return clean before a phase is review-ready or complete
 - **Cleanup expectations**: What legacy or replaced paths must be removed before the work can be called complete
 - **Test cases**: For behavioral changes, include input -> expected output examples
@@ -135,6 +137,8 @@ Before presenting the plan, verify against real code:
 - Migration and refactor plans should include a legacy seam inventory before implementation starts
 - Migration and refactor phases should include exact grep gates for the legacy symbols being removed
 - Refactor and replacement plans should explicitly call out what legacy or obsolete code will be removed instead of preserving it by default
+- Do not split files by concern labels alone. A new file requires a clear boundary, reuse need, or size reason.
+- Do not inflate tests by default. Start from a small high-signal set and expand only when risk justifies it.
 - If the user approves the plan, do not silently defer or drop checklist items later; discuss any proposed scope change first
 
 If the change touches durable project behavior, include docs/workspace updates in the plan.

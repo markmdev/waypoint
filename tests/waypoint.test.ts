@@ -35,51 +35,17 @@ test("init scaffolds core files", () => {
     profile: "universal"
   });
 
-  const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
-  const planning = readFileSync(path.join(root, ".agents/skills/planning/SKILL.md"), "utf8");
-  const foundationalRedesign = readFileSync(path.join(root, ".agents/skills/foundational-redesign/SKILL.md"), "utf8");
-  const verifyCompleteness = readFileSync(path.join(root, ".agents/skills/verify-completeness/SKILL.md"), "utf8");
-  const codeGuideAudit = readFileSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md"), "utf8");
   const gitignore = readFileSync(path.join(root, ".gitignore"), "utf8");
 
-  assert.ok(agents.includes("<!-- waypoint:start -->"));
-  assert.ok(agents.includes("These instructions are mandatory in this repo"));
-  assert.ok(
-    agents.includes(
-      "The most important rule: For each change, examine the existing system and redesign it into the most elegant solution that would have emerged if the change had been a foundational assumption from the start."
-    )
-  );
-  assert.ok(agents.includes("You are a direct, evidence-driven collaborator."));
-  assert.ok(agents.includes("Run the Waypoint bootstrap only at session start"));
-  assert.equal(agents.includes("Read `AGENTS.md`"), false);
-  assert.ok(agents.includes("approved scope is the execution contract"));
-  assert.ok(agents.includes(".waypoint/docs/code-guide.md"));
-  assert.ok(agents.includes("`WORKSPACE.md` is the live state file"));
-  assert.ok(agents.includes("do not hesitate to aggressively delete legacy code"));
-  assert.ok(agents.includes("Prefer clean replacement over compatibility scaffolding"));
-  assert.ok(agents.includes("Use reviewer passes when the work is non-trivial or risky"));
-  assert.ok(agents.includes("Before stopping, check the current plan and agreed scope"));
-  assert.ok(agents.includes("This final file re-read is mandatory"));
-  assert.ok(agents.includes("run `verify-completeness` for a final scope-and-files closeout pass"));
-  assert.ok(agents.includes("unapproved-scope and bloat cleanup checks"));
-  assert.ok(agents.includes("Do not run full repo typecheck/test/build loops after every small edit by default"));
+  assert.equal(existsSync(path.join(root, "AGENTS.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/planning/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/foundational-redesign/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/verify-completeness/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".agents/skills/code-guide-audit/SKILL.md")), true);
+  assert.equal(existsSync(path.join(root, ".waypoint/docs/code-guide.md")), true);
 
   assert.ok(readFileSync(path.join(root, ".waypoint/WORKSPACE.md"), "utf8").includes("## Active Plans"));
   assert.ok(readFileSync(path.join(root, ".waypoint/ACTIVE_PLANS.md"), "utf8").includes("# Active Plans"));
-
-  assert.ok(planning.includes("Legacy seam inventory"));
-  assert.ok(planning.includes("Grep gates"));
-  assert.ok(planning.includes("what legacy or obsolete code will be removed"));
-  assert.ok(planning.includes("full sweeps at phase-complete or pre-commit checkpoints"));
-  assert.ok(foundationalRedesign.includes("For each change, examine the existing system"));
-  assert.ok(foundationalRedesign.includes("Before stopping, re-read every changed file"));
-  assert.ok(verifyCompleteness.includes("Use this skill at final closeout"));
-  assert.ok(verifyCompleteness.includes("do not report completion"));
-  assert.ok(verifyCompleteness.includes("Run a scope-discipline pass"));
-  assert.ok(verifyCompleteness.includes("Run a cleanup pass on changed files"));
-  assert.ok(verifyCompleteness.includes("Before commit/final handoff, run the full checks required by the plan"));
-  assert.ok(verifyCompleteness.includes("Do not keep speculative extras"));
-  assert.ok(codeGuideAudit.includes("report only guide-related findings"));
 
   assert.ok(gitignore.includes(".agents/skills/verify-completeness/"));
   assert.ok(gitignore.includes(".waypoint/ACTIVE_PLANS.md"));
@@ -761,8 +727,8 @@ test("init fully replaces stale lines inside the managed AGENTS block", () => {
 
   const agentsPath = path.join(root, "AGENTS.md");
   const staleAgents = readFileSync(agentsPath, "utf8").replace(
-    "Run the Waypoint bootstrap only at session start",
-    "Run the Waypoint bootstrap only at session start\nSTALE WAYPOINT LINE"
+    "<!-- waypoint:start -->",
+    "<!-- waypoint:start -->\nSTALE WAYPOINT LINE"
   );
   writeFileSync(agentsPath, staleAgents, "utf8");
 
@@ -772,7 +738,8 @@ test("init fully replaces stale lines inside the managed AGENTS block", () => {
 
   const refreshed = readFileSync(agentsPath, "utf8");
   assert.equal(refreshed.includes("STALE WAYPOINT LINE"), false);
-  assert.ok(refreshed.includes(".waypoint/docs/code-guide.md"));
+  assert.ok(refreshed.includes("<!-- waypoint:start -->"));
+  assert.ok(refreshed.includes("<!-- waypoint:end -->"));
 });
 
 test("sync rebuilds the docs index only", () => {
@@ -978,77 +945,9 @@ test("init scaffolds codex agent pack by default", () => {
   assert.ok(codexConfig.includes('[agents."code-reviewer"]'));
   assert.ok(codexConfig.includes('[agents."plan-reviewer"]'));
   assert.equal(existsSync(path.join(root, ".codex/agents/coding-agent.toml")), false);
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes("You are a code reviewer.")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes('model = "gpt-5.4"')
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(
-      "A diff-only review is a failed review."
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes('model = "gpt-5.4"')
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
-      "Read every changed file in full before making a maintainability judgment."
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(
-      "Do not clear a change unless you can explain the critical paths you traced"
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
-      "Do not clear a change as healthy unless you can explain which surrounding files"
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-reviewer.toml"), "utf8").includes(
-      'model_reasoning_effort = "high"'
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
-      'model_reasoning_effort = "high"'
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/code-health-reviewer.toml"), "utf8").includes(
-      "A diff-only review is a failed review."
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
-      "You are an elite Plan Review Architect."
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes('model = "gpt-5.4"')
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
-      'model_reasoning_effort = "high"'
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(
-      "This reviewer agent is single-use"
-    )
-  );
-  assert.ok(
-    readFileSync(path.join(root, ".codex/agents/plan-reviewer.toml"), "utf8").includes(".waypoint/WORKSPACE.md")
-  );
+  assert.equal(existsSync(path.join(root, ".codex/agents/code-reviewer.toml")), true);
+  assert.equal(existsSync(path.join(root, ".codex/agents/code-health-reviewer.toml")), true);
+  assert.equal(existsSync(path.join(root, ".codex/agents/plan-reviewer.toml")), true);
   assert.equal(existsSync(path.join(root, ".waypoint/agents/code-reviewer.md")), false);
 });
 

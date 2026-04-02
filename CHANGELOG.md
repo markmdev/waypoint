@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.10
+
+### Patch Changes
+
+- Tighten core guidance around abstraction and file-splitting discipline (`do not X unless Y`), add higher-signal verification/closeout checks, and add explicit guardrails for rewrite scope expansion.
+- Add new skill scaffolds for `plan-swarm-audit` (including explicit subagent closeout requirements) and `collapse-fragmented-modules`.
+- Refocus tests on CLI/scaffold behavior by removing prompt-text assertions from `tests/waypoint.test.ts`, and ignore `.DS_Store` files by default.
+
 ## 1.0.9
 
 ### Patch Changes

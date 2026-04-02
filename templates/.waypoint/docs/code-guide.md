@@ -78,6 +78,8 @@ Security and privacy work is part of normal engineering, not a later hardening p
 Do not invent complexity for hypothetical future needs.
 
 - Add abstractions only when multiple concrete cases already demand the same shape.
+- Do not introduce a new abstraction unless at least two concrete call sites already need the same contract, or a documented architectural boundary requires it.
+- Do not add a thin wrapper, adapter, or pass-through layer unless it enforces a real contract, boundary, or migration transition.
 - Prefer straightforward code and small duplication over the wrong generic layer.
 - If a helper hides critical validation, state changes, or failure modes, it is probably hurting clarity.
 
@@ -106,6 +108,7 @@ Frontend changes should extend the app, not fork its design language.
 
 - Before creating a new component, check whether the app already has a component or pattern that should be reused.
 - Reuse existing components when they satisfy the need, even if minor adaptation is required.
+- Do not create a thin wrapper component when a direct edit to the existing component is the cleaner path.
 - When a new component is necessary, make it match the design language, interaction model, spacing, states, and compositional patterns of the rest of the app.
 - Handle all states for async and data-driven UI: loading, success, empty, error.
 - Optimistic UI must have an explicit rollback or invalidation strategy. Never leave optimistic state hanging without a recovery path.
@@ -124,6 +127,7 @@ UI work is not correct if important users cannot operate it.
 If you cannot see the failure path, you have not finished the work.
 
 - Emit structured logs, metrics, or events at important boundaries and state transitions.
+- Instrument important boundaries and state transitions, not every internal hop.
 - Include enough context to reproduce issues without logging secrets or sensitive data.
 - Failed async work, retries, degraded paths, and rejected inputs must leave a useful trace.
 - Do not use noisy logging to compensate for unclear control flow.
@@ -142,6 +146,10 @@ Optimize based on real impact, not superstition, but do not ignore performance f
 Tests should protect the contract users depend on.
 
 - Test observable behavior and boundary cases, not implementation trivia.
+- Start with the smallest test set that gives strong confidence.
+- Default budget for a normal feature: one main-path test, one key edge or failure-path test, plus unit tests only for non-trivial pure logic.
+- Do not duplicate confidence across layers unless a distinct risk justifies it.
+- Do not add tests for trivial helpers, thin wrappers, pass-through glue, or refactor-sensitive internals unless they protect a meaningful rule.
 - Never write brittle regression tests that assert exact class strings, styling internals, private helper calls, incidental DOM structure, internal schema representations, or other implementation-detail artifacts.
 - Regression tests must focus on the behavior that was broken and the behavior that is now guaranteed.
 - For backend bugs, prefer behavior-focused regression tests by default.
@@ -153,7 +161,10 @@ Tests should protect the contract users depend on.
 Code should be easy to navigate under pressure.
 
 - Use names that describe intent, not cleverness, incidental mechanics, or historical accidents.
-- Keep functions, modules, and APIs small enough that a reader can understand the responsibility without cross-referencing half the repo.
+- Do not split by default. Keep code that changes together in the same file or module unless there is a clear boundary, reuse need, or size problem.
+- Before creating a new file, decide whether it reduces or increases the number of files touched by a routine future change.
+- Do not create standalone files for helpers, types, constants, hooks, adapters, or mappers unless they are shared, large enough to justify extraction, or represent a real architectural boundary.
+- Keep functions, modules, and APIs understandable without cross-referencing half the repo, but do not split cohesive feature code only to make files shorter.
 - Prefer one obvious place for a behavior over scattering it across thin wrappers and pass-through layers.
 - Group code by responsibility and boundary, not by vague convenience buckets.
 - If a file or API has grown hard to name clearly, it is probably doing too much.
@@ -162,7 +173,7 @@ Code should be easy to navigate under pressure.
 
 Write code for the next engineer or agent who has to change it under pressure.
 
-- Keep modules narrow in responsibility and data flow obvious.
+- Keep responsibilities cohesive and data flow obvious, but do not create additional modules unless they reduce routine edit spread or establish a real boundary.
 - Remove stale branches, half-migrations, dead code, and obsolete docs around the change.
 - Keep docs and shipped behavior aligned.
 - Before pushing or opening a PR, do a hygiene pass for stale docs, drifting contracts, typing gaps, missing rollback strategies, and new persistence correctness risks.

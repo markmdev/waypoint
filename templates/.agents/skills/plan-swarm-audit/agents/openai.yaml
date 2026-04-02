@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Swarm Audit"
+  short_description: "Run a 5-agent audit loop against the active plan phase"
+  default_prompt: "Use $plan-swarm-audit with the current plan path and active phase. Spawn five parallel audit agents with distinct scopes, consolidate blockers, fix them, and repeat in bounded rounds until phase acceptance criteria are satisfied."
