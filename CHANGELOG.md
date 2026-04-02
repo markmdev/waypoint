@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.14
+
+### Patch Changes
+
+- Disable managed `.gitignore` injection so `waypoint init` no longer creates or rewrites `.gitignore`.
+- Remove `adversarial-review` and `code-guide-audit` from the shipped template skills and required-skill checks.
+- Add `edit-at-the-right-layer`, `make-invariants-explicit`, and `verify-codebase-coherence` skill scaffolds.
+- Update tests to match the new `.gitignore` behavior and shipped skill set.
+
 ## 1.0.13
 
 ### Patch Changes

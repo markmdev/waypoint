@@ -29,6 +29,7 @@ const DEFAULT_DOCS_INDEX = ".waypoint/DOCS_INDEX.md";
 const DEFAULT_PLANS_DIR = ".waypoint/plans";
 const DEFAULT_WORKSPACE = ".waypoint/WORKSPACE.md";
 const DEFAULT_ACTIVE_PLANS = ".waypoint/ACTIVE_PLANS.md";
+const ENABLE_MANAGED_GITIGNORE = false;
 const GITIGNORE_WAYPOINT_START = "# Waypoint state";
 const GITIGNORE_WAYPOINT_END = "# End Waypoint state";
 const GITIGNORE_SKILLS_PLACEHOLDER = "__WAYPOINT_SKILL_IGNORES__";
@@ -45,8 +46,6 @@ const LEGACY_WAYPOINT_GITIGNORE_RULES = new Set([
   ".agents/skills/planning/",
   ".agents/skills/foundational-redesign/",
   ".agents/skills/verify-completeness/",
-  ".agents/skills/code-guide-audit/",
-  ".agents/skills/adversarial-review/",
   ".agents/skills/visual-explanations/",
   ".agents/skills/frontend-context-interview/",
   ".agents/skills/backend-context-interview/",
@@ -74,8 +73,6 @@ const SHIPPED_SKILL_NAMES = [
   "planning",
   "foundational-redesign",
   "verify-completeness",
-  "code-guide-audit",
-  "adversarial-review",
   "pr-review",
   "agi-help",
   "frontend-context-interview",
@@ -482,7 +479,9 @@ export function initRepository(
   upsertManagedBlock(path.join(projectRoot, "AGENTS.md"), readTemplate("managed-agents-block.md"));
   scaffoldSkills(projectRoot);
   scaffoldOptionalCodex(projectRoot);
-  appendGitignoreSnippet(projectRoot);
+  if (ENABLE_MANAGED_GITIGNORE) {
+    appendGitignoreSnippet(projectRoot);
+  }
   const docsIndexPath = path.join(projectRoot, config.docs_index_file ?? DEFAULT_DOCS_INDEX);
   const docsIndex = renderDocsIndex(projectRoot, docsIndexSections(projectRoot, config));
   writeText(docsIndexPath, `${docsIndex.content}\n`);

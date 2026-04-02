@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify Codebase Coherence"
+  short_description: "Check architectural and structural coherence"
+  default_prompt: "Use $verify-codebase-coherence to audit the current scope for architectural coherence, boundary consistency, duplication, and drift before final handoff."
