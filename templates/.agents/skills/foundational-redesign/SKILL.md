@@ -1,6 +1,6 @@
 ---
 name: foundational-redesign
-description: Use for code changes, refactors, and migrations when quality matters. Treat the request as if it had been a foundational assumption from day one: inspect the current system, choose the clean target shape, implement direct replacement, and aggressively delete obsolete legacy code unless coexistence is explicitly required.
+description: Use for code changes, refactors, and migrations when quality matters. Treat the request as if it had been a foundational assumption from day one, inspect the current system, choose the clean target shape, implement direct replacement, and aggressively delete obsolete legacy code unless coexistence is explicitly required.
 ---
 
 # Foundational Redesign

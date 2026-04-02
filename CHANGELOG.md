@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.9
+
+### Patch Changes
+
+- Adjust foundational-redesign skill metadata wording to remove punctuation in the description for cleaner phrasing.
+
 ## 1.0.8
 
 ### Patch Changes
