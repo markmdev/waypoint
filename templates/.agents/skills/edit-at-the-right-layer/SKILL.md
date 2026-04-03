@@ -1,26 +1,33 @@
 ---
 name: edit-at-the-right-layer
-description: Make changes at the true ownership layer instead of patching nearby call sites. Use when implementing features, bug fixes, or refactors where behavior should be corrected at its source of truth rather than through wrappers, flags, or duplicated logic.
+description: Use when a change should be implemented at the owning layer of an existing behavior, not in callers, wrappers, adapters, or duplicated checks. Trigger only when the main decision is which layer owns the contract. Examples: moving validation into the domain model, fixing serialization in the owning mapper, or deleting a controller workaround after the service layer can enforce the rule.
 ---
 
-Identify where this behavior is actually owned, then edit there.
+# Edit At The Right Layer
 
-## Goal
+## Core Instruction
+Change the layer that owns the contract, not the layer that merely observes the failure.
 
-Fix or extend behavior at the layer that owns the contract so future changes stay local and coherent.
-
-## Workflow
-
-1. Trace the path from entry point to ownership.
-2. Identify the contract owner (domain/service/model/state boundary) for the requested behavior.
-3. Prefer changing that owner over adding patches in callers, controllers, views, adapters, or wrappers.
-4. Remove compensating logic that became unnecessary after the ownership-layer fix.
-5. Update boundary tests at the owning layer and only add higher/lower-layer tests when they cover a distinct risk.
+## Default Workflow
+1. Trace the request path to the first layer that can enforce the behavior once.
+2. Name the owning layer and the exact contract it must own.
+3. Implement the behavior at that layer.
+4. Remove caller-side workarounds, duplicate checks, and pass-through code made obsolete by the fix.
+5. Update tests at the owning layer first; add outer-layer tests only for distinct integration risk.
 
 ## Rules
-
-- Do not patch symptoms in outer layers when the source-of-truth layer can be fixed directly.
-- Do not add pass-through wrappers or compatibility branches as a default response.
+- Do not patch symptoms in controllers, views, clients, wrappers, or adapters when the source-of-truth layer can enforce the behavior.
 - Do not duplicate the same rule across multiple layers.
-- If a temporary cross-layer patch is unavoidable, mark it as transitional and remove it in the same phase whenever possible.
-- Prefer one clear owner per rule.
+- Do not add compatibility branches, feature flags, or fallback paths unless a bounded migration requires them and they are removed in the same phase.
+- Do not leave temporary cross-layer patches in place after the owning-layer fix is available.
+- Do not use this skill for pure redesign, greenfield architecture, or broad refactors whose goal is to rebase the system; use the more appropriate skill for that work.
+
+## Exception Rule
+If the owning layer cannot be changed in the current phase because of an external dependency, a hard compatibility constraint, or an unowned migration boundary, allow a temporary outer-layer patch only when it is isolated, explicitly time-bounded, and paired with a tracked follow-up to move the rule inward.
+
+## Output Contract
+- Owning layer identified
+- Change made at that layer
+- Obsolete outer-layer logic removed or retained with a reason
+- Tests updated at the owning layer
+- Exception used, if any, with the follow-up plan

@@ -16,3 +16,15 @@ config_file = "agents/code-reviewer.toml"
 [agents."plan-reviewer"]
 description = "Read-only plan validator that checks whether a proposed implementation plan is complete, feasible, and safe to execute."
 config_file = "agents/plan-reviewer.toml"
+
+[agents."ssot_judge"]
+description = "Strict read-only judge for duplicate-ownership findings that selects the canonical owner and hard-cut cleanup."
+config_file = "agents/ssot_judge.toml"
+
+[agents."ownership_taxonomy_mapper"]
+description = "Read-only mapper that identifies ownership boundaries and high-risk SSOT duplicate-ownership slices before deeper audits."
+config_file = "agents/ownership_taxonomy_mapper.toml"
+
+[agents."duplicate_ownership_explorer"]
+description = "Read-only slice explorer that audits one bounded area for duplicate ownership and classifies findings with file-level evidence."
+config_file = "agents/duplicate_ownership_explorer.toml"

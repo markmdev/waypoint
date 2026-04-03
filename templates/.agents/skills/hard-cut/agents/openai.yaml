@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hard Cut"
+  short_description: "Prefer one canonical shape and delete legacy paths"
+  default_prompt: "Use $hard-cut to enforce a single canonical implementation, remove legacy/compatibility layers, and keep exceptions only at proven external boundaries."

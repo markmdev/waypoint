@@ -1,4 +1,4 @@
 interface:
   display_name: "Test Writing"
-  short_description: "Write high-signal tests with minimal bloat"
-  default_prompt: "Use $test-writing to design and add the smallest durable test set that gives strong confidence for this change."
+  short_description: "Choose the smallest durable test set when test scope is not obvious"
+  default_prompt: "Use $test-writing to choose and add the smallest durable automated test set for this non-trivial change. Report the chosen tests, omitted tests, rationale, and residual risk."

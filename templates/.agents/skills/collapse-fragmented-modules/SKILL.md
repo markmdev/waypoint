@@ -1,56 +1,35 @@
 ---
 name: collapse-fragmented-modules
-description: Consolidate over-fragmented existing code within a defined scope. Use when a feature, module, or directory has been split into too many tiny files, thin wrappers, pass-through layers, single-use helpers, local-only types, local-only constants, or other low-value fragments that make future changes harder. Reduce file count by merging code that changes together, removing unnecessary indirection, and reorganizing the scope into a smaller number of cohesive files without changing intended behavior.
+description: Consolidate internal file fragmentation inside an existing module, feature, or directory when the code is split into too many tiny files, thin wrappers, pass-through layers, single-use helpers, or local-only types/constants. Use when the task is to reduce file count and remove low-value indirection without changing schemas, public contracts, persisted formats, or cross-boundary behavior.
 ---
 
-Refactor the given scope to reduce unnecessary file fragmentation.
+# Collapse Fragmented Modules
 
-Treat this as consolidation work, not feature work. Preserve behavior while making the code easier to change.
+## Core Instruction
+Consolidate internal fragmentation into the smallest cohesive file set that preserves current behavior.
 
-Within the requested scope:
+## Default Workflow
+1. Map the scope and classify each file as merge, keep, or delete.
+2. Merge code that changes together or serves one local responsibility.
+3. Remove thin wrappers, pass-through layers, and local-only helper/type/constant files.
+4. Update imports, exports, and tests to match the new file shape.
+5. Delete obsolete fragments and rerun a consolidation pass for any remaining avoidable splits.
 
-1. Identify files that should be merged, removed, or kept.
-   Target especially:
-   - tiny files with little logic
-   - single-use helpers
-   - local-only types
-   - local-only constants
-   - thin wrappers
-   - pass-through adapters
-   - split files that always change together
+## Rules
+- Do not create new abstractions to justify keeping fragmentation.
+- Do not keep a split file unless at least one is true: multiple live callers reuse it, it sits on a real public or cross-boundary interface, it protects a distinct runtime or lifecycle boundary, or merging would create an unreasonably large file.
+- Do not preserve local-only types, constants, or helpers in separate files unless they are reused outside the consolidation scope.
+- Do not split code by category alone.
+- Do not leave obsolete wrappers, adapters, re-export layers, or dead fragment files in place after the merge.
+- Do not change schemas, wire formats, persisted state, or public contracts in this skill.
 
-2. Merge code that belongs to the same feature or responsibility into a smaller number of cohesive files.
+## Exception Rule
+If a file is tied to a real external boundary that must remain separate, keep only that boundary file and consolidate everything else around it. If the requested work requires schema, contract, migration, or compatibility changes to proceed, stop and hand off to the appropriate redesign or hard-cut skill instead of stretching this one.
 
-3. Remove low-value indirection.
-   Collapse wrappers, adapters, and helper layers that do not enforce a real boundary or protect meaningful complexity.
-
-4. Keep splits only when they are justified by one of these:
-   - real shared reuse
-   - clear architectural boundary
-   - meaningful file size
-   - clearly separate responsibility that does not usually change with neighboring code
-
-5. Prefer edit locality over theoretical separation.
-   A routine change in this scope should touch as few files as reasonably possible.
-
-6. Preserve external behavior and stable public contracts unless the user asked for behavioral change.
-
-7. Update imports, exports, and tests to match the new structure.
-
-8. Delete obsolete files as part of the same work. Do not leave dead fragments behind.
-
-Rules:
-- Do not keep tiny files just because they already exist.
-- Do not preserve thin wrappers, pass-through hooks, local-only type files, or local-only constants files unless they provide real value.
-- Do not split by category alone.
-- Do not create a new abstraction while trying to remove fragmentation.
-- Prefer one cohesive file over several microscopic files when the code changes together.
-- Keep public boundaries clean, but aggressively collapse internal fragmentation.
-- If unsure whether two files should be merged, merge them unless there is a clear boundary reason not to.
-
-Before finishing, do a consolidation pass:
-- remove newly obsolete files
-- collapse redundant exports
-- simplify import paths
-- check whether the same feature is still spread across too many files
-- reduce file count further if behavior and clarity allow
+## Output Contract
+Report:
+- files merged
+- files deleted
+- files kept with the specific boundary reason
+- imports, exports, or tests updated
+- any remaining split that is still justified

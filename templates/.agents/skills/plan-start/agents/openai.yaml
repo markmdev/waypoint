@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Start"
+  short_description: "Bootstrap a fresh session onto an existing implementation plan"
+  default_prompt: "Use $plan-start when a durable implementation plan already exists and this is a fresh-session bootstrap, not a stalled execution recovery. Read the plan, inspect the current repo state, identify the active phase, pick the first substantial work package, and begin execution. If the plan is missing or underspecified, route to $planning; if the session is already stalled, route to $execution-reset."

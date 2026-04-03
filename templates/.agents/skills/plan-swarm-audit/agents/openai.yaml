@@ -1,4 +1,4 @@
 interface:
   display_name: "Plan Swarm Audit"
-  short_description: "Run a 5-agent audit loop against the active plan phase"
-  default_prompt: "Use $plan-swarm-audit with the current plan path and active phase. Spawn five parallel audit agents with distinct scopes, consolidate blockers, fix them, and repeat in bounded rounds until phase acceptance criteria are satisfied."
+  short_description: "Run a bounded 5-agent audit loop against an approved plan phase"
+  default_prompt: "Use $plan-swarm-audit only when you already have the plan path, active phase, changed-file scope or scope anchor commit, phase acceptance criteria, and a verify-completeness closeout target. Validate those inputs first; if any are missing or stale, return blocked and do not spawn agents. Otherwise spawn five parallel audit agents with distinct scopes, consolidate findings, fix blockers, repeat in bounded rounds, and hand off to $verify-completeness before reporting complete. Escalate if the round cap is reached or the same blocker repeats after targeted fixes."

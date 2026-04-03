@@ -1,36 +1,35 @@
 ---
 name: verify-codebase-coherence
-description: Verify that completed work fits the existing codebase instead of introducing unnecessary parallel patterns. Use after implementation within a defined scope to detect avoidable new components, utilities, abstractions, state paths, design patterns, or conventions that should have reused or extended existing ones. Correct the work so it integrates coherently with the repo's existing architecture, components, naming, contracts, and design language.
+description: Audit completed work in a defined scope for codebase coherence before handoff. Use after implementation to verify the change reuses existing components, utilities, abstractions, state paths, naming, contracts, and design language instead of introducing avoidable parallel patterns. Do not use for redesign, replacement, collapse, or other implementation tasks that belong to foundational/edit-layer skills.
 ---
 
-Review the completed work in the requested scope and check whether it fits the existing codebase.
+# Verify Codebase Coherence
 
-Look for unnecessary parallel patterns such as:
-- new frontend components where an existing component should have been reused or extended
-- new helpers, hooks, utilities, or adapters that duplicate an existing pattern
-- new state paths or data flows that bypass the established architecture
-- new naming, file structure, or API shapes that do not match nearby conventions
-- one-off design, styling, or interaction patterns that do not fit the app
-- local abstractions that solve a problem the codebase already has a standard way to solve
+## Mission
+Audit the finished change for coherence with the existing codebase and report whether it is ready for closeout.
 
-Before keeping a new construct, check whether the repo already has:
-- a reusable component or composition pattern
-- an established state or data-fetching pattern
-- a standard boundary for validation, formatting, permissions, or persistence
-- an existing utility or shared contract
-- a nearby feature that should be extended instead of bypassed
+## Ordered Workflow
+1. Confirm the requested scope and the files actually changed by the implementation.
+2. Inspect the changed code in context of nearby code, shared helpers, and adjacent conventions.
+3. Check for avoidable parallel patterns: duplicate components, helpers, hooks, adapters, state paths, naming, API shapes, styling, or local abstractions.
+4. Check whether the change should have reused an existing component, utility, boundary, or composition pattern instead of introducing a new one.
+5. Classify each issue as either a coherence finding, a deliberate divergence, or out of scope.
+6. Decide closeout status: pass only if no unresolved coherence findings remain.
+7. Report findings with enough detail for the owner to act on them.
 
-If the work introduced a parallel pattern without a clear reason, fix it. Do not just report it.
+## Rules
+- Do not edit files.
+- Do not recommend a redesign, replacement, collapse, or refactor as a substitute for this audit.
+- Do not accept a new component, utility, hook, adapter, state path, or API shape if an existing one already covers the same job.
+- Do not treat faster implementation as a valid reason to fork the architecture, data flow, or design language.
+- Do not expand the review beyond the requested scope unless a change in that scope creates a direct coherence issue outside it.
+- Do not mark a deliberate divergence as a finding when the repo already documents or consistently uses that variant.
 
-When correcting violations:
-- reuse or extend existing components, utilities, and patterns where appropriate
-- remove unnecessary one-off abstractions or duplicate paths
-- align naming, structure, and interfaces with nearby code
-- preserve intended behavior unless the user asked for a behavioral change
+## Exception Rule
+If the codebase already has a sanctioned local variant, feature flag boundary, or documented exception that justifies the divergence, classify it as accepted and do not report it as a coherence defect.
 
-Rules:
-- Do not create a new component, utility, hook, adapter, or pattern if the repo already has one that should be reused or extended.
-- Do not fork the design language or architecture for a local feature without a clear reason.
-- Do not bypass established patterns just because creating a new path is faster.
-- Prefer extending the existing system over creating a parallel mini-system.
-- If divergence is necessary, it must be justified by a real requirement, not convenience.
+## Output Contract
+- Start with `PASS` or `FAIL`.
+- If `FAIL`, list each finding with file path, concise reason, and the specific reuse or alignment that should have happened.
+- If `PASS`, state that the audited scope is coherent and closeout-ready.
+- Include no code changes, no patch plan, and no redesign proposal.

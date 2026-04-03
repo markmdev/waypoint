@@ -1,4 +1,4 @@
 interface:
   display_name: "Foundational Redesign"
-  short_description: "Redesign from first principles and delete legacy seams"
-  default_prompt: "Use $foundational-redesign for this change: inspect the existing system, design the clean target shape as if this requirement were foundational from the start, replace directly, and aggressively remove obsolete legacy code unless coexistence is explicitly required."
+  short_description: "Use for non-trivial redesigns that should replace the current shape"
+  default_prompt: "Use $foundational-redesign for this change if it alters architecture, data flow, interfaces, or long-lived abstractions: inspect the current system, design the clean target shape as if this requirement were foundational from the start, replace directly, and remove legacy seams unless coexistence is explicitly required."

@@ -1,4 +1,4 @@
 interface:
   display_name: "Make Invariants Explicit"
-  short_description: "Expose and enforce critical invariants"
-  default_prompt: "Use $make-invariants-explicit to identify hidden assumptions, encode them as explicit invariants at boundaries, and add focused validation/tests for high-risk rules."
+  short_description: "Enforce hidden correctness assumptions at the right layer"
+  default_prompt: "Use $make-invariants-explicit when correctness depends on hidden assumptions about data shape, ordering, uniqueness, idempotency, authorization, or lifecycle state. Identify the invariant, choose the authoritative enforcement layer, implement it, and report the verification/tests and residual risk."

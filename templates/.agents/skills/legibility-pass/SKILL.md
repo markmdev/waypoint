@@ -1,34 +1,38 @@
 ---
 name: legibility-pass
-description: Improve code legibility within a defined scope without changing intended behavior. Use when code is correct but hard to read, reason about, or safely modify. Focus on making intent, control flow, state, boundaries, and important behavior easier to see through better naming, clearer structure, reduced indirection, and simpler local reasoning.
+description: Legibility-only refactors for code that is already behaviorally correct but hard to read, reason about, or safely modify. Use only for local readability improvements inside an explicitly requested scope. Do not use for behavior changes, invariant redesign, architectural cleanup, or broad refactors that change boundaries.
 ---
 
-Refactor the given scope to make the current truth easier to see.
+# Legibility Pass
 
-Preserve behavior unless the user asked for functional change.
+Refactor the requested scope so the current behavior is easier to read without changing what the code does.
 
-Focus on:
-- clearer names for modules, functions, variables, and states
-- making the main flow easy to follow
-- making failure paths and edge conditions explicit
-- reducing indirection that hides important behavior
-- making state, contracts, and boundaries easier to understand
-- collapsing unnecessary wrappers or pass-through helpers
-- improving local reasoning so a reader needs less cross-referencing
+## Core Instruction
+Make the smallest readable change that improves comprehension while preserving the existing contract, control flow, and runtime behavior.
 
-Within the requested scope:
-1. Identify the parts that are hardest to understand or easiest to misread.
-2. Improve naming so intent is obvious.
-3. Restructure code so the main path is visible and important branches are easy to spot.
-4. Make hidden assumptions, state transitions, and invariants more explicit.
-5. Remove low-value indirection that makes behavior harder to trace.
-6. Keep comments rare; prefer making the code itself explain the behavior.
-7. Add a brief clarifying comment only when the underlying rule or constraint is not obvious from the code alone.
+## Default Workflow
+1. Identify the narrow scope where readability is actively hurting maintenance or review.
+2. Find the least intrusive change that improves naming, flow, or local structure.
+3. Rewrite the code so the main path, failure path, and key boundary are easier to see.
+4. Keep the public shape, observable behavior, and important data flow unchanged.
+5. Verify the refactor did not introduce a new abstraction, boundary shift, or hidden dependency.
 
-Rules:
-- Do not preserve confusing structure just because it already exists.
-- Do not add abstractions that make reading harder.
-- Do not replace clear code with clever code.
-- Do not rely on comments to explain code that should be rewritten instead.
-- Prefer fewer mental hops.
-- Prefer one obvious reading of the code over multiple plausible interpretations.
+## Rules
+- Do not change behavior, public API, persistence shape, wire format, timing, or error semantics.
+- Do not rename or restructure code unless the change reduces reading friction in the requested scope.
+- Do not introduce new layers, helper abstractions, or framework patterns just to make the diff look cleaner.
+- Do not perform broad cleanup, mechanical formatting, dead-code sweeps, or unrelated simplification.
+- Do not use this skill for collapsing unrelated abstractions, making invariants stricter, or redesigning architecture.
+- Do not use this skill as a substitute for a foundational refactor, make-invariants pass, or behavior-preserving optimization.
+- Do not rely on comments to explain code that can be made directly legible.
+- Do not add comments unless they capture a local constraint that cannot be expressed clearly in code.
+
+## Exception Rule
+If the only readability improvement would require a change that risks an unacceptable behavior shift, boundary violation, or contract change, stop and leave the code unchanged except for a brief explanation of the constraint. Use this exception only when the safer rewrite would cross one of the hard rules above.
+
+## Output Contract
+- Return a diff limited to the explicitly requested scope.
+- Include only legibility edits that preserve observable behavior.
+- List the files changed and the specific readability improvements made.
+- State any tempting cleanup, boundary change, or abstraction you intentionally left out because it would exceed the skill boundary.
+- If no safe readability improvement exists, report that the scope was left unchanged and why.

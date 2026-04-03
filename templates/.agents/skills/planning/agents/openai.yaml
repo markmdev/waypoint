@@ -1,4 +1,4 @@
 interface:
   display_name: "Planning"
-  short_description: "Interview, explore, and write an implementation-ready plan into the repo"
-  default_prompt: "Use $planning to deeply explore the repository, interview for the product and architectural details that materially affect the work, and write an implementation-ready plan into .waypoint/plans/."
+  short_description: "Interview, explore, and write a durable plan for non-trivial implementation work"
+  default_prompt: "Use $planning for non-trivial implementation work that needs interview-driven repo exploration and a durable plan doc in .waypoint/plans/. For tiny obvious edits or one-file changes, use the reduced-depth path or skip planning."

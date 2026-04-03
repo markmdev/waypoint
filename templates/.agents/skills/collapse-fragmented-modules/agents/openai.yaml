@@ -1,0 +1,4 @@
+interface:
+  display_name: "Collapse Fragmented Modules"
+  short_description: "Consolidate internal file fragmentation without changing contracts"
+  default_prompt: "Use $collapse-fragmented-modules when an existing module, feature, or directory is split into too many tiny files, thin wrappers, pass-through layers, single-use helpers, or local-only types/constants. Merge the internal pieces, delete obsolete fragments, and keep only splits that are justified by reuse or a real public or cross-boundary boundary."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Replace Don't Layer"
+  short_description: "Replace an existing path instead of layering the new one on top"
+  default_prompt: "Use $replace-dont-layer when a change is intended to replace an existing implementation path. Identify the old path and the new path, redirect callers to the new path, remove obsolete glue in the same change, and keep coexistence only at a real compatibility boundary."

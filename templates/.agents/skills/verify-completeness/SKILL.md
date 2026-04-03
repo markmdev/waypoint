@@ -1,52 +1,63 @@
 ---
 name: verify-completeness
-description: Use when implementation appears done and before reporting completion. Re-read the original plan and agreed scope, re-read files that were supposed to be created or changed, verify no approved scope was reduced or skipped, and continue working until the scope is truly complete.
+description: Use when implementation appears done and before reporting completion. Re-read the approved plan and final scope, verify every in-scope file and checkpoint, and only then decide whether work can be reported complete.
 ---
 
 # Verify Completeness
 
-Use this skill at final closeout, right before you would report the work complete.
+Use this skill at final closeout, right before you would report work complete. Its job is to gate completion, not to re-open the whole project.
 
-## Required verification loop
+## Rules
 
-1. Re-read the original plan and the latest agreed scope before deciding status.
-2. Re-read `ACTIVE_PLANS.md` and `WORKSPACE.md` for current checklist, phase, blockers, and verification state.
-3. Build the expected file set from plan/scope: files that were supposed to be created, modified, or deleted.
-4. Re-read those files directly. This final re-read is mandatory even if they were read earlier in the session.
-5. Compare expected scope vs actual outcome and list any missing or partially completed items.
-6. Run a scope-discipline pass: identify additions that were not requested or approved. Remove/simplify them before completion, or explicitly ask the user to approve keeping them.
-7. Run a cleanup pass on changed files: remove duplicated logic, unnecessary abstractions/files, and low-value comments that create maintenance bloat.
-8. If changed code is still hard to read or reason about, run `legibility-pass` before completion and apply the resulting readability cleanup.
-9. Run a file-footprint sanity pass: collapse avoidable tiny-file fragmentation and keep code that changes together in the same place when boundary/reuse/size reasons are weak.
-10. Run a test-signal sanity pass: remove redundant or brittle tests and keep the smallest high-signal set that still protects the contract.
-11. Before commit/final handoff, run the full checks required by the plan (for example full typecheck/test/build sweep) once, unless explicitly blocked or the user asks for a different cadence.
-12. If any approved item is missing, incomplete, or silently deferred, do not report completion. Continue working until the agreed scope is fully satisfied or discuss a scope change explicitly.
+1. Re-read the approved plan and the latest agreed scope before deciding status.
+2. Re-read `ACTIVE_PLANS.md` and `WORKSPACE.md` for the current checklist, phase, blockers, and verification state.
+3. Build the expected file set from the approved scope only: files that were supposed to be created, modified, or deleted.
+4. Re-read every file in the expected set directly. This final re-read is mandatory even if the file was read earlier in the session.
+5. Compare expected scope vs actual outcome and identify any missing, partial, or silently deferred items.
+6. Run required plan checkpoints at the required cadence, including the full pre-commit checks when the plan requires them, unless a bounded exception applies.
+7. Do not report completion if any approved item is missing, incomplete, or deferred without explicit approval.
+8. Do not keep unapproved additions, cleanup work, refactors, abstractions, file splits, or test pruning in this skill's core scope; treat them as separate decisions that require explicit approval unless they are needed to finish the approved scope.
+9. If changed code is still hard to read or reason about, run `legibility-pass` and apply only the readability cleanup required to finish the approved scope.
+10. Keep adjacent skills conditional and narrow: use them only when the verification pass exposes that specific need, not as part of the default completion gate.
 
-## Completion gate
+## Exception Rule
+
+You may relax the normal verification loop only when one of these is true:
+
+- required plan artifacts are missing or stale, and you need to reconstruct the approved scope before continuing
+- the task is read-only or review-only, so no code or files are expected to change
+- required checks cannot run because the environment, dependencies, permissions, or upstream blockers make them impossible right now
+
+In these cases, continue only far enough to identify the gap, record the blocker, and report the exact missing verification step or artifact. Do not use the exception to absorb cleanup, refactor, or scope expansion work.
+
+## Completion Gate
 
 You can report complete only when all are true:
 
 - approved scope items are done
 - planned file changes match reality
-- verification/checkpoints required by the plan were run at the required cadence, including full pre-commit checks when required (or explicitly called out as blocked)
+- required verification/checkpoints were run, or each skipped check has a specific blocked reason
 - no hidden scope reduction occurred
 - no unapproved scope expansion remains
 - no obvious duplication or avoidable bloat remains in touched files
 - no avoidable file fragmentation remains in touched feature areas
 - test set remains high-signal and non-redundant for the risk level
 
-## Output contract
+## Output Contract
 
-Before final status, summarize briefly:
+Before final status, report these items explicitly:
 
-- scope reviewed
-- files re-read for final verification
-- completed items
-- removed unapproved extras or bloat cleanup applied
-- legibility cleanup applied (if run)
-- file-collapsing or test-pruning done during sanity passes
-- remaining gaps (if any)
-- next action (continue execution or complete)
+- `status`: `complete`, `blocked`, or `incomplete`
+- `scope reviewed`: the plan/scope sources you re-read
+- `files re-read`: the files you re-opened for final verification
+- `missing scope items`: any approved items still absent, or `none`
+- `checks run`: each verification step actually executed
+- `checks skipped`: each omitted check with a reason, or `none`
+- `removed extras`: any unapproved extras, cleanup, or bloat you removed, or `none`
+- `adjacent skill escalation`: any conditional skill you invoked and why, or `none`
+- `next action`: continue execution, request scope approval, or complete
+
+Do not say the work is complete unless the `status` is `complete` and the completion gate is satisfied.
 
 ## Gotchas
 

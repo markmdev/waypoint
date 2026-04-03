@@ -1,4 +1,4 @@
 interface:
   display_name: "Edit At The Right Layer"
-  short_description: "Apply changes at the true ownership layer"
-  default_prompt: "Use $edit-at-the-right-layer to locate the source-of-truth ownership layer, implement the change there, and remove outer-layer patches or duplicated logic."
+  short_description: "Implement existing behavior at its owning layer"
+  default_prompt: "Use $edit-at-the-right-layer when the main decision is where an existing behavior should be owned. Trace to the source-of-truth layer, change it there, remove outer-layer workarounds or duplicate checks, and avoid using this skill for broad redesigns."

@@ -1,4 +1,4 @@
 interface:
   display_name: "Legibility Pass"
-  short_description: "Improve readability without changing behavior"
-  default_prompt: "Use $legibility-pass on the current scope to improve naming, control-flow clarity, and local reasoning while preserving intended behavior."
+  short_description: "Legibility-only refactors within a requested scope"
+  default_prompt: "Use $legibility-pass only for local readability refactors in the requested scope. Improve naming, flow, and local reasoning without changing behavior, boundaries, invariants, or architecture."

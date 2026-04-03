@@ -1,4 +1,4 @@
 interface:
   display_name: "Verify Completeness"
-  short_description: "Run a strict final scope and file verification pass"
-  default_prompt: "Use $verify-completeness now: re-read the approved plan and scope, re-read all files that were supposed to change, remove unapproved extras and obvious bloat, verify nothing was dropped, and keep working if any approved scope item is still incomplete."
+  short_description: "Gate completion by re-reading scope, files, and required checks before closeout"
+  default_prompt: "Use $verify-completeness now: re-read the approved plan and final scope, re-read every file that was supposed to change, confirm missing scope items and skipped checks with reasons, and only report completion if the approved scope is fully finished."

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.15
+
+### Patch Changes
+
+- Rewrite the shipped execution and closeout skill set to policy-grade contracts with tighter trigger boundaries, harder guardrails (`do not X unless Y`), explicit exception rules, and explicit output contracts.
+- Add and scaffold new skills: `hard-cut`, `root-cause-finder`, and `find-duplicate-ownership`.
+- Add duplicate-ownership Codex subagent definitions (`ssot_judge`, `ownership_taxonomy_mapper`, `duplicate_ownership_explorer`) under `.codex/agents` and register them in `.codex/config.toml`.
+- Align `find-duplicate-ownership` guidance to reference Codex agent definitions in `.codex/agents`.
+
 ## 1.0.14
 
 ### Patch Changes

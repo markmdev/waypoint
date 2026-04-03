@@ -1,4 +1,4 @@
 interface:
   display_name: "Execution Reset"
-  short_description: "Reset stalled plan execution and restore phase progress"
-  default_prompt: "Use $execution-reset with the active plan path and current phase to reset execution momentum and drive meaningful checklist progress."
+  short_description: "Recover stalled mid-execution work on an active plan phase"
+  default_prompt: "Use $execution-reset only after a plan phase has already started and execution has stalled; provide the referenced plan, the active phase, and the relevant workspace context so the skill can inspect current state, test for a stall, and pick one substantial next work package."
