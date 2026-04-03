@@ -144,6 +144,7 @@ Add these only when the work actually needs them:
 - **Cleanup expectations**: Required when the implementation must delete replaced paths before the work is complete.
 - **Test cases**: Required for behavioral changes where concrete input -> expected output examples prevent ambiguity.
 - **Docs/workspace updates**: Required when the change affects durable project behavior or operator-facing guidance.
+  Any new or updated routable doc under `.waypoint/docs/` or `.waypoint/plans/` must include `summary`, `last_updated`, and `read_when` frontmatter so `DOCS_INDEX` can route it.
 
 ### Reduced-Depth Exception Rule
 

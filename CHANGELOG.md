@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.16
+
+### Patch Changes
+
+- Restore explicit frontmatter requirements for routable docs in the managed AGENTS contract and planning skill guidance.
+- Clarify that docs under `.waypoint/docs/` and `.waypoint/plans/` must include `summary`, `last_updated`, and `read_when` so `DOCS_INDEX` can parse and route them.
+
 ## 1.0.15
 
 ### Patch Changes

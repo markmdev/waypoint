@@ -37,6 +37,7 @@ Once the user approves a plan or tells you to proceed, that approved scope is th
 
 `WORKSPACE.md` is the live state file. `ACTIVE_PLANS.md` is the active execution checklist. Keep them current when state, blockers, or verification materially change.
 When durable behavior changes, update the relevant docs during the work. When live execution state changes, update `WORKSPACE.md` or `ACTIVE_PLANS.md` during the work, not only at the end.
+When creating or updating routable docs in `.waypoint/docs/` or `.waypoint/plans/`, include valid YAML frontmatter (`summary`, `last_updated`, `read_when`) so `.waypoint/DOCS_INDEX.md` can parse and route them.
 
 When changing code, do not hesitate to aggressively delete legacy code and rebuild the system when that is the clearest path to accomplishing the goal. Prefer clean replacement over compatibility scaffolding unless the user or project docs explicitly require coexistence.
 Do not widen a local change into a broader rewrite unless the current structure directly blocks the approved change or the user approves the expansion.
