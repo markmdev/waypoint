@@ -1,4 +1,4 @@
 interface:
   display_name: "PR Review"
-  short_description: "Close the review loop on an active PR"
-  default_prompt: "Use $pr-review when a PR has active review comments or automated review in progress. Wait for review to settle, triage every comment, reply inline, fix meaningful issues, push follow-up commits, and repeat until no new meaningful findings remain."
+  short_description: "Close the review loop with CodeRabbit, Codex, and CI/CD"
+  default_prompt: "Use $pr-review: address all existing PR review findings, fix actionable CI/CD failures, reply inline and resolve each handled thread, push fixes, comment '@coderabbitai review' and '@codex review', then poll every 5 minutes for up to 30 minutes per round until no meaningful new issues remain."

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.17
+
+### Patch Changes
+
+- Rework the shipped `pr-review` skill into a strict reviewer loop for CodeRabbit and Codex.
+
+  - Require handling already-existing review comments when the skill starts.
+  - Require inline reply and thread resolution for each addressed or skipped finding.
+  - Add CI/CD status triage to each review pass and require fixing actionable failures.
+  - After each push, require posting `@coderabbitai review` and `@codex review`.
+  - Poll review and checks every 5 minutes for up to 30 minutes per round, repeating until no meaningful new issues remain.
+
 ## 1.0.16
 
 ### Patch Changes
