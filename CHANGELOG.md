@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.18
+
+### Patch Changes
+
+- Fix `waypoint upgrade` and init auto-update to recover from transient npm tarball 404s right after publish.
+
+  - Detect transient `E404` failures when installing `waypoint-codex@latest`.
+  - Resolve the latest tarball URL and retry install with a cache-busting query parameter.
+  - Apply the fallback in both `waypoint upgrade` and pre-init auto-update paths.
+  - Add regression tests covering the fallback behavior for both flows.
+
 ## 1.0.17
 
 ### Patch Changes

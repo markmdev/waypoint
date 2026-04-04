@@ -93,18 +93,115 @@ export function compareVersions(left: string, right: string): number {
   return 0;
 }
 
-function latestWaypointVersion(options: { npmBinary?: string }): string | null {
-  const npmBinary = options.npmBinary ?? process.env.WAYPOINT_NPM_COMMAND ?? npmBinaryForPlatform();
-  const latest = spawnSync(npmBinary, ["view", "waypoint-codex", "version"], {
+function spawnNpmPipe(
+  npmBinary: string,
+  args: string[],
+): { status: number; stdout: string; stderr: string } {
+  const result = spawnSync(npmBinary, args, {
     stdio: "pipe",
     encoding: "utf8",
   });
-  if ((latest.status ?? 1) !== 0) {
+
+  return {
+    status: result.status ?? 1,
+    stdout: result.stdout ?? "",
+    stderr: result.stderr ?? "",
+  };
+}
+
+function writePipedOutput(
+  result: { stdout: string; stderr: string },
+  stdio: "inherit" | "pipe",
+): void {
+  if (stdio !== "inherit") {
+    return;
+  }
+
+  if (result.stdout.length > 0) {
+    process.stdout.write(result.stdout);
+  }
+  if (result.stderr.length > 0) {
+    process.stderr.write(result.stderr);
+  }
+}
+
+function latestWaypointVersion(options: { npmBinary?: string }): string | null {
+  const npmBinary = options.npmBinary ?? process.env.WAYPOINT_NPM_COMMAND ?? npmBinaryForPlatform();
+  const latest = spawnNpmPipe(npmBinary, ["view", "waypoint-codex", "version"]);
+  if (latest.status !== 0) {
     return null;
   }
 
-  const version = latest.stdout?.trim();
+  const version = latest.stdout.trim();
   return version ? version : null;
+}
+
+function latestWaypointTarballUrl(options: { npmBinary: string; version: string }): string | null {
+  const tarball = spawnNpmPipe(options.npmBinary, ["view", `waypoint-codex@${options.version}`, "dist.tarball"]);
+  if (tarball.status !== 0) {
+    return null;
+  }
+
+  const tarballUrl = tarball.stdout.trim();
+  return tarballUrl.length > 0 ? tarballUrl : null;
+}
+
+function appendCacheBust(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set("waypointCacheBust", `${Date.now()}`);
+    return parsed.toString();
+  } catch {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}waypointCacheBust=${Date.now()}`;
+  }
+}
+
+function isTransientTarball404(result: { stdout: string; stderr: string }): boolean {
+  const combined = `${result.stdout}\n${result.stderr}`;
+  return /E404/.test(combined) && /waypoint-codex-.*\.tgz/i.test(combined);
+}
+
+function installLatestWaypointCli(options: {
+  npmBinary: string;
+  stdio: "inherit" | "pipe";
+  knownLatestVersion?: string;
+}): number {
+  const primary = spawnNpmPipe(options.npmBinary, ["install", "-g", "waypoint-codex@latest"]);
+  if (primary.status === 0) {
+    writePipedOutput(primary, options.stdio);
+    return 0;
+  }
+
+  if (!isTransientTarball404(primary)) {
+    writePipedOutput(primary, options.stdio);
+    return primary.status;
+  }
+
+  const latestVersion = options.knownLatestVersion ?? latestWaypointVersion({ npmBinary: options.npmBinary });
+  if (!latestVersion) {
+    writePipedOutput(primary, options.stdio);
+    return primary.status;
+  }
+
+  const tarballUrl = latestWaypointTarballUrl({
+    npmBinary: options.npmBinary,
+    version: latestVersion,
+  });
+  if (!tarballUrl) {
+    writePipedOutput(primary, options.stdio);
+    return primary.status;
+  }
+
+  if (options.stdio === "inherit") {
+    console.log(
+      `Waypoint npm install hit a transient tarball 404 for ${latestVersion}. Retrying with cache-busted URL...`
+    );
+  }
+
+  const fallback = spawnNpmPipe(options.npmBinary, ["install", "-g", appendCacheBust(tarballUrl)]);
+  writePipedOutput(fallback, options.stdio);
+  return fallback.status;
 }
 
 function hasWaypointConfig(projectRoot: string): boolean {
@@ -124,11 +221,12 @@ export function upgradeWaypoint(options: {
   const npmBinary = options.npmBinary ?? process.env.WAYPOINT_NPM_COMMAND ?? npmBinaryForPlatform();
   const stdio = options.stdio ?? "inherit";
 
-  const update = spawnSync(npmBinary, ["install", "-g", "waypoint-codex@latest"], {
+  const updateStatus = installLatestWaypointCli({
+    npmBinary,
     stdio,
   });
-  if ((update.status ?? 1) !== 0) {
-    return update.status ?? 1;
+  if (updateStatus !== 0) {
+    return updateStatus;
   }
 
   if (options.skipRepoRefresh) {
@@ -175,11 +273,13 @@ export function maybeUpgradeWaypointBeforeInit(options: {
     `Waypoint CLI ${options.currentVersion} is older than latest ${latestVersion}. Updating before init...`
   );
 
-  const update = spawnSync(npmBinary, ["install", "-g", "waypoint-codex@latest"], {
+  const updateStatus = installLatestWaypointCli({
+    npmBinary,
     stdio,
+    knownLatestVersion: latestVersion,
   });
-  if ((update.status ?? 1) !== 0) {
-    return update.status ?? 1;
+  if (updateStatus !== 0) {
+    return updateStatus;
   }
 
   const reexecArgs = options.initArgs.includes("--skip-cli-update")

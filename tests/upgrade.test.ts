@@ -89,6 +89,74 @@ test("init auto-updates and re-execs when a newer CLI is published", () => {
   assert.ok(log.includes(`cli init ${root} --skip-cli-update`));
 });
 
+test("init auto-update retries with cache-busted tarball URL after transient latest 404", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-init-upgrade-fallback-"));
+  const fakeBin = mkdtempSync(path.join(os.tmpdir(), "waypoint-fake-bin-"));
+  const logFile = path.join(root, "calls.log");
+  const tarballBase = "https://registry.npmjs.org/waypoint-codex/-/waypoint-codex-1.0.17.tgz";
+
+  const fakeNpm = path.join(fakeBin, "fake-npm.js");
+  writeFileSync(
+    fakeNpm,
+    [
+      "#!/usr/bin/env node",
+      "import { appendFileSync } from 'node:fs';",
+      "const args = process.argv.slice(2);",
+      "const command = args.join(' ');",
+      `appendFileSync(${JSON.stringify(logFile)}, 'npm ' + command + '\\n');`,
+      "if (args[0] === 'view' && args[1] === 'waypoint-codex' && args[2] === 'version') {",
+      "  process.stdout.write('1.0.17\\n');",
+      "  process.exit(0);",
+      "}",
+      "if (args[0] === 'view' && args[1] === 'waypoint-codex@1.0.17' && args[2] === 'dist.tarball') {",
+      `  process.stdout.write(${JSON.stringify(tarballBase)} + '\\n');`,
+      "  process.exit(0);",
+      "}",
+      "if (args[0] === 'install' && args[2] === 'waypoint-codex@latest') {",
+      "  process.stderr.write('npm error code E404\\n');",
+      `  process.stderr.write(${JSON.stringify(`npm error 404 Not Found - GET ${tarballBase} - Not found\\n`)});`,
+      "  process.exit(1);",
+      "}",
+      "if (args[0] === 'install' && typeof args[2] === 'string' && args[2].startsWith(",
+      `  ${JSON.stringify(`${tarballBase}?waypointCacheBust=`)}`,
+      ")) {",
+      "  process.exit(0);",
+      "}",
+      "process.exit(0);",
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(fakeNpm, 0o755);
+
+  const fakeCli = path.join(fakeBin, "fake-cli.js");
+  writeFileSync(
+    fakeCli,
+    [
+      "#!/usr/bin/env node",
+      "import { appendFileSync } from 'node:fs';",
+      `appendFileSync(${JSON.stringify(logFile)}, 'cli ' + process.argv.slice(2).join(' ') + '\\n');`,
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(fakeCli, 0o755);
+
+  const status = maybeUpgradeWaypointBeforeInit({
+    currentVersion: "1.0.16",
+    cliEntry: fakeCli,
+    initArgs: [root],
+    nodeBinary: process.execPath,
+    npmBinary: fakeNpm,
+    stdio: "pipe",
+  });
+
+  assert.equal(status, 0);
+  const log = readFileSync(logFile, "utf8");
+  assert.ok(log.includes("npm install -g waypoint-codex@latest"));
+  assert.ok(log.includes("npm view waypoint-codex@1.0.17 dist.tarball"));
+  assert.ok(log.includes(`npm install -g ${tarballBase}?waypointCacheBust=`));
+  assert.ok(log.includes(`cli init ${root} --skip-cli-update`));
+});
+
 test("init skips auto-update when current CLI is already latest", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-init-upgrade-none-"));
   const fakeBin = mkdtempSync(path.join(os.tmpdir(), "waypoint-fake-bin-"));
@@ -216,4 +284,61 @@ test("upgradeWaypoint can skip repo refresh", () => {
   assert.equal(status, 0);
   const log = readFileSync(logFile, "utf8");
   assert.ok(log.includes("npm install -g waypoint-codex@latest"));
+});
+
+test("upgradeWaypoint retries with cache-busted tarball URL after transient latest 404", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-upgrade-fallback-"));
+  const fakeBin = mkdtempSync(path.join(os.tmpdir(), "waypoint-fake-bin-"));
+  const logFile = path.join(root, "calls.log");
+  const tarballBase = "https://registry.npmjs.org/waypoint-codex/-/waypoint-codex-1.0.17.tgz";
+
+  const fakeNpm = path.join(fakeBin, "fake-npm.js");
+  writeFileSync(
+    fakeNpm,
+    [
+      "#!/usr/bin/env node",
+      "import { appendFileSync } from 'node:fs';",
+      "const args = process.argv.slice(2);",
+      "const command = args.join(' ');",
+      `appendFileSync(${JSON.stringify(logFile)}, 'npm ' + command + '\\n');`,
+      "if (args[0] === 'view' && args[1] === 'waypoint-codex' && args[2] === 'version') {",
+      "  process.stdout.write('1.0.17\\n');",
+      "  process.exit(0);",
+      "}",
+      "if (args[0] === 'view' && args[1] === 'waypoint-codex@1.0.17' && args[2] === 'dist.tarball') {",
+      `  process.stdout.write(${JSON.stringify(tarballBase)} + '\\n');`,
+      "  process.exit(0);",
+      "}",
+      "if (args[0] === 'install' && args[2] === 'waypoint-codex@latest') {",
+      "  process.stderr.write('npm error code E404\\n');",
+      `  process.stderr.write(${JSON.stringify(`npm error 404 Not Found - GET ${tarballBase} - Not found\\n`)});`,
+      "  process.exit(1);",
+      "}",
+      "if (args[0] === 'install' && typeof args[2] === 'string' && args[2].startsWith(",
+      `  ${JSON.stringify(`${tarballBase}?waypointCacheBust=`)}`,
+      ")) {",
+      "  process.exit(0);",
+      "}",
+      "process.exit(0);",
+    ].join("\n"),
+    "utf8"
+  );
+  chmodSync(fakeNpm, 0o755);
+
+  const status = upgradeWaypoint({
+    projectRoot: root,
+    config: {},
+    cliEntry: path.join(fakeBin, "unused-cli.js"),
+    nodeBinary: process.execPath,
+    npmBinary: fakeNpm,
+    stdio: "pipe",
+    skipRepoRefresh: true,
+  });
+
+  assert.equal(status, 0);
+  const log = readFileSync(logFile, "utf8");
+  assert.ok(log.includes("npm install -g waypoint-codex@latest"));
+  assert.ok(log.includes("npm view waypoint-codex version"));
+  assert.ok(log.includes("npm view waypoint-codex@1.0.17 dist.tarball"));
+  assert.ok(log.includes(`npm install -g ${tarballBase}?waypointCacheBust=`));
 });
