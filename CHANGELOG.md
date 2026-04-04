@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.19
+
+### Patch Changes
+
+- Adjust the shipped `pr-review` stop rule so the loop can end when the latest reviewer comments are only minor/nitpick feedback and there are no major (`P1+`) findings.
+
+  - Explicitly classify review findings into major (`P1+`) vs minor/nitpick.
+  - Keep major (`P1+`) findings mandatory to fix unless clearly false positive.
+  - Allow minor/nitpick findings to be acknowledged inline and resolved without code changes.
+  - Update exit criteria and default skill prompt wording to match this threshold.
+
 ## 1.0.18
 
 ### Patch Changes

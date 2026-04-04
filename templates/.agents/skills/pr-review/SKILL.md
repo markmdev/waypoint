@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Run and close the full PR review loop with CodeRabbit and Codex reviewers. Use when a PR already has review activity or when you need to request, wait for, triage, fix, and re-request automated review until no meaningful issues remain and CI/CD is green.
+description: Run and close the full PR review loop with CodeRabbit and Codex reviewers. Use when a PR already has review activity or when you need to request, wait for, triage, fix, and re-request automated review until no major (`P1+`) issues remain and CI/CD is green.
 ---
 
 # PR review
@@ -22,8 +22,10 @@ Run this loop until exit criteria are satisfied.
 - collect CI/CD status for required checks
 
 2. Triage and act:
-- treat each reviewer finding as actionable unless it is clearly a false positive
-- fix all non-false-positive findings in code/docs/tests
+- classify each reviewer finding as either major (`P1+`) or minor/nitpick
+- treat major (`P1+`) findings as mandatory unless they are clearly false positives
+- fix all non-false-positive major (`P1+`) findings in code/docs/tests
+- minor/nitpick findings may be accepted without code changes, but must still be replied to inline and resolved
 - if CI/CD has failures, fix those failures as part of the same loop
 
 3. Thread discipline for every addressed or skipped finding:
@@ -39,17 +41,17 @@ Run this loop until exit criteria are satisfied.
 - wait up to 30 minutes total
 - check every 5 minutes using a sleep interval (`sleep 300`)
 - on each check, re-read both review and CI/CD status
-- if meaningful findings or CI/CD failures appear, continue the loop immediately
+- if major (`P1+`) findings or CI/CD failures appear, continue the loop immediately
 
 ## Exit Criteria
 
 You may end the loop only when all are true:
 
-- no unresolved meaningful CodeRabbit findings remain
-- no unresolved meaningful Codex findings remain
+- no unresolved major (`P1+`) CodeRabbit findings remain
+- no unresolved major (`P1+`) Codex findings remain
 - every addressed or skipped finding has an inline reply and is resolved
 - CI/CD is green (or explicitly non-blocking per repo policy)
-- the latest reviewer rounds contain no meaningful new issues
+- the latest reviewer rounds contain only nitpicks/minor issues (no major `P1+` issues)
 
 ## Required Behavior
 
