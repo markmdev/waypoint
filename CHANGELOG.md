@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+### Patch Changes
+
+- Fix `waypoint upgrade` repo refresh to run through the updated global `waypoint` command, so refresh behavior matches the newly installed CLI version instead of reusing a stale entrypoint path.
+
+  Also add platform helper coverage for resolving the Waypoint binary name.
+
 ## 1.1.0
 
 ### Minor Changes

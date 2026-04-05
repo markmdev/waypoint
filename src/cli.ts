@@ -138,7 +138,6 @@ async function main(): Promise<number> {
     return upgradeWaypoint({
       projectRoot,
       config,
-      cliEntry: process.argv[1] ? path.resolve(process.argv[1]) : fileURLToPath(import.meta.url),
       skipRepoRefresh: values["skip-repo-refresh"],
     });
   }

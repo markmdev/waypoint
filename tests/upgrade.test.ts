@@ -10,6 +10,7 @@ import {
   compareVersions,
   maybeUpgradeWaypointBeforeInit,
   npmBinaryForPlatform,
+  waypointBinaryForPlatform,
   upgradeWaypoint,
 } from "../src/upgrade.js";
 
@@ -30,6 +31,11 @@ test("buildInitArgs preserves the app-friendly profile and ignores retired featu
 test("npmBinaryForPlatform maps windows to npm.cmd", () => {
   assert.equal(npmBinaryForPlatform("win32"), "npm.cmd");
   assert.equal(npmBinaryForPlatform("darwin"), "npm");
+});
+
+test("waypointBinaryForPlatform maps windows to waypoint.cmd", () => {
+  assert.equal(waypointBinaryForPlatform("win32"), "waypoint.cmd");
+  assert.equal(waypointBinaryForPlatform("darwin"), "waypoint");
 });
 
 test("compareVersions handles release and prerelease ordering", () => {
@@ -238,8 +244,7 @@ test("upgradeWaypoint updates cli then refreshes repo using existing config", ()
         automations: true,
       },
     } as unknown as Parameters<typeof upgradeWaypoint>[0]["config"],
-    cliEntry: fakeCli,
-    nodeBinary: process.execPath,
+    waypointBinary: fakeCli,
     npmBinary: fakeNpm,
     stdio: "pipe",
   });

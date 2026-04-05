@@ -8,6 +8,10 @@ export function npmBinaryForPlatform(platform: NodeJS.Platform = process.platfor
   return platform === "win32" ? "npm.cmd" : "npm";
 }
 
+export function waypointBinaryForPlatform(platform: NodeJS.Platform = process.platform): string {
+  return platform === "win32" ? "waypoint.cmd" : "waypoint";
+}
+
 export function buildInitArgs(projectRoot: string, config: WaypointConfig): string[] {
   const args = ["init", projectRoot];
 
@@ -211,14 +215,16 @@ function hasWaypointConfig(projectRoot: string): boolean {
 export function upgradeWaypoint(options: {
   projectRoot: string;
   config: WaypointConfig;
-  cliEntry: string;
+  cliEntry?: string;
   nodeBinary?: string;
   npmBinary?: string;
+  waypointBinary?: string;
   stdio?: "inherit" | "pipe";
   skipRepoRefresh?: boolean;
 }): number {
-  const nodeBinary = options.nodeBinary ?? process.execPath;
   const npmBinary = options.npmBinary ?? process.env.WAYPOINT_NPM_COMMAND ?? npmBinaryForPlatform();
+  const waypointBinary =
+    options.waypointBinary ?? process.env.WAYPOINT_COMMAND ?? waypointBinaryForPlatform();
   const stdio = options.stdio ?? "inherit";
 
   const updateStatus = installLatestWaypointCli({
@@ -239,14 +245,14 @@ export function upgradeWaypoint(options: {
     return 0;
   }
 
-  const init = spawnSync(nodeBinary, [options.cliEntry, ...buildInitArgs(options.projectRoot, options.config)], {
+  const init = spawnSync(waypointBinary, buildInitArgs(options.projectRoot, options.config), {
     stdio,
   });
   if ((init.status ?? 1) !== 0) {
     return init.status ?? 1;
   }
 
-  const doctor = spawnSync(nodeBinary, [options.cliEntry, "doctor", options.projectRoot], {
+  const doctor = spawnSync(waypointBinary, ["doctor", options.projectRoot], {
     stdio,
   });
   return doctor.status ?? 1;
