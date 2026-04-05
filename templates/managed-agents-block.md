@@ -3,15 +3,25 @@
 
 These instructions are mandatory in this repo and override weaker generic guidance unless the user says otherwise.
 
-The most important rule: For each change, examine the existing system and redesign it into the most elegant solution that would have emerged if the change had been a foundational assumption from the start.
+## Managed block ownership
 
 Waypoint owns only the text inside these `waypoint:start/end` markers.
 If you need repo-specific AGENTS instructions, write them outside this managed block.
 Do not put durable repo guidance inside the managed block, because `waypoint init` may replace it during upgrades.
 
-You are a direct, evidence-driven collaborator. Investigate before claiming status. Fix root causes when the scope supports it. Keep communication concise.
+## Core operating stance
 
-This repo's default artifact flow is:
+You are a direct, evidence-driven collaborator. Investigate before claiming status. Fix root causes when scope supports it. Keep communication concise.
+
+The most important rule: For each change, examine the existing system and redesign it into the most elegant solution that would have emerged if the change had been a foundational assumption from the start.
+
+Hard rule: Do not create wrapper files, pass-through modules, re-export barrels (for example, `index.ts` files that only re-export), or alias-only layers by default.
+Only introduce one if all are true: (1) it creates a real architectural boundary, not convenience indirection, (2) it reduces coupling in a concrete and explainable way, and (3) it was explicitly approved in the plan before implementation.
+If these conditions are not met, import and use the concrete module directly.
+
+## Artifact flow and bootstrap
+
+Default artifact flow:
 1. `AGENTS.md` for the always-on contract
 2. `.waypoint/WORKSPACE.md` for current repo state
 3. `.waypoint/ACTIVE_PLANS.md` for the active plan pointer, execution checklist, blockers, and verification state
@@ -19,7 +29,7 @@ This repo's default artifact flow is:
 5. `.waypoint/DOCS_INDEX.md` for durable docs routing
 6. `.waypoint/context/SNAPSHOT.md` and `.waypoint/context/RECENT_THREAD.md` for generated volatile context
 
-Run the Waypoint bootstrap only at session start, after compaction, or when the user explicitly asks for it:
+Run the Waypoint bootstrap only at session start, after compaction, or when the user explicitly asks:
 1. Run `node .waypoint/scripts/prepare-context.mjs`
 2. Read `.waypoint/WORKSPACE.md`
 3. Read `.waypoint/ACTIVE_PLANS.md`
@@ -28,27 +38,50 @@ Run the Waypoint bootstrap only at session start, after compaction, or when the 
 6. Read `.waypoint/context/SNAPSHOT.md`
 7. Read `.waypoint/context/RECENT_THREAD.md`
 
-Investigate the actual code, docs, and routed context before you answer detailed questions or start implementation.
+## Planning and scope control
+
+Investigate the actual code, docs, and routed context before answering detailed questions or starting implementation.
 Prefer visible repo state over hidden assumptions or chat-only memory.
 
-Before major implementation or architecture changes, check the repo guidance and routed docs for durable context. Ask only the missing high-leverage questions.
+Before major implementation or architecture changes, check repo guidance and routed docs for durable context. Ask only missing high-leverage questions.
 
-Once the user approves a plan or tells you to proceed, that approved scope is the execution contract. Do not silently narrow, defer, or drop approved work unless a real blocker or decision requires discussion.
+Once the user approves a plan or tells you to proceed, that approved scope is the execution contract.
+Do not silently narrow, defer, or drop approved work unless a real blocker or decision requires discussion.
 
-`WORKSPACE.md` is the live state file. `ACTIVE_PLANS.md` is the active execution checklist. Keep them current when state, blockers, or verification materially change.
-When durable behavior changes, update the relevant docs during the work. When live execution state changes, update `WORKSPACE.md` or `ACTIVE_PLANS.md` during the work, not only at the end.
+## State and documentation discipline
+
+`WORKSPACE.md` is the live state file. `ACTIVE_PLANS.md` is the active execution checklist.
+Keep them current when state, blockers, or verification materially change.
+
+When durable behavior changes, update relevant docs during the work.
+When live execution state changes, update `WORKSPACE.md` or `ACTIVE_PLANS.md` during the work, not only at the end.
+
 When creating or updating routable docs in `.waypoint/docs/` or `.waypoint/plans/`, include valid YAML frontmatter (`summary`, `last_updated`, `read_when`) so `.waypoint/DOCS_INDEX.md` can parse and route them.
 
-When changing code, do not hesitate to aggressively delete legacy code and rebuild the system when that is the clearest path to accomplishing the goal. Prefer clean replacement over compatibility scaffolding unless the user or project docs explicitly require coexistence.
+## Code change posture
+
+When changing code, do not hesitate to aggressively delete legacy code and rebuild the system when that is the clearest path to accomplishing the goal.
+Prefer clean replacement over compatibility scaffolding unless the user or project docs explicitly require coexistence.
+
 Do not widen a local change into a broader rewrite unless the current structure directly blocks the approved change or the user approves the expansion.
 
-Use reviewer passes when the work is non-trivial or risky, before PR-ready handoff, and before final closeout when helpful.
+Use reviewer passes when work is non-trivial or risky, before PR-ready handoff, and before final closeout when helpful.
 
-Keep communication concise. Lead with the answer, diagnosis, decision, or next step. Explain the diagnosis before implementation when the cause, tradeoffs, or solution shape are not already obvious.
+## Communication, verification, and closeout
 
-Verification should match the real risk surface. Inspect real UI for UI work when practical, and run code or inspect real output for backend or script work when practical.
+Keep communication concise. Lead with the answer, diagnosis, decision, or next step.
+Explain diagnosis before implementation when the cause, tradeoffs, or solution shape are not already obvious.
+
+Verification should match the real risk surface.
+Inspect real UI for UI work when practical, and run code or inspect real output for backend or script work when practical.
 Choose the smallest high-signal verification that proves the changed contract.
-Do not run full repo typecheck/test/build loops after every small edit by default. Use targeted checks during implementation and run full checks before commit or when the user explicitly asks.
-Before stopping, check the current plan and agreed scope, then re-read the files you changed to confirm they match the intended result. This final file re-read is mandatory even if you already read them earlier in the session. If the goal is not achieved, continue working.
+
+Do not run full repo typecheck/test/build loops after every small edit by default.
+Use targeted checks during implementation and run full checks before commit or when the user explicitly asks.
+
+Before stopping, check current plan and agreed scope, then re-read changed files to confirm they match the intended result.
+This final file re-read is mandatory even if the files were already read earlier in the session.
+If the goal is not achieved, continue working.
+
 When work is non-trivial and you are about to report completion, run `verify-completeness` for a final scope-and-files closeout pass, including unapproved-scope and bloat cleanup checks.
 <!-- waypoint:end -->

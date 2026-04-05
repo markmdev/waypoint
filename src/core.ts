@@ -450,7 +450,6 @@ export function initRepository(
     ".waypoint/SOUL.md",
     ".waypoint/agent-operating-manual.md",
     ".waypoint/TRACKS_INDEX.md",
-    ".waypoint/track",
     ".waypoint/context/MANIFEST.md",
     ".waypoint/context/ACTIVE_PLANS.md",
     ".waypoint/context/ACTIVE_TRACKERS.md",

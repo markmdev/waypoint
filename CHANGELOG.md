@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Refine the managed Waypoint AGENTS block with clearer section structure while preserving behavior, and add a hard default rule against wrapper/barrel indirection unless explicitly approved in plan.
+
+  Also stop managing `.waypoint/track` as a scaffolded path during repository init.
+
 ## 1.0.19
 
 ### Patch Changes

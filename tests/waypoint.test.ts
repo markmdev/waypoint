@@ -239,6 +239,26 @@ test("init removes retired .waypoint agent prompt files on refresh", () => {
   assert.equal(existsSync(path.join(root, ".waypoint/agents")), false);
 });
 
+test("init preserves legacy .waypoint/track content on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-preserve-track-content-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  mkdirSync(path.join(root, ".waypoint/track"), { recursive: true });
+  writeFileSync(
+    path.join(root, ".waypoint/track/custom-notes.md"),
+    "# Keep me\n",
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  assert.equal(existsSync(path.join(root, ".waypoint/track/custom-notes.md")), true);
+});
+
 test("init removes retired coding-agent scaffold on refresh", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-coding-agent-"));
   initRepository(root, {
