@@ -20,6 +20,8 @@ Run this loop until exit criteria are satisfied.
 1. Load PR state:
 - collect all current review threads and comments, including existing comments present before the skill started
 - collect CI/CD status for required checks
+- for each reviewer (`Codex`, `CodeRabbit`), identify only that reviewer's latest top-level PR comment as the source of truth for the current reviewer state
+- do not bind Codex parsing to one exact phrase; use author identity plus the latest comment/findings content (including explicit "no meaningful issues" style outcomes)
 
 2. Triage and act:
 - classify each reviewer finding as either major (`P1+`) or minor/nitpick
@@ -27,21 +29,31 @@ Run this loop until exit criteria are satisfied.
 - fix all non-false-positive major (`P1+`) findings in code/docs/tests
 - minor/nitpick findings may be accepted without code changes, but must still be replied to inline and resolved
 - if CI/CD has failures, fix those failures as part of the same loop
+- for CodeRabbit state handling:
+- if latest CodeRabbit comment is `Actions performed -> Review triggered`, treat CodeRabbit as `pending` and wait for its next latest comment before triaging CodeRabbit findings
+- do not use CodeRabbit CI/CD or check-run status as reviewer truth; comments are authoritative
 
 3. Thread discipline for every addressed or skipped finding:
 - post an inline reply on that thread explaining the fix or why it is a false positive
 - resolve the thread after replying
 
-4. Push and re-request automated review:
+4. Push and request reviewer-specific re-review only when needed:
 - push commits
-- post comment: `@coderabbitai review`
-- post comment: `@codex review`
+- determine which reviewer findings were addressed this round:
+- if Codex findings were addressed, post comment: `@codex review`
+- if CodeRabbit findings were addressed, post comment: `@coderabbitai review`
+- if both were addressed, post both comments
+- if neither reviewer's findings were addressed, do not trigger either reviewer
 
 5. Wait for review/check updates:
 - wait up to 30 minutes total
 - check every 5 minutes using a sleep interval (`sleep 300`)
 - on each check, re-read both review and CI/CD status
 - if major (`P1+`) findings or CI/CD failures appear, continue the loop immediately
+- when both reviewers' latest completed comments (not pending triggers) contain no major (`P1+`) findings, enter terminal cleanup mode:
+- fix and resolve that round's remaining findings
+- push commits if needed
+- do not post any further `@codex review` or `@coderabbitai review` comments
 
 ## Exit Criteria
 
@@ -51,12 +63,16 @@ You may end the loop only when all are true:
 - no unresolved major (`P1+`) Codex findings remain
 - every addressed or skipped finding has an inline reply and is resolved
 - CI/CD is green (or explicitly non-blocking per repo policy)
-- the latest reviewer rounds contain only nitpicks/minor issues (no major `P1+` issues)
+- the latest completed reviewer comments from both bots contain only nitpicks/minor issues (no major `P1+` issues)
+- terminal cleanup mode has been completed (remaining minor/nitpick findings handled, with no retrigger afterward)
 
 ## Required Behavior
 
 - Do not ignore existing comments that were already open when the skill was invoked.
 - Do not stop after one pass if reviewer bots are still producing new findings.
+- Distinguish reviewer ownership of findings and retrigger only the reviewer whose findings were addressed.
+- Use each reviewer's latest comment as reviewer truth; do not infer reviewer completion from CodeRabbit CI/CD status.
+- Treat CodeRabbit `Actions performed -> Review triggered` as pending review, not as final findings.
 - Do not mark false positives without a concrete reason in the inline reply.
 - Do not leave handled threads unresolved.
 - Do not declare completion while CI/CD is failing for actionable reasons.

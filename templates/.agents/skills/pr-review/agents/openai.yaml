@@ -1,4 +1,4 @@
 interface:
   display_name: "PR Review"
   short_description: "Close the review loop with CodeRabbit, Codex, and CI/CD"
-  default_prompt: "Use $pr-review: address all existing PR review findings, fix actionable CI/CD failures, reply inline and resolve each handled thread, push fixes, comment '@coderabbitai review' and '@codex review', then poll every 5 minutes for up to 30 minutes per round until no major (P1+) issues remain and latest comments are only minor or nitpicks."
+  default_prompt: "Use $pr-review: address all existing PR review findings, fix actionable CI/CD failures, reply inline and resolve each handled thread, and request re-review per reviewer ownership (`@codex review` only if Codex findings were addressed, `@coderabbitai review` only if CodeRabbit findings were addressed). Treat each reviewer's latest comment as source of truth (CodeRabbit `Actions performed -> Review triggered` means pending); for Codex, do not key detection to one exact phrase, use latest authored comment/findings content. When both reviewers' latest completed comments have no major (P1+) findings, do one terminal cleanup pass and do not retrigger either reviewer."
