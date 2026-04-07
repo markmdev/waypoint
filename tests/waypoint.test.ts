@@ -193,6 +193,44 @@ test("init removes retired visual-explanations skill on refresh", () => {
   assert.equal(existsSync(path.join(root, ".agents/skills/visual-explanations")), false);
 });
 
+test("init removes retired execution-reset and plan-start skills on refresh", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-execution-plan-skills-"));
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  mkdirSync(path.join(root, ".agents/skills/execution-reset/agents"), { recursive: true });
+  writeFileSync(
+    path.join(root, ".agents/skills/execution-reset/SKILL.md"),
+    "# Execution Reset\n",
+    "utf8"
+  );
+  writeFileSync(
+    path.join(root, ".agents/skills/execution-reset/agents/openai.yaml"),
+    "display_name: \"Execution Reset\"\n",
+    "utf8"
+  );
+
+  mkdirSync(path.join(root, ".agents/skills/plan-start/agents"), { recursive: true });
+  writeFileSync(
+    path.join(root, ".agents/skills/plan-start/SKILL.md"),
+    "# Plan Start\n",
+    "utf8"
+  );
+  writeFileSync(
+    path.join(root, ".agents/skills/plan-start/agents/openai.yaml"),
+    "display_name: \"Plan Start\"\n",
+    "utf8"
+  );
+
+  initRepository(root, {
+    profile: "universal"
+  });
+
+  assert.equal(existsSync(path.join(root, ".agents/skills/execution-reset")), false);
+  assert.equal(existsSync(path.join(root, ".agents/skills/plan-start")), false);
+});
+
 test("init removes retired audit skill directories on refresh", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "waypoint-retired-audit-skills-"));
   initRepository(root, {

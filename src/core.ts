@@ -431,6 +431,8 @@ export function initRepository(
     ".agents/skills/waypoint-explore",
     ".agents/skills/waypoint-research",
     ".agents/skills/visual-explanations",
+    ".agents/skills/execution-reset",
+    ".agents/skills/plan-start",
     ".agents/skills/work-tracker",
     ".agents/skills/docs-sync",
     ".agents/skills/break-it-qa",

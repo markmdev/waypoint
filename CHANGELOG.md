@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.3
+
+### Patch Changes
+
+- Remove the `execution-reset` and `plan-start` skills from the default Waypoint scaffold.
+
+  Also treat both as retired scaffold paths so `waypoint init` / `waypoint upgrade` remove stale copies in existing repositories.
+
 ## 1.1.2
 
 ### Patch Changes
